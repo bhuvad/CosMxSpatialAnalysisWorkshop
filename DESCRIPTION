@@ -47,7 +47,7 @@ Imports:
     scran,
     hoodscanR
 Remotes:
-    DavisLaboratory/SpaNorm
+    bhuvad/SpaNorm
 Suggests: 
     pkgdown,
     BiocStyle,
