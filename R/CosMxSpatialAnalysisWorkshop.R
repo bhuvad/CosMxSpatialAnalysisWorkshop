@@ -1,6 +1,6 @@
-#' Sub-sampled 10x Xenium breast cancer (IDC) spatial transcriptomics dataset
+#' Sub-sampled CosMx non-small cell lung cancer (NSCLC) spatial transcriptomics dataset
 #'
-#' A 10x Xenium spatial transcriptomics dataset containing a sub-region of a intra-ductal carcinoma (IDC) breast cancer sample. The data contains pathology annotations. The full dataset is available through the SubcellularSpatialData R/Bioconductor package.
+#' A Bruker CosMx spatial transcriptomics dataset containing a sub-region of a non-small cell lung cancer (NSCLC) sample. The data contains pathology annotations. The full dataset is available through the SubcellularSpatialData R/Bioconductor package.
 #'
 #' @format A SpatialExperiment object.
 #' @docType data
@@ -12,18 +12,18 @@
 #' 
 #'  Bhuva DD. Library size confounds biology in spatial transcriptomics. 2024. Zenodo. https://doi.org/10.5281/zenodo.10946961.
 #' 
-"idc"
+"lung5"
 
-#' Pseudo-bulked single-cell breast cancer reference dataset
+#' Pseudo-bulked single-cell non-small cell lung cancer (NSCLC) atlas reference dataset
 #'
-#' A pseudo-bulked single-cell RNA-seq breast cancer dataset from the study by Wu et al., Nat Genetics, 2021. The original dataset has been subsetted to the genes present in the 10x Xenium dataset.
+#' A pseudo-bulked single-cell RNA-seq non-small cell lung cancer (NSCLC) atlas dataset from the study by Salcher et al., Cancer Cell, 2022. The original dataset has been subsetted to the genes present in the 10x Xenium dataset.
 #'
 #' @format A SingleCellExperiment object.
 #' @docType data
 # 
-#' @references Wu SZ, Al-Eryani G, Roden DL, Junankar S, Harvey K, Andersson A, Thennavan A, Wang C, Torpy JR, Bartonicek N, Wang T. A single-cell and spatially resolved atlas of human breast cancers. Nature genetics. 2021 Sep;53(9):1334-47. https://www.weizmann.ac.il/sites/3CA/breast
+#' @references Salcher S, Sturm G, Horvath L, Untergasser G, Kuempers C, Fotakis G, Panizzolo E, Martowicz A, Trebo M, Pall G, Gamerith G. High-resolution single-cell atlas reveals diversity and plasticity of tissue-resident neutrophils in non-small cell lung cancer. Cancer cell. 2022 Dec 12;40(12):1503-20.
 #' 
-"ref_wu"
+"ref_luca"
 
 .myDataEnv <- new.env(parent = emptyenv()) # not exported
 

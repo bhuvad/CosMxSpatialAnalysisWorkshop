@@ -1,4 +1,4 @@
-Package: XeniumSpatialAnalysisWorkshop
+Package: CosMxSpatialAnalysisWorkshop
 Title: Introduction to imaging-based spatial transcriptomics analysis
 Version: 1.0.0
 Authors@R: 
@@ -56,7 +56,7 @@ Suggests:
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Language: en-US
-URL: https://bhuvad.github.io/XeniumSpatialAnalysisWorkshop/
-BugReports: https://github.com/bhuvad/XeniumSpatialAnalysisWorkshop/issues
-DockerImage: bhuvad/xeniumspatialanalysisworkshop:latest
+URL: https://bhuvad.github.io/CosMxSpatialAnalysisWorkshop/
+BugReports: https://github.com/bhuvad/CosMxSpatialAnalysisWorkshop/issues
+DockerImage: bhuvad/CosMxSpatialAnalysisWorkshop:latest
 LazyData: true

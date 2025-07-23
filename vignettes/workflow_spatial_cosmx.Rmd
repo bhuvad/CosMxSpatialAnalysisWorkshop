@@ -1,5 +1,5 @@
 ---
-title: "Introduction to imaging-based spatial transcriptomics analysis (10x Xenium breast cancer)"
+title: "Introduction to imaging-based spatial transcriptomics analysis (Bruker CosMx NSCLC)"
 date: "`r format(Sys.time(), '%b %Y')`"
 title-block-banner: true
 author: 
@@ -8,9 +8,8 @@ author:
     url: https://bhuvad.github.io/
     email: dharmesh.bhuva@adelaide.edu.au
     affiliation:
+      - Frazer Institute, The University of Queensland
       - SAiGENCI, The University of Adelaide
-      - South Australian Health and Medical Research Institute (SAHMRI)
-      - Walter and Eliza Hall Institute
   - name: Chin Wee Tan
     orcid: 0000-0001-9695-7218
     email: cwtan@wehi.edu.au
@@ -33,7 +32,7 @@ nocite: |
   @R-ggplot2, @R-knitr, @R-rmarkdown, @R-prettydoc
 bibliography: [bibliography.bib, packages.bib]
 vignette: >
-  %\VignetteIndexEntry{Introduction to imaging-based spatial transcriptomics analysis (10x Xenium breast cancer).}
+  %\VignetteIndexEntry{Introduction to imaging-based spatial transcriptomics analysis (Bruker CosMx NSCLC).}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 keywords: spatial transcriptomics, cell typing, normalisation, signature scoring, visualisation
@@ -41,7 +40,7 @@ keywords: spatial transcriptomics, cell typing, normalisation, signature scoring
 
 <p>
 
-**R version**: `r R.version.string` <br /> **Bioconductor version**: `r BiocManager::version()` <br /> **Package version**: `r packageVersion("XeniumSpatialAnalysisWorkshop")`
+**R version**: `r R.version.string` <br /> **Bioconductor version**: `r BiocManager::version()` <br /> **Package version**: `r packageVersion("CosMxSpatialAnalysisWorkshop")`
 
 </p>
 
@@ -60,7 +59,7 @@ library(SingleR)
 library(SpatialExperiment)
 library(SpaNorm)
 library(singscore)
-library(XeniumSpatialAnalysisWorkshop)
+library(CosMxSpatialAnalysisWorkshop)
 
 #automatically create a bib database for R packages
 knitr::write_bib(c(
@@ -89,17 +88,17 @@ The data we will use in this workshop is from the 10x Xenium platform. Since the
 ```{r}
 library(SpatialExperiment)
 
-data(idc)
+data(lung5) # replicate 1
 # preview object
-idc
+lung5
 # retrieve column (cell) annotations
-colData(idc)
+colData(lung5)
 # retrieve row (gene/probe) annotations
-rowData(idc)
+rowData(lung5)
 # retrieve spatial coordinates
-head(spatialCoords(idc))
+head(spatialCoords(lung5))
 # retrieve counts - top 5 cells and genes
-counts(idc)[1:5, 1:5]
+counts(lung5)[1:5, 1:5]
 ```
 
 ```{r}
@@ -109,7 +108,7 @@ library(SpaNorm)
 
 # set default point size to 0.5 for this report
 update_geom_defaults(geom = "point", new = list(size = 0.5))
-plotSpatial(idc, colour = region) +
+plotSpatial(lung5, colour = region) +
   scale_colour_brewer(palette = "Dark2") +
   # improve legend visibility
   guides(colour = guide_legend(override.aes = list(shape = 15, size = 5)))
@@ -131,11 +130,11 @@ if (!require("SubcellularSpatialData", quietly = TRUE)) {
 # load the metadata from the ExperimentHub
 eh = ExperimentHub()
 # download the transcript-level data
-tx = eh[["EH8567"]]
-# filter the IDC sample
-tx = tx[tx$sample_id == "IDC", ]
+tx = eh[["EH8232"]]
+# filter the Lung5_Rep1 sample
+tx = tx[tx$sample_id == "Lung5_Rep1", ]
 # summarise measurements for each cell
-idc = tx2spe(tx)
+lung5 = tx2spe(tx, bin = "cell")
 ```
 
 # Quality control
@@ -143,7 +142,7 @@ idc = tx2spe(tx)
 Most spatial transcriptomics assays include negative control probes to aid in quality control. These probes do not bind to the transcripts of interest (signal), so represent noise in the assay. There are three different types of negative controls in the 10x Xenium assay. As these vary across technologies and serve different purposes, we treat them equally for our analysis and assess them collectively. The breakdown of the different types of negative control probes is given below.
 
 ```{r}
-table(rowData(idc)$genetype)
+table(rowData(lung5)$genetype)
 ```
 
 We now use compute and visualise quality control metrics for each cell. Some of the key metrics we assess are:
@@ -161,136 +160,113 @@ library(scater)
 library(scuttle)
 
 # identify the negative control probes
-is_neg = rowData(idc)$genetype != "Gene"
+is_neg = rowData(lung5)$genetype != "Gene"
 # compute QC metrics for each cell
-idc = addPerCellQCMetrics(idc, subsets = list("neg" = is_neg))
+lung5 = addPerCellQCMetrics(lung5, subsets = list("neg" = is_neg))
 ```
 
 > Quality control is all about visualisation!
 
-One of the best ways to understand the data and identify problematic cells or regions is to visualise the QC metrics. We need to visualise the metrics in various contexts to better understand what cells appear of poor qaulity. As such, we usually plot metrics against each other, we visualise them in space, and we visualise them in the context of the higher dimensional structure of the data. To aid the latter, we will compute lower dimensional representations using the t-distributed stochastic neighbours embedding (t-SNE). As the t-SNE embedding can be computationally intensive, we usually perform PCA prior to t-SNE. This approach to quality control is identical to that used for single-cell RNA-seq analysis.
+One of the best ways to understand the data and identify problematic cells or regions is to visualise the QC metrics. We need to visualise the metrics in various contexts to better understand what cells appear of poor qaulity. As such, we usually plot metrics against each other, we visualise them in space, and we visualise them in the context of the higher dimensional structure of the data. To aid the latter, we will compute lower dimensional representations using the uniform manifold approximation and projection (UMAP). As the UMAP embedding can be computationally intensive, we usually perform PCA prior to UMAP. This approach to quality control is identical to that used for single-cell RNA-seq analysis.
 
 ```{r}
 # compute log counts - to fix the skew with counts
-logcounts(idc) = log2(counts(idc) + 1)
+logcounts(lung5) = log2(counts(lung5) + 1)
 # compute PCA
-idc = runPCA(idc)
-# compute t-SNE
-idc = runTSNE(idc, dimred = "PCA")
+lung5 = runPCA(lung5, ncomponents = 30)
+# compute UMAP
+lung5 = runUMAP(lung5, dimred = "PCA")
 ```
 
-We plot the `sum` (library size) against the number of genes detected, and colouring the points based on the quality score (`qv`). We see that as more genes are detected, more measurements are obtained (library size increases). There are cells where the library size is very low and the number of genes detected is low as well. Considering the smaller panel size of 380 target genes in this assay, we expect the number of genes detected in some cell types to be small. However, if we detect very few genes in a cell, we are less likely to obtain any useful information from them. As such, poor quality cells can be defined as those with very low library sizes and number of genes detected.
+We plot the `sum` (library size) against the number of genes detected, and colouring the points based on the proportion of negative control probes (`subsets_neg_percent`). We see that as more genes are detected, more measurements are obtained (library size increases). There are cells where the library size is very low and the number of genes detected is low as well. Considering the smaller panel size of 960 target genes in this assay, we expect the number of genes detected in some cell types to be small. However, if we detect very few genes in a cell, we are less likely to obtain any useful information from them. As such, poor quality cells can be defined as those with very low library sizes and number of genes detected.
 
 ```{r}
-plotColData(idc, "detected", "sum", colour_by = "qv") +
-  geom_hline(yintercept = 20, lty = 2) +
-  geom_vline(xintercept = 10, lty = 2)
+plotColData(lung5, "detected", "sum", colour_by = "region", scattermore = TRUE) +
+  scale_colour_brewer(palette = "Dark2") +
+  guides(colour = guide_legend(override.aes = list(shape = 15, size = 5), title = "Region")) +
+  geom_hline(yintercept = 50, lty = 2) +
+  geom_vline(xintercept = 75, lty = 2)
 ```
 
-However, we need to identify appropriate thresholds to classify poor quality cells. As the panel sizes and compositions for these emerging technologies are variable, there are no standards as of yet for filtering. For instance, immune cells will always have smaller library sizes and potentially a smaller number of genes expressed in a targetted panel as each cell type may be represented by a few marker genes. Additionally, these cells are smaller in size therefore could be filtered out using an area-based filter. Desipte the lack of standards, the extreme cases where cells express fewer than 10 genes and have fewer than 10-20 detections are clearly of poor quality. As such, we can start with these thresholds and adjust based on other metrics and visualisations.
+However, we need to identify appropriate thresholds to classify poor quality cells. As the panel sizes and compositions for these emerging technologies are variable, there are no standards as of yet for filtering. For instance, immune cells will always have smaller library sizes and potentially a smaller number of genes expressed in a targetted panel as each cell type may be represented by a few marker genes. Additionally, these cells are smaller in size therefore could be filtered out using an area-based filter. Desipte the lack of standards, the extreme cases where cells express fewer than 20 genes and have fewer than 50 detections are clearly of poor quality. As such, we can start with these thresholds and adjust based on other metrics and visualisations.
 
 ```{r}
 library(standR)
 
-# t-SNE plot
-p1 = plotDR(idc, dimred = "TSNE", colour = sum, alpha = 0.75, size = 0.5) +
+# UMAP plot
+p1 = plotDR(lung5, dimred = "UMAP", colour = sum, alpha = 0.75, size = 0.5) +
   scale_colour_viridis_c(option = "F") +
-  labs(x = "TSNE1", y = "TSNE2") +
+  labs(x = "UMAP1", y = "UMAP2") +
   theme(legend.position = "bottom")
 # spatial plot
-p2 = plotSpatial(idc, colour = sum, alpha = 0.75) +
+p2 = plotSpatial(lung5, colour = sum, alpha = 0.75) +
   scale_colour_viridis_c(option = "F") +
   theme(legend.position = "bottom")
 p1 + p2 + plot_annotation(title = "Sum (library size)")
 ```
 
 ```{r}
-# t-SNE plot
-p1 = plotDR(idc, dimred = "TSNE", colour = detected, alpha = 0.75, size = 0.5) +
+# UMAP plot
+p1 = plotDR(lung5, dimred = "UMAP", colour = detected, alpha = 0.75, size = 0.5) +
   scale_colour_viridis_c(option = "F") +
-  labs(x = "TSNE1", y = "TSNE2") +
+  labs(x = "UMAP1", y = "UMAP2") +
   theme(legend.position = "bottom")
 # spatial plot
-p2 = plotSpatial(idc, colour = detected, alpha = 0.75) +
+p2 = plotSpatial(lung5, colour = detected, alpha = 0.75) +
   scale_colour_viridis_c(option = "F") +
   theme(legend.position = "bottom")
 p1 + p2 + plot_annotation(title = "Detected (number of genes expressed)")
 ```
 
 ```{r}
-# t-SNE plot
-p1 = plotDR(idc, dimred = "TSNE", colour = qv, alpha = 0.75, size = 0.5) +
-  scale_colour_viridis_c(option = "F") +
-  labs(x = "TSNE1", y = "TSNE2") +
+# UMAP plot
+p1 = plotDR(lung5, dimred = "UMAP", colour = subsets_neg_percent, alpha = 0.75, size = 0.5) +
+  scale_colour_viridis_c(option = "F", limits = c(0, 5), oob = scales::squish) +
+  labs(x = "UMAP1", y = "UMAP2") +
   theme(legend.position = "bottom")
 # spatial plot
-p2 = plotSpatial(idc, colour = qv, alpha = 0.75) +
-  scale_colour_viridis_c(option = "F") +
-  theme(legend.position = "bottom")
-p1 + p2 + plot_annotation(title = "Quality score")
-```
-
-```{r}
-# t-SNE plot
-p1 = plotDR(idc, dimred = "TSNE", colour = subsets_neg_percent, alpha = 0.75, size = 0.5) +
-  scale_colour_viridis_c(option = "F", limits = c(0, 2), oob = scales::squish) +
-  labs(x = "TSNE1", y = "TSNE2") +
-  theme(legend.position = "bottom")
-# spatial plot
-p2 = plotSpatial(idc, colour = subsets_neg_percent, alpha = 0.75) +
-  scale_colour_viridis_c(option = "F", limits = c(0, 2), oob = scales::squish) +
+p2 = plotSpatial(lung5, colour = subsets_neg_percent, alpha = 0.75) +
+  scale_colour_viridis_c(option = "F", limits = c(0, 5), oob = scales::squish) +
   theme(legend.position = "bottom")
 p1 + p2 + plot_annotation(title = "Proportion of negative control probes")
-```
-
-```{r}
-# t-SNE plot
-p1 = plotDR(idc, dimred = "TSNE", colour = overlaps_nucleus, alpha = 0.75, size = 0.5) +
-  scale_colour_viridis_c(option = "F") +
-  labs(x = "TSNE1", y = "TSNE2") +
-  theme(legend.position = "bottom")
-# spatial plot
-p2 = plotSpatial(idc, colour = overlaps_nucleus, alpha = 0.75) +
-  scale_colour_viridis_c(option = "F") +
-  theme(legend.position = "bottom")
-p1 + p2 + plot_annotation(title = "Proportion of nuclear transcripts")
 ```
 
 Having visualised the quality metrics and their distrition across space and the genomic dimensions, we can now begin to test threshold values. We want to remove low quality cells but we have to be careful not to introduce bias (e.g., by preferentially removing biological entities such as regions or cells).
 
 Try modifying the thresholds below to see the effect of over- or under- filtering.
 
-* What happens when you set the `sum` threshold to 100?
-* What about setting the `detected` threshold to 50?
+* What happens when you set the `sum` threshold to 300?
+* What about setting the `detected` threshold to 100?
 
 ```{r}
-thresh_sum = 20
-thresh_detected = 10
+thresh_sum = 75
+thresh_detected = 50
+thresh_neg = 5
 
 # classify cells to keep
-idc$keep = idc$sum > thresh_sum & idc$detected > thresh_detected
+lung5$keep = lung5$sum > thresh_sum & lung5$detected > thresh_detected & lung5$subsets_neg_percent < thresh_neg
 
-# t-SNE plot
-p1 = plotDR(idc, dimred = "TSNE", colour = keep, alpha = 0.75, size = 0.5) +
+# UMAP plot
+p1 = plotDR(lung5, dimred = "UMAP", colour = keep, alpha = 0.75, size = 0.5) +
   scale_color_brewer(palette = "Set1") +
-  labs(x = "TSNE1", y = "TSNE2") +
+  labs(x = "UMAP1", y = "UMAP2") +
   theme(legend.position = "bottom") +
   guides(colour = guide_legend(override.aes = list(shape = 15, size = 5)))
 # spatial plot
-p2 = plotSpatial(idc, colour = keep, alpha = 0.75) +
+p2 = plotSpatial(lung5, colour = keep, alpha = 0.75) +
   scale_color_brewer(palette = "Set1") +
   theme(legend.position = "bottom") +
   guides(colour = guide_legend(override.aes = list(shape = 15, size = 5)))
 p1 + p2 + plot_annotation(title = "Cells retained after QC filtering")
 ```
 
-In practice, after poor quality cells are filtered out, we tend to see clearer separation of clusters in the t-SNE (or equivalent visualisations). We also notice that poor quality cells often seem like intermmediate states between clusters in these plots. Additionally, they tend to be randomly distributed in space. If they are concentrated in some sub-regions (as above - top left corner), it is usually due to technical reasons. In the above plot, we see a clear rectangular section that is of poor quality. It is unlikely that biology would be present in such a regular shape therefore we can use that region as a guide in selecting thresholds. Having selected the thresholds, we now apply them and remove the negative control probes from donwstream analysis.
+In practice, after poor quality cells are filtered out, we tend to see clearer separation of clusters in the UMAP (or equivalent visualisations). We also notice that poor quality cells often seem like intermmediate states between clusters in these plots. Additionally, they tend to be randomly distributed in space. If they are concentrated in some sub-regions (as above - along the field of view boundaries), it is usually due to technical reasons. In the above plot, we poor quality primarily occurs along the field of view boundaries. It is unlikely that biology would be present in such a regular shape therefore we can use that region as a guide in selecting thresholds. Having selected the thresholds, we now apply them and remove the negative control probes from donwstream analysis. This phenomenon of lower library size and lower number of genes detected has been observed in the past and is due to cells being cut off from the field of view.
 
 ```{r}
 # apply the filtering
-idc = idc[, idc$keep]
+lung5 = lung5[, lung5$keep]
 # remove negative probes
-idc = idc[!is_neg, ]
+lung5 = lung5[!is_neg, ]
 ```
 
 Newer quality control tools are being developed and are currently under peer-review. These include SpotSweeper [@totty2024spotsweeper] and [SpaceTrooper](https://github.com/drighelli/SpaceTrooper). As these software are not deposited to more permanent repositories, we do not use them in this workshop. We advise advanced users to use these tools for their QC as they help come up with additional QC summaries for each cell or region in space. SpaceTrooper for instance, computes a flag score that penalises cells that are too large or small, and whose aspect ratio is large. While these filters may make sense in most systems, they could penalise stomal or neuronal cells that are elongated and whose aspect ratio will be very large. Therefore always remember that QC is relative the biological system being studied.
@@ -301,14 +277,18 @@ As these technologies are still emerging, all quality control metrics should be 
 
 Above we plot the `sum`, which is commonly known as the library size, for the purpose of quality control. Assessing the library size is helpful in identifying poor quality cells. Beyond QC, variation in library size can affect donwstream analysis as it represents measurement bias. A gene may appear to be highly expressed in some cells simply because more measurements were sampled from the cell, and not because the gene is truly highly expressed. Whether it is sequencing-based or imaging-based transcriptomics, we are always sampling from the true pool of transcripts and are therefore likely to have library size variation.
 
+While library sizes are a good measure of technical variation in conventional sequencing data (bulk and single-cell RNA-seq), they are not the most appropriate in assessing technical effects in targeted panels because the panel is biased towards measuring the biology of interest. As such, we need a purely technical measurement to adjust our data. Negative control probes offer this measure of technical biases in the data as they are designed to not measure any biology (i.e., the are synthetic probes designed to not hybridise with any transcripts in the system).
+
+Though it is ideal to use negative control probes for normalisation of targeted spatial transcriptomics data, the data we are analysing is relatively old and from a prototype instrument, therefore, the negative control probe counts are too low to be used for modelling. Additionally, the current Bruker CosMx instrument uses two kinds of negative control probes, conventional negative control probes (such as in this dataset) and false codes. The latter are best used for modelling technical variation in CosMx datasets as their counts are generally higher. We recommend using false code counts for normalising Bruker CosMx datasets.
+
 ```{r}
-idc$logLS = log2(idc$sum + 1)
-plotSpatial(idc, colour = logLS) +
-  scale_colour_viridis_c(option = "F") +
+lung5$logLS = log1p(lung5$sum) - mean(log1p(lung5$sum))
+plotSpatial(lung5, colour = logLS) +
+  scale_colour_distiller(palette = "PRGn", limits = c(-0.5, 0.5), oob = scales::squish) +
   theme(legend.position = "bottom")
 ```
 
-To remove these library size biases, we perform library size normalisation. As measurements are independent in bulk and single-cell RNA-seq (reactions happen independently for each sample/cell), each cell or sample can be normalised independently by computing sample/cell-specific adjustment factors. Measurements are locally dependent in spatial transcriptomics datasets therefore library size effects confound biology [@bhuva2024library]. The plot above show this clearly as the technical effect of library size is already showing tissue structures. These can be due to various causes such as:
+To remove these technical biases, we perform normalisation. As measurements are independent in bulk and single-cell RNA-seq (reactions happen independently for each sample/cell), each cell or sample can be normalised independently by computing sample/cell-specific adjustment factors. Measurements are locally dependent in spatial transcriptomics datasets therefore technical effects (including conventional library size effects) confound biology [@bhuva2024library]. The plot above show this clearly as the technical effect demarcate tissue structures. These can be due to various causes such as:
 
 1. The tissue structure in one region is more rigid, thereby making it difficult for reagents to permeate.
 1. Reagents distributed unevenly due to technical issues leading to a sub-region within a tissue region being under sampled.
@@ -319,62 +299,126 @@ In both cases, each cell cannot be normalised independently as nearby cells are 
 
 The key parameters for SpaNorm normalisation that need to be adjusted are:
 
-1. `sample.p` - This is the proportion of the data that is sub-sampled to fit the regularised GLM. As spatial transcriptomics datasets are very large, the model can be approximated using by sampling. In practice, we see that ~50,000 cells in a dataset with 500,000 cells works well enough under the assumption that all possible cellular states are sampled evenly across the tissue. This is likely to be true in most cases. Below we use half the cells to fit the model (you can tweak this to 1 to use all cells).
-1. `df.tps` - Spatial dependence is modelled using thin plate spline functions. This parameter controls the degrees of freedom (complexity) of the function. Complex functions will fit the data better but could overfit therefore in practice, we see that 6-10 degrees of freedom are generally good enough. If the degrees of freedom are increased, regularisation should also be increased (`lambda.a` parameter).
+1. `sample.p` - This is the proportion of the data that is sub-sampled to fit the regularised GLM. As spatial transcriptomics datasets are very large, the model can be approximated using by sampling. In practice, we see that ~50,000 cells in a dataset with 500,000 cells works well enough under the assumption that all possible cellular states are sampled evenly across the tissue. This is likely to be true in most cases. Below we use 25% of the cells (which is the default as well) to fit the model (you can tweak this to 1 to use all cells).
+1. `df.tps` - Spatial dependence is modelled using thin plate spline functions. This parameter controls the degrees of freedom (complexity) of the function. Complex functions will fit the data better but could overfit therefore in practice, we see that 6-10 degrees of freedom are generally good enough. If the degrees of freedom are increased, regularisation should also be increased (`lambda.a` parameter). We also allow separate specification of the degrees of freedom for the spline functions for biological and technical effects. Below we specify 8 d.f. for biology and 3 d.f. for technical effects. This works on the assumption that biology will vary more sharply across space than technical effects, which we expect to be relatively smooth.
 
 ```{r}
 set.seed(1000)
 # perform SpaNorm normalisation
-idc = SpaNorm(idc, sample.p = 0.5, df.tps = 6)
+lung5 = SpaNorm(lung5, df.tps = c(8, 3), sample.p = 0.25, batch = lung5$fov)
 ```
 
-Above, the model is fit and the default adjustment, `logPAC`, is computed. Alternative adjustments such as the mean biology (`meanbio`), pearson residuals (`pearson`), and median biology (`median`) can be computed as well (this will be faster as the fit does not need to be repeated).
+Above, the model is fit and the default adjustment, `logPAC`, is computed. Alternative adjustments such as the mean biology (`meanbio`), pearson residuals similar to sctransform used in Seurat (`pearson`), and median biology (`median`) can be computed as well (this will be faster as the fit does not need to be repeated, however, the same parameters need to be passed to the function).
 
 ```{r}
 # compute mean biology
-idc_mean = SpaNorm(idc, adj.method = "meanbio")
+lung5_pearson = SpaNorm(lung5, df.tps = c(8, 3), batch = lung5$fov, adj.method = "pearson")
 
-p1 = plotSpatial(idc, what = "expression", assay = "logcounts", colour = EPCAM, alpha = 0.75) +
+p1 = plotSpatial(lung5, what = "expression", assay = "logcounts", colour = EPCAM, alpha = 0.75) +
   scale_colour_viridis_c(option = "F") +
   ggtitle("Normalised expression") +
   theme(legend.position = "bottom")
-p2 = plotSpatial(idc_mean, what = "expression", assay = "logcounts", colour = EPCAM, alpha = 0.75) +
-  scale_colour_viridis_c(option = "F") +
+p2 = plotSpatial(lung5_pearson, what = "expression", assay = "logcounts", colour = EPCAM, alpha = 0.75) +
+  scale_colour_viridis_c(option = "F", limits = c(NA, 3), oob = scales::squish) +
   ggtitle("Mean from SpaNorm model") +
   theme(legend.position = "bottom")
-p1 + p2 + plot_annotation(title = "Proportion of nuclear transcripts")
+p1 + p2
 ```
 
-[_EPCAM_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=DHRS) is an epithelial cell marker gene that will also be expressed in breast cancer cells that are of epithelial origin. The SpaNorm model correctly models the regions where the cancer cells exist (mean) and is able to normalise technical effects without affecting the biology.
+Since the SpaNorm model learns the functions for biological and technical effects for each gene, we can also investigate these to ensure that the correct biology is learnt and modelled. The `plotCovariate` functions can be used to study these. It is worth remembering that while the biological function is independent of covariates (like an intercept), the technical function is a function of the library size. To enable some interpretation, we show how the function evaluates at the mean library size below.
+
+```{r fig.width=8, fig.height=4.5}
+p1 = plotCovariate(lung5, covariate = "biology", colour = EPCAM, alpha = 0.75) +
+  scale_colour_viridis_c(option = "F") +
+  ggtitle("Biological variation") +
+  theme(legend.position = "bottom")
+p2 = plotCovariate(lung5, covariate = "ls", colour = EPCAM, alpha = 0.75) +
+  scale_colour_viridis_c(option = "G") +
+  ggtitle("Technical variation") +
+  theme(legend.position = "bottom")
+p3 = plotCovariate(lung5, covariate = "batch", colour = EPCAM, alpha = 0.75) +
+  scale_colour_viridis_c(option = "A") +
+  ggtitle("Batch variation") +
+  theme(legend.position = "bottom")
+p1 + p2 + p3
+```
+
+[_EPCAM_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=DHRS) is an epithelial cell marker gene that will also be expressed in lung cancer cells that are of epithelial origin. The SpaNorm model correctly models the regions where the cancer cells exist (mean) and is able to normalise technical effects without affecting the biology. The technical function looks similar to the function for biology and this is expected as technical effects due to library size biases confound biology, however, SpaNorm is able to perform the adjustment while preserving most of the biology.
 
 Library size normalisation is important to ensure technical variation is removed from gene expression. In the most extreme cases, a gene that is highly expressed in a region of interest may seem to be lowly expressed because of a drop in library sizes in said region (see manuscript). We have seen that negative probes across most technologies are also capturing library size effects very well and are experimenting with using these to model technical variation and normalise data. In some technologies/datasets, these are very lowly expressed, not because of better data quality but by design as well, and therefore would NOT faithfully represent technical variation. As with every other step, this is still an active area of research.
 
-# Cell typing
-
-Cell typing can be performed using various approaches. Most of these were developed for the analysis of single-cell RNA-seq datasets and port across well to spatial transcriptomics datasets. The two common strategies are reference-based and reference-free annotations. In the former, annotations are mapped across from a previously annotated dataset. For a thorough discussion on this topic, review the [Orchestrating Single-Cell Analysis (OSCA) with Bioconductor](https://bioconductor.org/books/release/OSCA/) book [@amezquita2020orchestrating]. Here, we use the SingleR package [@aran2019reference] along with a reference breast cancer dataset [@wu2021single]. The processed dataset can be downloaded from [Curated Cancer Cell Atlas](https://www.weizmann.ac.il/sites/3CA/breast). 
-
-SingleR is a simple yet powerful algorithm that only requires a single prototype of what the cell type's expression profile should look like. As such, counts are aggregated (pseudobulked) across cells to form a reference dataset where a single expression vector is created for each cell type. Aggregation is performed using the `scater::aggregateAcrossCells` function. As the original dataset contains >96,000 cells, we only provide the aggregated counts for this workshop.
+# Identifying spatially variable genes (SVGs)
 
 ```{r}
-# load reference dataset - Wu et al., Nat Genetics, 2021
-data(ref_wu)
-ref_wu
+set.seed(1000)
+lung5 = SpaNormSVG(lung5)
+topsvgs = topSVGs(lung5, n = 9, fdr = 0.05)
+```
+
+```{r fig.width=10, fig.width=10}
+lapply(rownames(topsvgs), function(gene) {
+  plotSpatial(
+    lung5,
+    what = "expression",
+    assay = "logcounts",
+    colour = !!sym(gene),
+    size = 0.2
+  ) +
+    scale_colour_viridis_c(option = "F")
+}) |> 
+  wrap_plots(ncol = 3)
+```
+
+# GLM-PCA
+
+```{r}
+lung5 = SpaNormPCA(lung5, svg.fdr = 0.1, ncomponents = 20, residuals = "pearson")
+lung5 = runUMAP(lung5, min_dist = 0.3)
+
+# UMAP plot
+p1 = plotDR(lung5, dimred = "UMAP", colour = region, alpha = 0.75, size = 0.5) +
+  scale_color_brewer(palette = "Dark2") +
+  guides(colour = guide_legend(override.aes = list(shape = 15, size = 5))) +
+  labs(x = "UMAP1", y = "UMAP2") +
+  theme(legend.position = "bottom")
+p2 = plotDR(lung5, dimred = "UMAP", colour = fov, alpha = 0.75, size = 0.5) +
+  scale_color_brewer(palette = "Set2") +
+  guides(colour = guide_legend(override.aes = list(shape = 15, size = 5))) +
+  labs(x = "UMAP1", y = "UMAP2") +
+  theme(legend.position = "bottom")
+p1 + p2
+```
+
+# Cell typing
+
+Cell typing can be performed using various approaches. Most of these were developed for the analysis of single-cell RNA-seq datasets and port across well to spatial transcriptomics datasets. The two common strategies are reference-based and reference-free annotations. In the former, annotations are mapped across from a previously annotated dataset. For a thorough discussion on this topic, review the [Orchestrating Single-Cell Analysis (OSCA) with Bioconductor](https://bioconductor.org/books/release/OSCA/) book [@amezquita2020orchestrating]. Here, we use the SingleR package [@aran2019reference] along with a reference non-small cell lung cancer (NSCLC) dataset [@salcher2022high].
+
+SingleR is a simple yet powerful algorithm that only requires a single prototype of what the cell type's expression profile should look like. As such, counts are aggregated (pseudobulked) across cells to form a reference dataset where a single expression vector is created for each cell type. Aggregation is performed using the `scater::aggregateAcrossCells` function. As the original dataset contains >96,000 cells, we only provide the aggregated counts for this workshop. Aggregated counts tend to be more robust to technical variation and are therefore more suitable for cell typing.
+
+```{r}
+library(scran)
+
+# load reference dataset - Salcher et al., Cancer Cell, 2022
+data(ref_luca)
+# normalise the reference dataset
+cl = quickCluster(ref_luca)
+ref_luca = computeSumFactors(ref_luca, cluster = cl)
+ref_luca = logNormCounts(ref_luca)
 # cell types in the reference dataset
-ref_wu$label.cell_type
+levels(ref_luca$cell_type)
 ```
 
 ```{r}
 library(SingleR)
 
 # predict cell types using SingleR
-prediction = SingleR(test = idc, ref = ref_wu, labels = ref_wu$label.cell_type)
+prediction = SingleR(test = lung5, ref = ref_luca, labels = ref_luca$cell_type)
 # add prediction to the SpatialExperiment object
-idc$cell_type = prediction$labels
+lung5$cell_type = prediction$labels
 ```
 
 ```{r}
-plotSpatial(idc, colour = cell_type, alpha = 0.75) +
-  scale_colour_brewer(palette = "Paired", na.value = "#333333") +
+plotSpatial(lung5, colour = cell_type, alpha = 0.75) +
   ggtitle("Predicted cell type") +
   theme(legend.position = "bottom") +
   guides(colour = guide_legend(override.aes = list(shape = 15, size = 5)))
@@ -396,7 +440,7 @@ library(hoodscanR)
 
 # find neighbouring cells using an approximate nearest neighbour search
 set.seed(1000)
-nb_cells = findNearCells(idc, k = 100, anno_col = "cell_type")
+nb_cells = findNearCells(lung5, k = 100, anno_col = "cell_type")
 nb_cells$cells[1:5, 1:5]
 nb_cells$distance[1:5, 1:5]
 # estimate proportion of each cell type in the neighbourhood of each cell
@@ -406,7 +450,7 @@ dim(probmat)
 neighbourhoods = mergeByGroup(probmat, nb_cells$cells)
 neighbourhoods[1:5, 1:5]
 # add neighbourhood information to the SpatialExperiment object
-idc = mergeHoodSpe(idc, neighbourhoods)
+lung5 = mergeHoodSpe(lung5, neighbourhoods)
 ```
 
 Once these probabilies are assigned around each cell, a secondary clustering can be performed using any desired method. The package currently only supports k-means clustering on the neighbourhood matrix but advanced users can cluster the matrix directly using their preferred method.
@@ -414,14 +458,14 @@ Once these probabilies are assigned around each cell, a secondary clustering can
 ```{r}
 # identify spatial domains based on neighbourhood composition (5 clusters)
 set.seed(1000)
-idc = clustByHood(idc, pm_cols = colnames(neighbourhoods), k = 5, val_names = "clusters")
+lung5 = clustByHood(lung5, pm_cols = colnames(neighbourhoods), k = 5, val_names = "hoodscanr_region")
 # plot predictions
-p1 = plotSpatial(idc, colour = clusters, alpha = 0.75) +
+p1 = plotSpatial(lung5, colour = hoodscanr_region, alpha = 0.75) +
   scale_colour_brewer(palette = "Paired", na.value = "#333333", name = "predicted") +
   ggtitle("Predicted pathology") +
   theme(legend.position = "bottom") +
   guides(colour = guide_legend(nrow = 3, override.aes = list(shape = 15, size = 5)))
-p2 = plotSpatial(idc, colour = region) +
+p2 = plotSpatial(lung5, colour = region) +
   scale_colour_brewer(palette = "Dark2") +
   ggtitle("Pathology annotations") +
   guides(colour = guide_legend(nrow = 3, override.aes = list(shape = 15, size = 5)))
@@ -431,25 +475,24 @@ p1 + p2 + plot_annotation(title = "Spatial domain identification")
 The plot above shows that hoodscanR is able to differentiate the key regions and is clearly able to separate the distinct DCIS lesions. It is also able to identify the layer of cells separating the tumour lesions from the stroma. However, it is unable to distinguish between the invasive and DCIS regions. This is because our current annotation of cell types does not discriminate between the different cellular states of cells in these regions. This is one limitation of cell type based methods - that is, they need the labels of all possible cell types and cell states we are interested. However, the power of these methods is that we can study the neighbourhood composition directly as this was used to generate the domains.
 
 ```{r}
-plotProbDist(idc, pm_cols = colnames(neighbourhoods), by_cluster = TRUE, plot_all = TRUE, show_clusters = as.character(seq(5)))
+plotProbDist(lung5, pm_cols = colnames(neighbourhoods), by_cluster = TRUE, plot_all = TRUE, show_clusters = as.character(seq(5)))
 ```
 
 we see that cluster 5 is entirely defined by the presence of malignant cells while cluster 2 captures the tumour lining epithelial cells, malignant cells, and fibroblasts. Cluster 1 is composed of the immune cells, particularly T cells, B cells and macrophages, indicating the formation of lymphoid aggregates. Lymphoid aggregates are interesting structures in the context of solid cancers, and depending on their expression profile, these can be beneficial for patients.
 
 ```{r}
 # calculate metrics of heterogeneity - entropy
-idc = calcMetrics(idc, pm_cols = colnames(neighbourhoods))
+lung5 = calcMetrics(lung5, pm_cols = colnames(neighbourhoods))
 # plot metric
-p1 = plotSpatial(idc, colour = cell_type, alpha = 0.75) +
+p1 = plotSpatial(lung5, colour = cell_type, alpha = 0.75) +
   scale_colour_brewer(palette = "Paired", na.value = "#333333") +
   ggtitle("Predicted cell type") +
   theme(legend.position = "bottom") +
   guides(colour = guide_legend(override.aes = list(shape = 15, size = 5)))
-p2 = plotSpatial(idc, colour = entropy, alpha = 0.75) +
+p2 = plotSpatial(lung5, colour = entropy, alpha = 0.75) +
   scale_colour_viridis_c(option = "G") +
   ggtitle("Cell type heterogeneity") +
-  theme(legend.position = "bottom") +
-  guides(colour = guide_legend(override.aes = list(shape = 15, size = 5)))
+  theme(legend.position = "bottom")
 p1 + p2 + plot_annotation(title = "Cell type heterogeneity")
 ```
 
@@ -479,25 +522,25 @@ library(Banksy)
 
 # parameters
 lambda = 0.2
-npcs = 50
-k_geom = 30
-res = 0.8
+npcs = 30
+k_geom = 50
+res = 0.4
 
 # compute the features required by Banksy
-idc = computeBanksy(idc, assay_name = "logcounts", k_geom = k_geom)
+lung5 = computeBanksy(lung5, assay_name = "logcounts", k_geom = k_geom)
 
 # compute PCA on the features
 set.seed(1000)
-idc = runBanksyPCA(idc, lambda = lambda, npcs = npcs)
+lung5 = runBanksyPCA(lung5, lambda = lambda, npcs = npcs)
 
 # perform graph-based clusering
 set.seed(1000)
-idc = clusterBanksy(idc, lambda = lambda, npcs = npcs, resolution = res)
+lung5 = clusterBanksy(lung5, lambda = lambda, npcs = npcs, resolution = res)
 
-# store to the column predicted_region
-idc$predicted_region = idc$`clust_M0_lam0.2_k50_res0.8`
+# store to the column banksy_region
+lung5$banksy_region = lung5$`clust_M0_lam0.2_k50_res0.4`
 
-plotSpatial(idc, colour = predicted_region, alpha = 0.75) +
+plotSpatial(lung5, colour = banksy_region, alpha = 0.75) +
   scale_colour_brewer(palette = "Paired", na.value = "#333333", name = "predicted") +
   ggtitle("Mean from SpaNorm model") +
   theme(legend.position = "bottom") +
@@ -509,12 +552,12 @@ Try varying the parameters to see how the clustering changes. Do note that the r
 Looking back at the original annotations, we see that clusters 3 and 5 represent the DCIS and Invasive tumours respectively. Similarly, cluster 10 represents the blood vessel annotated by the pathologist. Computational analysis reveals additional structures present in the tissue that may differ only in the genomic measurements. Clustes 6 and 7 for instance seems to represent different structures in the stroma, some of which may be visible in the histology image but are intestive to label manually. We also find cluster 4 which represents a boundary of cells surrounding invasive and DCIS lesions.
 
 ```{r}
-p1 = plotSpatial(idc, colour = predicted_region, alpha = 0.75) +
+p1 = plotSpatial(lung5, colour = banksy_region, alpha = 0.75) +
   scale_colour_brewer(palette = "Paired", na.value = "#333333", name = "predicted") +
   ggtitle("Predicted pathology") +
   theme(legend.position = "bottom") +
   guides(colour = guide_legend(nrow = 3, override.aes = list(shape = 15, size = 5)))
-p2 = plotSpatial(idc, colour = region) +
+p2 = plotSpatial(lung5, colour = region) +
   scale_colour_brewer(palette = "Dark2") +
   ggtitle("Pathology annotations") +
   guides(colour = guide_legend(nrow = 3, override.aes = list(shape = 15, size = 5)))
@@ -531,7 +574,7 @@ Additionally, cancer cells interact with their environment including cell types 
 
 ```{r}
 # create clusters to study how cell types vary across domains
-clusters = paste(idc$cell_type, idc$predicted_region, sep = "_")
+clusters = paste(lung5$cell_type, lung5$hoodscanr_region, sep = "_")
 clusters |>
   table() |>
   sort() |> 
@@ -543,28 +586,26 @@ We see that the two largest clusters capture malignant cells in spatial domains 
 > The analysis below is only meant to be a demonstration of the potential of spatial transcriptomics data. A proper statistical analysis would require replicate tissue samples from across different patients. In such a case, we would aggregate transcript counts across cell types using the `scater::sumCountsAcrossCells` to create pseudo-bulk samples, and follow up with a differential expression analysis using the [`edgeR`](https://doi.org/10.12688/f1000research.8987.2) or [`limma`](https://doi.org/10.12688/f1000research.9005.3) pipelines. Alternatively, a more advanced tool such as [`nicheDE`](https://doi.org/10.1186/s13059-023-03159-6) could be used to perform analysis on a single tissue, however, it would also be more robust with biological replicates. This tool is outside the scope of this introductory workshop therefore is not covered.
 
 ```{r}
-library(scran)
-
 # identify markers
-marker.info = scoreMarkers(idc, clusters, pairings = list(c("Malignant_2", "Fibroblast_3"), c("Malignant_5", "Fibroblast_6")))
+marker.info = scoreMarkers(lung5, clusters, pairings = list(c("B cell_4", "T cell regulatory_4"), c("B cell_3", "T cell regulatory_3")))
 marker.info
 ```
 
 Below we compare the malignant (cancer) cells from region 2 (invasive) against those from region 5 (DCIS). Investigating and visialising the top genes shows that [_DHRS_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=DHRS) and [_MUC6_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=MUC6) are up-regulated in invasive cancer cells while [_GATA3_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=GATA3) and [_FLNB_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=FLNB) are moderately up-regulated in DCIS cancer cells.
 
 ```{r fig.width=8, fig.height=8}
-# study markers of Malignant_2
-chosen_malignant <- marker.info[["Malignant_2"]]
-ordered_malignant <- chosen_malignant[order(chosen_malignant$rank.AUC), ]
-head(ordered_malignant[, 1:4])
+# study markers of B cell_4
+chosen_bcell = marker.info[["B cell_4"]]
+ordered_bcell = chosen_bcell[order(chosen_bcell$rank.AUC), ]
+head(ordered_bcell[, 1:4])
 
-plotExpression(idc,
-  features = head(rownames(ordered_malignant), 9),
-  x = "predicted_region",
-  colour_by = "predicted_region",
+plotExpression(lung5,
+  features = head(rownames(ordered_bcell), 9),
+  x = "hoodscanr_region",
+  colour_by = "hoodscanr_region",
   ncol = 3
 ) +
-  geom_vline(xintercept = c(2, 5), lwd = 0.1, lty = 2) +
+  geom_vline(xintercept = c(3, 4), lwd = 0.1, lty = 2) +
   scale_colour_brewer(palette = "Paired", na.value = "#333333", name = "cluster") +
   theme(legend.position = "bottom") +
   guides(colour = guide_legend(override.aes = list(shape = 15, size = 5)))
@@ -573,18 +614,18 @@ plotExpression(idc,
 Next we compare the fibroblasts from region 6 (stroma) against those from region 3 (tumour-adjacent). Investigating and visialising the top genes shows that [_LUM_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=LUM) and [_POSTN_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=POSTN) are up-regulated in stromal fibroblasts while [_MMP11_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=MMP11) and [_AQP1_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=AQP1) are up-regulated in the tumour-adjacent fibroblasts.
 
 ```{r fig.width=8, fig.height=8}
-# study markers of Malignant_2
-chosen_fibroblasts <- marker.info[["Fibroblast_3"]]
-ordered_fibroblasts <- chosen_fibroblasts[order(chosen_fibroblasts$rank.AUC), ]
-head(ordered_fibroblasts[, 1:4])
+# study markers of T cell regulatory_4
+chosen_tcell = marker.info[["T cell regulatory_4"]]
+ordered_tcell = chosen_tcell[order(chosen_tcell$rank.AUC), ]
+head(ordered_tcell[, 1:4])
 
-plotExpression(idc,
-  features = head(rownames(ordered_fibroblasts), 9),
-  x = "predicted_region",
-  colour_by = "predicted_region",
+plotExpression(lung5,
+  features = head(rownames(ordered_tcell), 9),
+  x = "hoodscanr_region",
+  colour_by = "hoodscanr_region",
   ncol = 3
 ) +
-  geom_vline(xintercept = c(3, 6), lwd = 0.1, lty = 2) +
+  geom_vline(xintercept = c(3, 4), lwd = 0.1, lty = 2) +
   scale_colour_brewer(palette = "Paired", na.value = "#333333", name = "cluster") +
   theme(legend.position = "bottom") +
   guides(colour = guide_legend(override.aes = list(shape = 15, size = 5)))
@@ -594,7 +635,7 @@ plotExpression(idc,
 
 The example dataset used here was generated using the 10x Xenium platform that measured 380 genes. More recent versions of this platform and competing platforms such as the NanoString CosMx are now providing around 5000 genes (soon whole transcriptome as well!). It is relatively easy to scan through the strongest differentially expressed genes from a list of at most 380 genes to understand the processes underpinning the system. With larger panel sizes, we need computational tools to perform such analyses, often referred to as gene-set enrichment analysis or functional analysis. As this is an extensive topic, it is not covered in depth in this workshop, however, we have previously developed a [workshop on gene-set enrichment analysis](https://davislaboratory.github.io/GenesetAnalysisWorkflow/) and refer the attendees to that if they are interested. A non-programmatic interface of some of the tools in our workshop can be accessed through [vissE.cloud](https://visse.cloud/).
 
-> Optional: You can also explore the full dataset from this workshop on vissE.cloud through the following [link](https://visse.cloud/galleryexample/xenium_V1FFPEHumanBreastIDCWithAddon_PCA). This exploratory analysis performs principal components analysis (PCA) or non-negative matrix factorisation (NMF) on the dataset to identify macroscopic biological programs. It then performs gene-set enrichment analysis on the factor loadings to explain the biological processes.
+> Optional: You can also explore the full dataset from this workshop on vissE.cloud through the following [link](https://visse.cloud/galleryexample/cosmx_NSCLCLung5Rep3_PCA). This exploratory analysis performs principal components analysis (PCA) or non-negative matrix factorisation (NMF) on the dataset to identify macroscopic biological programs. It then performs gene-set enrichment analysis on the factor loadings to explain the biological processes.
 
 # Packages used {.unnumbered}
 
