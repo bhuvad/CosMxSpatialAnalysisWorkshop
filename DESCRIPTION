@@ -46,6 +46,8 @@ Imports:
     scuttle,
     scran,
     hoodscanR
+Remotes:
+    DavisLaboratory/SpaNorm
 Suggests: 
     pkgdown,
     BiocStyle,
