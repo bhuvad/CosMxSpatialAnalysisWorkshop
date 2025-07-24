@@ -458,7 +458,7 @@ Once these probabilies are assigned around each cell, a secondary clustering can
 ```{r}
 # identify spatial domains based on neighbourhood composition (5 clusters)
 set.seed(1000)
-lung5 = clustByHood(lung5, pm_cols = colnames(neighbourhoods), k = 5, val_names = "hoodscanr_region")
+lung5 = clustByHood(lung5, pm_cols = colnames(neighbourhoods), k = 5, val_name = "hoodscanr_region")
 # plot predictions
 p1 = plotSpatial(lung5, colour = hoodscanr_region, alpha = 0.75) +
   scale_colour_brewer(palette = "Paired", na.value = "#333333", name = "predicted") +
@@ -475,7 +475,7 @@ p1 + p2 + plot_annotation(title = "Spatial domain identification")
 The plot above shows that hoodscanR is able to differentiate the key regions and is clearly able to separate the distinct DCIS lesions. It is also able to identify the layer of cells separating the tumour lesions from the stroma. However, it is unable to distinguish between the invasive and DCIS regions. This is because our current annotation of cell types does not discriminate between the different cellular states of cells in these regions. This is one limitation of cell type based methods - that is, they need the labels of all possible cell types and cell states we are interested. However, the power of these methods is that we can study the neighbourhood composition directly as this was used to generate the domains.
 
 ```{r}
-plotProbDist(lung5, pm_cols = colnames(neighbourhoods), by_cluster = TRUE, plot_all = TRUE, show_clusters = as.character(seq(5)))
+plotProbDist(lung5, pm_cols = colnames(neighbourhoods), by_cluster = TRUE, plot_all = TRUE, show_clusters = as.character(seq(5)), val_name = "hoodscanr_region")
 ```
 
 we see that cluster 5 is entirely defined by the presence of malignant cells while cluster 2 captures the tumour lining epithelial cells, malignant cells, and fibroblasts. Cluster 1 is composed of the immune cells, particularly T cells, B cells and macrophages, indicating the formation of lymphoid aggregates. Lymphoid aggregates are interesting structures in the context of solid cancers, and depending on their expression profile, these can be beneficial for patients.
