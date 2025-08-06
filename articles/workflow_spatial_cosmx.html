@@ -173,7 +173,7 @@ workshop comes from 4 fields of view (FOVs) from the sample labeled
 Lung5_Rep3. This window is shown in the context of the full tissue
 below.</p>
 <div class="float">
-<img src="https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/full_tissue.png" alt="The CosMx non-small cell lung cancer (NSCLC) dataset."><div class="figcaption">The CosMx non-small cell lung cancer (NSCLC)
+<img src="https://raw.githubusercontent.com/bhuvad/CosMxSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/full_tissue.png" alt="The CosMx non-small cell lung cancer (NSCLC) dataset."><div class="figcaption">The CosMx non-small cell lung cancer (NSCLC)
 dataset.</div>
 </div>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -539,7 +539,7 @@ the data as they are designed to not measure any biology (i.e., the are
 synthetic probes designed to not hybridise with any transcripts in the
 system).</p>
 <div class="float">
-<img src="https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/neg_probes_normalisation.png" alt="Using negative control probes to normalise spatial transcriptomics data."><div class="figcaption">Using negative control probes to normalise
+<img src="https://raw.githubusercontent.com/bhuvad/CosMxSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/neg_probes_normalisation.png" alt="Using negative control probes to normalise spatial transcriptomics data."><div class="figcaption">Using negative control probes to normalise
 spatial transcriptomics data.</div>
 </div>
 <p>Though it is ideal to use negative control probes for normalisation
@@ -582,7 +582,7 @@ constrained regularised generalised linear model to model library size
 effects and subsequently adjust the data. This is done by calling the
 <code><a href="https://bhuvad.github.io/spaNorm/reference/SpaNorm.html" class="external-link">SpaNorm()</a></code> function on a SpatialExperiment object.</p>
 <div class="float">
-<img src="https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/spanorm_schematic.png" alt="A schematic diagram of the SpaNorm normalisation method."><div class="figcaption">A schematic diagram of the SpaNorm normalisation
+<img src="https://raw.githubusercontent.com/bhuvad/CosMxSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/spanorm_schematic.png" alt="A schematic diagram of the SpaNorm normalisation method."><div class="figcaption">A schematic diagram of the SpaNorm normalisation
 method.</div>
 </div>
 <p>The key parameters for SpaNorm normalisation that need to be adjusted
@@ -659,7 +659,7 @@ function evaluates at the mean library size below.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Batch variation"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="va">p3</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-16-1.png" width="768"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-16-1.png" width="960"></p>
 <p><a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=DHRS" class="external-link"><em>EPCAM</em></a>
 is an epithelial cell marker gene that will also be expressed in lung
 cancer cells that are of epithelial origin. The SpaNorm model correctly
@@ -711,7 +711,7 @@ variable genes (SVGs). Results of the test are stored in the
 <code>rowData</code> of the SpatialExperiment object, but can also be
 retrieved using the <code><a href="https://bhuvad.github.io/spaNorm/reference/topSVGs.html" class="external-link">topSVGs()</a></code> function.</p>
 <div class="float">
-<img src="https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/spanorm_svg_schematic.png" alt="A schematic diagram of the SpaNormSVG normalisation method."><div class="figcaption">A schematic diagram of the SpaNormSVG
+<img src="https://raw.githubusercontent.com/bhuvad/CosMxSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/spanorm_svg_schematic.png" alt="A schematic diagram of the SpaNormSVG normalisation method."><div class="figcaption">A schematic diagram of the SpaNormSVG
 normalisation method.</div>
 </div>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
