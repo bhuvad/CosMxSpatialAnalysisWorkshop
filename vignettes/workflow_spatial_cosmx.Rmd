@@ -329,7 +329,7 @@ p1 + p2
 
 Since the SpaNorm model learns the functions for biological and technical effects for each gene, we can also investigate these to ensure that the correct biology is learnt and modelled. The `plotCovariate()` functions can be used to study these. It is worth remembering that while the biological function is independent of covariates (like an intercept), the technical function is a function of the library size. To enable some interpretation, we show how the function evaluates at the mean library size below.
 
-```{r fig.width=8, fig.height=4.5}
+```{r fig.width=10, fig.height=4.5}
 p1 = plotCovariate(lung5, covariate = "biology", colour = EPCAM, alpha = 0.75) +
   scale_colour_viridis_c(option = "F") +
   ggtitle("Biological variation") +
@@ -363,7 +363,7 @@ lung5 = SpaNormSVG(lung5)
 topsvgs = topSVGs(lung5, n = 9, fdr = 0.05)
 ```
 
-```{r fig.width=10, fig.width=10}
+```{r fig.width=10, fig.height=11}
 lapply(rownames(topsvgs), function(gene) {
   plotSpatial(
     lung5,
