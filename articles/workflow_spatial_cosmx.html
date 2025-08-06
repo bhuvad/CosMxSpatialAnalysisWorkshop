@@ -59,7 +59,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/bhuvad/XeniumSpatialAnalysisWorkshop">
+  <a href="https://github.com/bhuvad/CosMxSpatialAnalysisWorkshop">
     <span class="fa fa-github"></span>
 
   </a>
@@ -93,9 +93,9 @@ Tan</h4>
 Melbourne<br><a class="author_email" href="mailto:#"></a><a href="mailto:cwtan@wehi.edu.au" class="email">cwtan@wehi.edu.au</a>
       </address>
                   
-            <h4 data-toc-skip class="date">Jul 2025</h4>
+            <h4 data-toc-skip class="date">Aug 2025</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/bhuvad/CosMxSpatialAnalysisWorkshop/blob/main/vignettes/workflow_spatial_cosmx.Rmd" class="external-link"><code>vignettes/workflow_spatial_cosmx.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/bhuvad/CosMxSpatialAnalysisWorkshop/blob/main/vignettes/workflow_spatial_cosmx.Rmd"><code>vignettes/workflow_spatial_cosmx.Rmd</code></a></small>
       <div class="hidden name"><code>workflow_spatial_cosmx.Rmd</code></div>
 
     </div>
@@ -162,18 +162,19 @@ The design for this object is shown in the figure below.</p>
 <div class="section level2">
 <h2 id="loading-prepared-data">Loading prepared data<a class="anchor" aria-label="anchor" href="#loading-prepared-data"></a>
 </h2>
-<p>The data we will use in this workshop is from the 10x Xenium
-platform. Since the objective of this workshop is to introduce you to
-spatial transcriptomics analysis, we do not work with the full dataset,
-which contains over 500,000 cells and instead opt to work with a smaller
-subset of the sample. This region contains interesting features and is
-therefore enough to showcase a complete spatial transcriptomics analysis
-workflow. The data used in this workshop is a window with the x
-coordinate in the interval (4800, 5800) and the y coordinate in the
-interval (8500, 9500). This window is shown in the context of the full
-tissue below.</p>
+<p>The data we will use in this workshop is from the Bruker/Nanostring
+CosMx SMI platform. Since the objective of this workshop is to introduce
+you to spatial transcriptomics analysis, we do not work with the full
+dataset, which contains over 700,000 cells from 8 samples and instead
+opt to work with a smaller subset of one sample. This region contains
+interesting features and is therefore enough to showcase a complete
+spatial transcriptomics analysis workflow. The data used in this
+workshop comes from 4 fields of view (FOVs) from the sample labeled
+Lung5_Rep3. This window is shown in the context of the full tissue
+below.</p>
 <div class="float">
-<img src="https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/full_tissue.png" alt="Full IDC"><div class="figcaption">Full IDC</div>
+<img src="https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/full_tissue.png" alt="The CosMx non-small cell lung cancer (NSCLC) dataset."><div class="figcaption">The CosMx non-small cell lung cancer (NSCLC)
+dataset.</div>
 </div>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/drighelli/SpatialExperiment" class="external-link">SpatialExperiment</a></span><span class="op">)</span></span>
@@ -289,7 +290,7 @@ code below on your own laptop.</p>
 </blockquote>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## DO NOT RUN during the workshop as the data are large and could crash your session</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st">"ExperimentHub"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://github.com/Bioconductor/ExperimentHub" class="external-link">"ExperimentHub"</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"ExperimentHub"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st">"SubcellularSpatialData"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -400,8 +401,8 @@ sizes and potentially a smaller number of genes expressed in a targetted
 panel as each cell type may be represented by a few marker genes.
 Additionally, these cells are smaller in size therefore could be
 filtered out using an area-based filter. Desipte the lack of standards,
-the extreme cases where cells express fewer than 20 genes and have fewer
-than 50 detections are clearly of poor quality. As such, we can start
+the extreme cases where cells express fewer than 50 genes and have fewer
+than 75 detections are clearly of poor quality. As such, we can start
 with these thresholds and adjust based on other metrics and
 visualisations.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
@@ -537,6 +538,10 @@ data. Negative control probes offer this measure of technical biases in
 the data as they are designed to not measure any biology (i.e., the are
 synthetic probes designed to not hybridise with any transcripts in the
 system).</p>
+<div class="float">
+<img src="https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/neg_probes_normalisation.png" alt="Using negative control probes to normalise spatial transcriptomics data."><div class="figcaption">Using negative control probes to normalise
+spatial transcriptomics data.</div>
+</div>
 <p>Though it is ideal to use negative control probes for normalisation
 of targeted spatial transcriptomics data, the data we are analysing is
 relatively old and from a prototype instrument, therefore, the negative
@@ -574,9 +579,11 @@ cells are likely to experience similar technical effects. To tackle
 this, our team has developed the SpaNorm normalisation method that uses
 spatial dependence to decouple technical and biological effects <span class="citation">(Salim et al. 2024)</span>. SpaNorm uses a spatially
 constrained regularised generalised linear model to model library size
-effects and subsequently adjust the data.</p>
+effects and subsequently adjust the data. This is done by calling the
+<code><a href="https://bhuvad.github.io/spaNorm/reference/SpaNorm.html" class="external-link">SpaNorm()</a></code> function on a SpatialExperiment object.</p>
 <div class="float">
-<img src="https://raw.githubusercontent.com/bhuvad/SpaNorm/refs/heads/master/vignettes/SpaNormWorkflow.png" alt="SpaNorm schematic"><div class="figcaption">SpaNorm schematic</div>
+<img src="https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/spanorm_schematic.png" alt="A schematic diagram of the SpaNorm normalisation method."><div class="figcaption">A schematic diagram of the SpaNorm normalisation
+method.</div>
 </div>
 <p>The key parameters for SpaNorm normalisation that need to be adjusted
 are:</p>
@@ -633,7 +640,7 @@ to be passed to the function).</p>
 <p>Since the SpaNorm model learns the functions for biological and
 technical effects for each gene, we can also investigate these to ensure
 that the correct biology is learnt and modelled. The
-<code>plotCovariate</code> functions can be used to study these. It is
+<code><a href="https://bhuvad.github.io/spaNorm/reference/plotCovariate.html" class="external-link">plotCovariate()</a></code> functions can be used to study these. It is
 worth remembering that while the biological function is independent of
 covariates (like an intercept), the technical function is a function of
 the library size. To enable some interpretation, we show how the
@@ -677,6 +684,36 @@ is still an active area of research.</p>
 <div class="section level2">
 <h2 id="identifying-spatially-variable-genes-svgs">Identifying spatially variable genes (SVGs)<a class="anchor" aria-label="anchor" href="#identifying-spatially-variable-genes-svgs"></a>
 </h2>
+<p>Not all genes in the study are likely to be meaningful, therefore, a
+key step in any transcriptomic analysis is to identify informative
+features/genes. In spatial transcriptomics, we are interest in
+identifying features that are spatially non-random. These genes should
+vary spatially along with biology and are thus referred to as spatially
+variable genes (SVGs). Common approaches to identify these genes use
+approaches inspired from spatial statistics such as Moran’s I. However,
+these approaches generally work with unnormalised data and often apply
+their own non-spatial normalisation to the data prior to identifying
+SVGs. As we have a spatial normalisation approach, we want to retain our
+normalisation.</p>
+<p>We have recently developed a model-based SVG detection approach which
+makes use of the model fit for the normalisation step of SpaNorm. Note
+that the SpaNorm model contains coefficients to represent biological and
+technical variation. Genes that are spatially variable, and therefore
+biologically informative should have non-zero coefficients for biology.
+We can test for the importance of the coefficients for the biological
+components using a likelihood ratio test (LRT) by comparing the SpaNorm
+model (Model 1 below) to a nested model (Model 2) containing only the
+technical components. This allows us to identify statistically
+significant spatial variation. The <code><a href="https://bhuvad.github.io/spaNorm/reference/SpaNormSVG.html" class="external-link">SpaNormSVG()</a></code> function
+fits this additional nested model, compares it to the full SpaNorm
+model, and performs the likelihood ratio test to identify spatially
+variable genes (SVGs). Results of the test are stored in the
+<code>rowData</code> of the SpatialExperiment object, but can also be
+retrieved using the <code><a href="https://bhuvad.github.io/spaNorm/reference/topSVGs.html" class="external-link">topSVGs()</a></code> function.</p>
+<div class="float">
+<img src="https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/spanorm_svg_schematic.png" alt="A schematic diagram of the SpaNormSVG normalisation method."><div class="figcaption">A schematic diagram of the SpaNormSVG
+normalisation method.</div>
+</div>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span></span>
 <span><span class="va">lung5</span> <span class="op">=</span> <span class="fu"><a href="https://bhuvad.github.io/spaNorm/reference/SpaNormSVG.html" class="external-link">SpaNormSVG</a></span><span class="op">(</span><span class="va">lung5</span><span class="op">)</span></span>
@@ -698,6 +735,24 @@ is still an active area of research.</p>
 <div class="section level2">
 <h2 id="glm-pca">GLM-PCA<a class="anchor" aria-label="anchor" href="#glm-pca"></a>
 </h2>
+<p>Spatial transcriptomics data is usually in the form of sparse counts.
+Principal components analysis (PCA), which relies on Euclidean geometry
+is not appropriate with such data. Subsequently, PCA is usually
+performed on log normalised counts, a transformation which makes the
+data more amenable to PCA. However, this approach also introduces biases
+to the PCA estimation (discussed in depth in <span class="citation">(Townes et al. 2019)</span>). The GLM-PCA approach was
+proposed to compute PCA directly on counts, however, the approach is
+computationally intensive. A more practical approach was proposed by
+<span class="citation">(Townes et al. 2019)</span> which approximated
+the GLM-PCA by computing PCA on the deviance residuals from a null model
+(a model consisting of technical variation alone). This model is already
+fit to identify SVGs in the previous step (Model 2) therefore GLM-PCA
+can be easily computed. The <code><a href="https://bhuvad.github.io/spaNorm/reference/SpaNormPCA.html" class="external-link">SpaNormPCA()</a></code> function can be
+used to compute GLM-PCA. In most cases, it will be comparable to PCA on
+the logPAC counts generated by SpaNorm, however, the GLM-PCA
+approximation is theoretically more rigorous and will poses better
+properties as discussed in <span class="citation">(Townes et al.
+2019)</span>.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lung5</span> <span class="op">=</span> <span class="fu"><a href="https://bhuvad.github.io/spaNorm/reference/SpaNormPCA.html" class="external-link">SpaNormPCA</a></span><span class="op">(</span><span class="va">lung5</span>, svg.fdr <span class="op">=</span> <span class="fl">0.1</span>, ncomponents <span class="op">=</span> <span class="fl">20</span>, residuals <span class="op">=</span> <span class="st">"pearson"</span><span class="op">)</span></span>
 <span><span class="va">lung5</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runUMAP.html" class="external-link">runUMAP</a></span><span class="op">(</span><span class="va">lung5</span>, min_dist <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span>
@@ -733,7 +788,7 @@ single prototype of what the cell type’s expression profile should look
 like. As such, counts are aggregated (pseudobulked) across cells to form
 a reference dataset where a single expression vector is created for each
 cell type. Aggregation is performed using the
-<code><a href="https://rdrr.io/pkg/scuttle/man/aggregateAcrossCells.html" class="external-link">scater::aggregateAcrossCells</a></code> function. As the original
+<code><a href="https://rdrr.io/pkg/scuttle/man/aggregateAcrossCells.html" class="external-link">scater::aggregateAcrossCells</a></code> function. While the original
 dataset contains &gt;96,000 cells, we only provide the aggregated counts
 for this workshop. Aggregated counts tend to be more robust to technical
 variation and are therefore more suitable for cell typing.</p>
@@ -773,13 +828,36 @@ variation and are therefore more suitable for cell typing.</p>
 <span><span class="co"># predict cell types using SingleR</span></span>
 <span><span class="va">prediction</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/SingleR/man/SingleR.html" class="external-link">SingleR</a></span><span class="op">(</span>test <span class="op">=</span> <span class="va">lung5</span>, ref <span class="op">=</span> <span class="va">ref_luca</span>, labels <span class="op">=</span> <span class="va">ref_luca</span><span class="op">$</span><span class="va">cell_type</span><span class="op">)</span></span>
 <span><span class="co"># add prediction to the SpatialExperiment object</span></span>
-<span><span class="va">lung5</span><span class="op">$</span><span class="va">cell_type</span> <span class="op">=</span> <span class="va">prediction</span><span class="op">$</span><span class="va">labels</span></span></code></pre></div>
+<span><span class="va">lung5</span><span class="op">$</span><span class="va">cell_type_fine</span> <span class="op">=</span> <span class="va">prediction</span><span class="op">$</span><span class="va">labels</span></span></code></pre></div>
+<p>Since the reference datasets contains highly detailed cell
+annotation, we are able to annotate our data to such a high degree.
+However, for the sake of demonstration, we simplify the annotation to
+collapse them to a higher order classification below.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># load the cell type map</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">luca_map</span><span class="op">)</span></span>
+<span><span class="va">lung5</span><span class="op">$</span><span class="va">cell_type</span> <span class="op">=</span> <span class="va">luca_map</span><span class="op">[</span><span class="va">lung5</span><span class="op">$</span><span class="va">cell_type_fine</span><span class="op">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://bhuvad.github.io/spaNorm/reference/plotSpatial.html" class="external-link">plotSpatial</a></span><span class="op">(</span><span class="va">lung5</span>, colour <span class="op">=</span> <span class="va">cell_type</span>, alpha <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Predicted cell type"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Paired"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-22-1.png" width="700"></p>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-23-1.png" width="700"></p>
+<p>Though discrete cell type identities are appealing due to their ease
+of interpretation, in many biological systems, metastable cell states
+(also referred to as plasticity) are likely to be present. Thus, such
+discrete cell type annotation may force cells into states that are not
+representative of true biology. PhiSpace, covered in the second part of
+this workshop series, is a method developed to deal with this issue.
+PhiSpace assigns a continuous score for each cell belonging to a cell
+type. These scores can either be thought of as the degree of evidence
+towards a cell conforming to a certain cell type, or the location of a
+cell in a plastic trajectory. In cancer sytems, where plasticity is
+dominant due to regression to stem-like states, the continuous cell
+annotation PhiSpace provides is powerful. Part 2 of this workshop
+describes PhiSpace in detail and demonstrates the types of analyses it
+powers.</p>
 </div>
 <div class="section level2">
 <h2 id="spatial-domain-identification">Spatial domain identification<a class="anchor" aria-label="anchor" href="#spatial-domain-identification"></a>
@@ -810,32 +888,26 @@ type being in a local neighbourhood of each cell in the dataset <span class="cit
 cell is determined based on the <code>k</code> parameter which specifies
 how many of the nearest neighbouring cells should be used to estimate
 the cell type probabilities.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/DavisLaboratory/hoodscanR" class="external-link">hoodscanR</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># find neighbouring cells using an approximate nearest neighbour search</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span></span>
 <span><span class="va">nb_cells</span> <span class="op">=</span> <span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/findNearCells.html" class="external-link">findNearCells</a></span><span class="op">(</span><span class="va">lung5</span>, k <span class="op">=</span> <span class="fl">100</span>, anno_col <span class="op">=</span> <span class="st">"cell_type"</span><span class="op">)</span></span>
 <span><span class="va">nb_cells</span><span class="op">$</span><span class="va">cells</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></code></pre></div>
-<pre><code><span><span class="co">##                              nearest_cell_1           nearest_cell_2</span></span>
-<span><span class="co">## Lung5_Rep3_16_1    Fibroblast peribronchial Fibroblast peribronchial</span></span>
-<span><span class="co">## Lung5_Rep3_16_10   Fibroblast peribronchial  Endothelial cell venous</span></span>
-<span><span class="co">## Lung5_Rep3_16_100   Endothelial cell venous      Fibroblast alveolar</span></span>
-<span><span class="co">## Lung5_Rep3_16_1000        T cell regulatory Fibroblast peribronchial</span></span>
-<span><span class="co">## Lung5_Rep3_16_1001                   B cell               Macrophage</span></span>
-<span><span class="co">##                              nearest_cell_3      nearest_cell_4</span></span>
-<span><span class="co">## Lung5_Rep3_16_1         Fibroblast alveolar Fibroblast alveolar</span></span>
-<span><span class="co">## Lung5_Rep3_16_10        Fibroblast alveolar Fibroblast alveolar</span></span>
-<span><span class="co">## Lung5_Rep3_16_100    Monocyte non-classical   T cell regulatory</span></span>
-<span><span class="co">## Lung5_Rep3_16_1000 Fibroblast peribronchial         Plasma cell</span></span>
-<span><span class="co">## Lung5_Rep3_16_1001        T cell regulatory    myeloid dividing</span></span>
-<span><span class="co">##                              nearest_cell_5</span></span>
-<span><span class="co">## Lung5_Rep3_16_1    Fibroblast peribronchial</span></span>
-<span><span class="co">## Lung5_Rep3_16_10        Fibroblast alveolar</span></span>
-<span><span class="co">## Lung5_Rep3_16_100                 Mast cell</span></span>
-<span><span class="co">## Lung5_Rep3_16_1000              Plasma cell</span></span>
-<span><span class="co">## Lung5_Rep3_16_1001  Endothelial cell venous</span></span></code></pre>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">##                    nearest_cell_1      nearest_cell_2      nearest_cell_3</span></span>
+<span><span class="co">## Lung5_Rep3_16_1        Fibroblast          Fibroblast          Fibroblast</span></span>
+<span><span class="co">## Lung5_Rep3_16_10       Fibroblast         Endothelial          Fibroblast</span></span>
+<span><span class="co">## Lung5_Rep3_16_100     Endothelial          Fibroblast Monocyte/Macrophage</span></span>
+<span><span class="co">## Lung5_Rep3_16_1000         T cell          Fibroblast          Fibroblast</span></span>
+<span><span class="co">## Lung5_Rep3_16_1001         B cell Monocyte/Macrophage              T cell</span></span>
+<span><span class="co">##                    nearest_cell_4 nearest_cell_5</span></span>
+<span><span class="co">## Lung5_Rep3_16_1        Fibroblast     Fibroblast</span></span>
+<span><span class="co">## Lung5_Rep3_16_10       Fibroblast     Fibroblast</span></span>
+<span><span class="co">## Lung5_Rep3_16_100          T cell        Myeloid</span></span>
+<span><span class="co">## Lung5_Rep3_16_1000         Plasma         Plasma</span></span>
+<span><span class="co">## Lung5_Rep3_16_1001        Myeloid    Endothelial</span></span></code></pre>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nb_cells</span><span class="op">$</span><span class="va">distance</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##                    nearest_cell_1 nearest_cell_2 nearest_cell_3 nearest_cell_4</span></span>
 <span><span class="co">## Lung5_Rep3_16_1          59.66036       71.23732       93.28319      105.50952</span></span>
@@ -849,28 +921,28 @@ the cell type probabilities.</p>
 <span><span class="co">## Lung5_Rep3_16_100        82.58831</span></span>
 <span><span class="co">## Lung5_Rep3_16_1000      100.66268</span></span>
 <span><span class="co">## Lung5_Rep3_16_1001      103.71212</span></span></code></pre>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># estimate proportion of each cell type in the neighbourhood of each cell</span></span>
 <span><span class="va">probmat</span> <span class="op">=</span> <span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/scanHoods.html" class="external-link">scanHoods</a></span><span class="op">(</span><span class="va">nb_cells</span><span class="op">$</span><span class="va">distance</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">probmat</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 11721   100</span></span></code></pre>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># compute probability of each each cell type in the neighbour hood of each cell</span></span>
 <span><span class="va">neighbourhoods</span> <span class="op">=</span> <span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/mergeByGroup.html" class="external-link">mergeByGroup</a></span><span class="op">(</span><span class="va">probmat</span>, <span class="va">nb_cells</span><span class="op">$</span><span class="va">cells</span><span class="op">)</span></span>
 <span><span class="va">neighbourhoods</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></code></pre></div>
-<pre><code><span><span class="co">##                    Alveolar cell type 1 Alveolar cell type 2      B cell</span></span>
-<span><span class="co">## Lung5_Rep3_16_1            1.360625e-02         1.142060e-02 0.000000000</span></span>
-<span><span class="co">## Lung5_Rep3_16_10           1.522646e-03         3.848242e-02 0.000000000</span></span>
-<span><span class="co">## Lung5_Rep3_16_100          4.929518e-09         8.189433e-05 0.003586059</span></span>
-<span><span class="co">## Lung5_Rep3_16_1000         0.000000e+00         0.000000e+00 0.009200223</span></span>
-<span><span class="co">## Lung5_Rep3_16_1001         0.000000e+00         1.066744e-03 0.110972648</span></span>
-<span><span class="co">##                    B cell dividing         cDC1</span></span>
-<span><span class="co">## Lung5_Rep3_16_1        0.000000000 0.0283521102</span></span>
-<span><span class="co">## Lung5_Rep3_16_10       0.000000000 0.0021066222</span></span>
-<span><span class="co">## Lung5_Rep3_16_100      0.002428671 0.0002870623</span></span>
-<span><span class="co">## Lung5_Rep3_16_1000     0.001067195 0.0001393729</span></span>
-<span><span class="co">## Lung5_Rep3_16_1001     0.015444471 0.0349382750</span></span></code></pre>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">##                        B cell           DC Endothelial Fibroblast</span></span>
+<span><span class="co">## Lung5_Rep3_16_1    0.00000000 0.0958606703  0.02710968  0.6440314</span></span>
+<span><span class="co">## Lung5_Rep3_16_10   0.00000000 0.0504909298  0.17678046  0.5933051</span></span>
+<span><span class="co">## Lung5_Rep3_16_100  0.00601473 0.0002870623  0.36437939  0.1244843</span></span>
+<span><span class="co">## Lung5_Rep3_16_1000 0.01026742 0.0002508496  0.05354242  0.3221676</span></span>
+<span><span class="co">## Lung5_Rep3_16_1001 0.12641712 0.1079731780  0.08390277  0.2046618</span></span>
+<span><span class="co">##                    Monocyte/Macrophage</span></span>
+<span><span class="co">## Lung5_Rep3_16_1            0.013978776</span></span>
+<span><span class="co">## Lung5_Rep3_16_10           0.049942312</span></span>
+<span><span class="co">## Lung5_Rep3_16_100          0.188404569</span></span>
+<span><span class="co">## Lung5_Rep3_16_1000         0.009734457</span></span>
+<span><span class="co">## Lung5_Rep3_16_1001         0.080494328</span></span></code></pre>
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># add neighbourhood information to the SpatialExperiment object</span></span>
 <span><span class="va">lung5</span> <span class="op">=</span> <span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/mergeHoodSpe.html" class="external-link">mergeHoodSpe</a></span><span class="op">(</span><span class="va">lung5</span>, <span class="va">neighbourhoods</span><span class="op">)</span></span></code></pre></div>
 <p>Once these probabilies are assigned around each cell, a secondary
@@ -878,13 +950,13 @@ clustering can be performed using any desired method. The package
 currently only supports k-means clustering on the neighbourhood matrix
 but advanced users can cluster the matrix directly using their preferred
 method.</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># identify spatial domains based on neighbourhood composition (5 clusters)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span></span>
 <span><span class="va">lung5</span> <span class="op">=</span> <span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/clustByHood.html" class="external-link">clustByHood</a></span><span class="op">(</span><span class="va">lung5</span>, pm_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">neighbourhoods</span><span class="op">)</span>, k <span class="op">=</span> <span class="fl">5</span>, val_name <span class="op">=</span> <span class="st">"hoodscanr_region"</span><span class="op">)</span></span>
 <span><span class="co"># plot predictions</span></span>
 <span><span class="va">p1</span> <span class="op">=</span> <span class="fu"><a href="https://bhuvad.github.io/spaNorm/reference/plotSpatial.html" class="external-link">plotSpatial</a></span><span class="op">(</span><span class="va">lung5</span>, colour <span class="op">=</span> <span class="va">hoodscanr_region</span>, alpha <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Paired"</span>, na.value <span class="op">=</span> <span class="st">"#333333"</span>, name <span class="op">=</span> <span class="st">"predicted"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Set1"</span>, na.value <span class="op">=</span> <span class="st">"#333333"</span>, name <span class="op">=</span> <span class="st">"predicted"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Predicted pathology"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">3</span>, override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -893,29 +965,21 @@ method.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Pathology annotations"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">3</span>, override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Spatial domain identification"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-24-1.png" width="700"></p>
-<p>The plot above shows that hoodscanR is able to differentiate the key
-regions and is clearly able to separate the distinct DCIS lesions. It is
-also able to identify the layer of cells separating the tumour lesions
-from the stroma. However, it is unable to distinguish between the
-invasive and DCIS regions. This is because our current annotation of
-cell types does not discriminate between the different cellular states
-of cells in these regions. This is one limitation of cell type based
-methods - that is, they need the labels of all possible cell types and
-cell states we are interested. However, the power of these methods is
-that we can study the neighbourhood composition directly as this was
-used to generate the domains.</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotProbDist.html" class="external-link">plotProbDist</a></span><span class="op">(</span><span class="va">lung5</span>, pm_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">neighbourhoods</span><span class="op">)</span>, by_cluster <span class="op">=</span> <span class="cn">TRUE</span>, plot_all <span class="op">=</span> <span class="cn">TRUE</span>, show_clusters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span>, val_name <span class="op">=</span> <span class="st">"hoodscanr_region"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-25-1.png" width="700"></p>
-<p>we see that cluster 5 is entirely defined by the presence of
-malignant cells while cluster 2 captures the tumour lining epithelial
-cells, malignant cells, and fibroblasts. Cluster 1 is composed of the
-immune cells, particularly T cells, B cells and macrophages, indicating
-the formation of lymphoid aggregates. Lymphoid aggregates are
-interesting structures in the context of solid cancers, and depending on
-their expression profile, these can be beneficial for patients.</p>
+<p>The plot above shows that hoodscanR is able to differentiate the key
+regions and is clearly able to delineate the tumour regions. It is also
+able to identify more sophosticated structures such as region 4 which
+was not identified in the pathological annotation.</p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotProbDist.html" class="external-link">plotProbDist</a></span><span class="op">(</span><span class="va">lung5</span>, pm_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">neighbourhoods</span><span class="op">)</span>, by_cluster <span class="op">=</span> <span class="cn">TRUE</span>, plot_all <span class="op">=</span> <span class="cn">TRUE</span>, show_clusters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span>, val_name <span class="op">=</span> <span class="st">"hoodscanr_region"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-26-1.png" width="700"></p>
+<p>we see that cluster 5 is entirely defined by the presence of
+malignant cells while cluster 4 is composed of immune cells,
+particularly B cells, T cells and plasma cells, indicating the formation
+of lymphoid aggregates. Lymphoid aggregates are interesting structures
+in the context of solid cancers, and depending on their expression
+profile, these can be beneficial for patients.</p>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># calculate metrics of heterogeneity - entropy</span></span>
 <span><span class="va">lung5</span> <span class="op">=</span> <span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/calcMetrics.html" class="external-link">calcMetrics</a></span><span class="op">(</span><span class="va">lung5</span>, pm_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">neighbourhoods</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># plot metric</span></span>
@@ -929,12 +993,12 @@ their expression profile, these can be beneficial for patients.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Cell type heterogeneity"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Cell type heterogeneity"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-26-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-27-1.png" width="700"></p>
 <p>Looking at the heterogeneity of cell types across space, we see that
 cell composition is very homogeneous within the tumour regions while it
 is highest in the lymphoid aggregates which are often characterised by
 the presence of various different types of immune cells. We emphasise
-again that the homogeneity of the tumour regions is determined based on
+here that the homogeneity of the tumour regions is determined based on
 their cell type call alone and not on their expression profile. As such,
 the tumours themselves could be heterogeneous if finer cell typing or
 cell phenotyping were to be performed. Additionally, any errors made in
@@ -984,7 +1048,7 @@ depth.</li>
 information. The authors recommend values within [15, 30] and note that
 variation is minimal within this range.</li>
 </ol>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/prabhakarlab/Banksy" class="external-link">Banksy</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># parameters</span></span>
@@ -1008,31 +1072,36 @@ variation is minimal within this range.</li>
 <span><span class="va">lung5</span><span class="op">$</span><span class="va">banksy_region</span> <span class="op">=</span> <span class="va">lung5</span><span class="op">$</span><span class="va">`clust_M0_lam0.2_k50_res0.4`</span></span>
 <span></span>
 <span><span class="fu"><a href="https://bhuvad.github.io/spaNorm/reference/plotSpatial.html" class="external-link">plotSpatial</a></span><span class="op">(</span><span class="va">lung5</span>, colour <span class="op">=</span> <span class="va">banksy_region</span>, alpha <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Paired"</span>, na.value <span class="op">=</span> <span class="st">"#333333"</span>, name <span class="op">=</span> <span class="st">"predicted"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Set1"</span>, na.value <span class="op">=</span> <span class="st">"#333333"</span>, name <span class="op">=</span> <span class="st">"predicted"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Mean from SpaNorm model"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-27-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-28-1.png" width="700"></p>
 <p>Try varying the parameters to see how the clustering changes. Do note
 that the results are automatically stored in a new column in the
 colData. Unfortunately, the function does not allow specification of the
 new column name so the only approach is to look at the column names
-using <code>colnames(colData(idc))</code> and find the name of the new
+using <code>colnames(colData(lung5))</code> and find the name of the new
 column (usually the last one) containing the clustering results. We then
 store these to a column of our choosing to make it easier to reference
 it.</p>
-<p>Looking back at the original annotations, we see that clusters 3 and
-5 represent the DCIS and Invasive tumours respectively. Similarly,
-cluster 10 represents the blood vessel annotated by the pathologist.
-Computational analysis reveals additional structures present in the
-tissue that may differ only in the genomic measurements. Clustes 6 and 7
-for instance seems to represent different structures in the stroma, some
-of which may be visible in the histology image but are intestive to
-label manually. We also find cluster 4 which represents a boundary of
-cells surrounding invasive and DCIS lesions.</p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<p>Banksy is able to identify the tumour regions (4 and 6), lymphoid
+aggregates (5 and 9) and other stromal regions. However, we notice that
+it is not able to merge regions from the different fields of view (FOVs)
+which have batch effects. This is because the transcriptomic profiles
+may yet have batch effects following adjustment. This is one of the pit
+falls of methods that use expression data compared to cell-based
+methods. The former are more sensitive to batch effects than the latter,
+which use higher-order phenotypes (cell types) that are less likely to
+be altered due to batch effects.</p>
+<p>We highlight here that when the full dataset is used and there are
+more cells to learn structure from, Banksy is able to identify merged
+clusters across the tissue. It is worth remembering that this workshop
+only provides a demonstration of methods. When methods are optimised and
+run on more data, perfomance will vary and will generally improve.</p>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p1</span> <span class="op">=</span> <span class="fu"><a href="https://bhuvad.github.io/spaNorm/reference/plotSpatial.html" class="external-link">plotSpatial</a></span><span class="op">(</span><span class="va">lung5</span>, colour <span class="op">=</span> <span class="va">banksy_region</span>, alpha <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Paired"</span>, na.value <span class="op">=</span> <span class="st">"#333333"</span>, name <span class="op">=</span> <span class="st">"predicted"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Set1"</span>, na.value <span class="op">=</span> <span class="st">"#333333"</span>, name <span class="op">=</span> <span class="st">"predicted"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Predicted pathology"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">3</span>, override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -1041,7 +1110,7 @@ cells surrounding invasive and DCIS lesions.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Pathology annotations"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">3</span>, override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Spatial domain identification"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-28-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-29-1.png" width="700"></p>
 <p>The choice of the better approach amongst the two demonstrated here
 should be based on the question of interest. They both have their
 strengths and limitations. BANKSY allows us to identify within tumour
@@ -1062,41 +1131,28 @@ type annotation.</p>
 different cellular states in a biological system. The power of spatial
 molecular datasets is that we can study how cellular states change in
 response to different structures in the tissue. For instance, in our
-tissue we see that there are two different types of cancer lesions,
-ductal carcinoma in situ and invasive. Cancer cells in the latter lesion
-tend to me aggresive and can spread more than those in the DCIS region.
-We would be interested in knowning the biological processes that make
-this happen.</p>
-<p>Additionally, cancer cells interact with their environment including
-cell types such as fibroblasts. We may be interested in identifying the
-differences in fibroblasts that are in close proximity to cancer cells
-as opposed to the distant ones. We can identify the genes that are
-associated with these changes below.</p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+tissue we notice immune cells in lymphoid aggregates (region 4) and
+immune cells dispersed elsewhere in the tissue (region 3). We may be
+interested in studying the functional differences of cells in different
+domains. We can cluster the cells using a combination of cell types and
+regions and study phenotypic differences in a cell type within different
+regions.</p>
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create clusters to study how cell types vary across domains</span></span>
 <span><span class="va">clusters</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">lung5</span><span class="op">$</span><span class="va">cell_type</span>, <span class="va">lung5</span><span class="op">$</span><span class="va">hoodscanr_region</span>, sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span></span>
-<span><span class="va">clusters</span> <span class="op">|&gt;</span></span>
+<span><span class="va">clusters</span><span class="op">[</span><span class="va">lung5</span><span class="op">$</span><span class="va">hoodscanr_region</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"3"</span>, <span class="st">"4"</span><span class="op">)</span><span class="op">]</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/table.html" class="external-link">table</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## clusters</span></span>
-<span><span class="co">## Fibroblast peribronchial_5                     Club_2 </span></span>
-<span><span class="co">##                        254                        345 </span></span>
-<span><span class="co">##  Endothelial cell venous_3              Plasma cell_3 </span></span>
-<span><span class="co">##                        382                        383 </span></span>
-<span><span class="co">##               Macrophage_3 Fibroblast peribronchial_3 </span></span>
-<span><span class="co">##                        405                        427 </span></span>
-<span><span class="co">##                   B cell_4 Fibroblast peribronchial_1 </span></span>
-<span><span class="co">##                        576                        584 </span></span>
-<span><span class="co">##              Plasma cell_5              Tumor cells_2 </span></span>
-<span><span class="co">##                        756                        772</span></span></code></pre>
-<p>We see that the two largest clusters capture malignant cells in
-spatial domains 2 and 5 which align with the invasive and DCIS regions
-respectively based on the pathology annotations. We also see that though
-most of the fibroblasts are dispersed in the stroma (region 6), those
-that are closer to the cancer lesions are clustered in region 3. We
-would be interested in studying the difference between these and
-understanding whether they contain features that promote the tumour.</p>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">##               Tumor_4              T cell_3                  DC_4 </span></span>
+<span><span class="co">##                   188                   201                   234 </span></span>
+<span><span class="co">## Monocyte/Macrophage_4              T cell_4              Plasma_4 </span></span>
+<span><span class="co">##                   248                   272                   396 </span></span>
+<span><span class="co">##             Stromal_4         Endothelial_4              B cell_3 </span></span>
+<span><span class="co">##                   456                   521                   708 </span></span>
+<span><span class="co">##          Fibroblast_4 </span></span>
+<span><span class="co">##                  1172</span></span></code></pre>
 <blockquote>
 <p>The analysis below is only meant to be a demonstration of the
 potential of spatial transcriptomics data. A proper statistical analysis
@@ -1111,35 +1167,37 @@ could be used to perform analysis on a single tissue, however, it would
 also be more robust with biological replicates. This tool is outside the
 scope of this introductory workshop therefore is not covered.</p>
 </blockquote>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># identify markers</span></span>
-<span><span class="va">marker.info</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/scoreMarkers.html" class="external-link">scoreMarkers</a></span><span class="op">(</span><span class="va">lung5</span>, <span class="va">clusters</span>, pairings <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"B cell_4"</span>, <span class="st">"T cell regulatory_4"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"B cell_3"</span>, <span class="st">"T cell regulatory_3"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">marker.info</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/scoreMarkers.html" class="external-link">scoreMarkers</a></span><span class="op">(</span><span class="va">lung5</span>, <span class="va">clusters</span>, pairings <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"B cell_4"</span>, <span class="st">"T cell_4"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"B cell_3"</span>, <span class="st">"T cell_3"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">marker.info</span></span></code></pre></div>
 <pre><code><span><span class="co">## List of length 2</span></span>
-<span><span class="co">## names(2): B cell_4 T cell regulatory_4</span></span></code></pre>
-<p>Below we compare the malignant (cancer) cells from region 2
-(invasive) against those from region 5 (DCIS). Investigating and
-visialising the top genes shows that <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=DHRS" class="external-link"><em>DHRS</em></a>
-and <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=MUC6" class="external-link"><em>MUC6</em></a>
-are up-regulated in invasive cancer cells while <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=GATA3" class="external-link"><em>GATA3</em></a>
-and <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=FLNB" class="external-link"><em>FLNB</em></a>
-are moderately up-regulated in DCIS cancer cells.</p>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<span><span class="co">## names(2): B cell_4 T cell_4</span></span></code></pre>
+<p>Below we compare B cells from region 4 (lymphoid aggregates) against
+those from region 3 (dispersed). Investigating and visualising the top
+genes shows that <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=CD74" class="external-link"><em>CD74</em></a>,
+<a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=MS4A1" class="external-link"><em>MS4A1</em></a>,
+and <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=IGHM" class="external-link"><em>IGHM</em></a>
+are up-regulated in B cells within lymphoid aggregates compared to
+dispersed B cells. These genes are indicative of increased antigen
+presentation, B cell maturation and increased activity against the
+adjacent tumour regions respectively.</p>
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># study markers of B cell_4</span></span>
 <span><span class="va">chosen_bcell</span> <span class="op">=</span> <span class="va">marker.info</span><span class="op">[[</span><span class="st">"B cell_4"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">ordered_bcell</span> <span class="op">=</span> <span class="va">chosen_bcell</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">chosen_bcell</span><span class="op">$</span><span class="va">rank.AUC</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ordered_bcell</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## DataFrame with 6 rows and 4 columns</span></span>
-<span><span class="co">##        self.average other.average self.detected other.detected</span></span>
-<span><span class="co">##           &lt;numeric&gt;     &lt;numeric&gt;     &lt;numeric&gt;      &lt;numeric&gt;</span></span>
-<span><span class="co">## MALAT1     4.803664      4.459637      1.000000       0.994512</span></span>
-<span><span class="co">## CD74       3.153887      2.312227      0.973958       0.848988</span></span>
-<span><span class="co">## RPL34      1.797616      1.365601      0.814236       0.668511</span></span>
-<span><span class="co">## MS4A1      1.416434      0.560667      0.631944       0.260054</span></span>
-<span><span class="co">## IGHM       1.501242      0.702592      0.649306       0.298785</span></span>
-<span><span class="co">## CD79A      0.777071      0.322778      0.477431       0.210886</span></span></code></pre>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotExpression.html" class="external-link">plotExpression</a></span><span class="op">(</span><span class="va">lung5</span>,</span>
+<span><span class="co">##          self.average other.average self.detected other.detected</span></span>
+<span><span class="co">##             &lt;numeric&gt;     &lt;numeric&gt;     &lt;numeric&gt;      &lt;numeric&gt;</span></span>
+<span><span class="co">## CD74         2.820786      2.414665      0.945578       0.868591</span></span>
+<span><span class="co">## BGN          0.989965      0.458192      0.530612       0.275329</span></span>
+<span><span class="co">## COL3A1       0.632564      0.253462      0.414966       0.178230</span></span>
+<span><span class="co">## HLA-DRB1     1.657442      1.288221      0.789116       0.617147</span></span>
+<span><span class="co">## COL1A1       0.504057      0.185932      0.374150       0.145986</span></span>
+<span><span class="co">## CIITA        0.929347      0.609135      0.537415       0.338656</span></span></code></pre>
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotExpression.html" class="external-link">plotExpression</a></span><span class="op">(</span><span class="va">lung5</span><span class="op">[</span>, <span class="va">lung5</span><span class="op">$</span><span class="va">cell_type</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">%in%</a></span> <span class="st">"B cell"</span><span class="op">]</span>,</span>
 <span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">ordered_bcell</span><span class="op">)</span>, <span class="fl">9</span><span class="op">)</span>,</span>
 <span>  x <span class="op">=</span> <span class="st">"hoodscanr_region"</span>,</span>
 <span>  colour_by <span class="op">=</span> <span class="st">"hoodscanr_region"</span>,</span>
@@ -1149,30 +1207,33 @@ are moderately up-regulated in DCIS cancer cells.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Paired"</span>, na.value <span class="op">=</span> <span class="st">"#333333"</span>, name <span class="op">=</span> <span class="st">"cluster"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-31-1.png" width="768"></p>
-<p>Next we compare the fibroblasts from region 6 (stroma) against those
-from region 3 (tumour-adjacent). Investigating and visialising the top
-genes shows that <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=LUM" class="external-link"><em>LUM</em></a>
-and <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=POSTN" class="external-link"><em>POSTN</em></a>
-are up-regulated in stromal fibroblasts while <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=MMP11" class="external-link"><em>MMP11</em></a>
-and <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=AQP1" class="external-link"><em>AQP1</em></a>
-are up-regulated in the tumour-adjacent fibroblasts.</p>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># study markers of T cell regulatory_4</span></span>
-<span><span class="va">chosen_tcell</span> <span class="op">=</span> <span class="va">marker.info</span><span class="op">[[</span><span class="st">"T cell regulatory_4"</span><span class="op">]</span><span class="op">]</span></span>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-32-1.png" width="768"></p>
+<p>Next we compare T cells from region 4 (lymphoid aggregates) against
+those from region 3 (dispersed). Investigating and visualising the top
+genes shows that <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=FYB1" class="external-link"><em>FYB1</em></a>,
+<a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=FYN" class="external-link"><em>FYN</em></a>,
+<a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=CD37" class="external-link"><em>CD37</em></a>,
+and <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=CXCR4" class="external-link"><em>CXCR4</em></a>
+are up-regulated in T cells. The first two genes indicate increased
+T-cell receptor (TCR) signalling while the latter two are involved in
+immune cell recruitment and infiltration. These genes suggest increased
+activity and infiltration of T cells in the lymphoid aggregates.</p>
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># study markers of T cell_4</span></span>
+<span><span class="va">chosen_tcell</span> <span class="op">=</span> <span class="va">marker.info</span><span class="op">[[</span><span class="st">"T cell_4"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">ordered_tcell</span> <span class="op">=</span> <span class="va">chosen_tcell</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">chosen_tcell</span><span class="op">$</span><span class="va">rank.AUC</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ordered_tcell</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## DataFrame with 6 rows and 4 columns</span></span>
-<span><span class="co">##       self.average other.average self.detected other.detected</span></span>
-<span><span class="co">##          &lt;numeric&gt;     &lt;numeric&gt;     &lt;numeric&gt;      &lt;numeric&gt;</span></span>
-<span><span class="co">## CD37      0.921737      0.921644      0.545455       0.478048</span></span>
-<span><span class="co">## FYN       0.778307      0.329144      0.504132       0.213585</span></span>
-<span><span class="co">## FYB1      0.712461      0.342734      0.454545       0.253396</span></span>
-<span><span class="co">## IL6ST     0.721561      0.261453      0.429752       0.185830</span></span>
-<span><span class="co">## IL32      1.029293      0.813102      0.611570       0.483851</span></span>
-<span><span class="co">## TIGIT     0.557663      0.167929      0.396694       0.127260</span></span></code></pre>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotExpression.html" class="external-link">plotExpression</a></span><span class="op">(</span><span class="va">lung5</span>,</span>
+<span><span class="co">##        self.average other.average self.detected other.detected</span></span>
+<span><span class="co">##           &lt;numeric&gt;     &lt;numeric&gt;     &lt;numeric&gt;      &lt;numeric&gt;</span></span>
+<span><span class="co">## COL1A1     0.503700      0.185932      0.371324       0.145986</span></span>
+<span><span class="co">## IL32       1.053676      0.664202      0.654412       0.438433</span></span>
+<span><span class="co">## COL9A2     2.671671      2.187151      0.970588       0.908677</span></span>
+<span><span class="co">## IL7R       0.728842      0.372767      0.441176       0.255934</span></span>
+<span><span class="co">## S100A4     0.737982      0.325845      0.466912       0.238911</span></span>
+<span><span class="co">## CD3E       1.093200      0.809936      0.716912       0.514430</span></span></code></pre>
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotExpression.html" class="external-link">plotExpression</a></span><span class="op">(</span><span class="va">lung5</span><span class="op">[</span>, <span class="va">lung5</span><span class="op">$</span><span class="va">cell_type</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">%in%</a></span> <span class="st">"T cell"</span><span class="op">]</span>,</span>
 <span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">ordered_tcell</span><span class="op">)</span>, <span class="fl">9</span><span class="op">)</span>,</span>
 <span>  x <span class="op">=</span> <span class="st">"hoodscanr_region"</span>,</span>
 <span>  colour_by <span class="op">=</span> <span class="st">"hoodscanr_region"</span>,</span>
@@ -1182,24 +1243,24 @@ are up-regulated in the tumour-adjacent fibroblasts.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Paired"</span>, na.value <span class="op">=</span> <span class="st">"#333333"</span>, name <span class="op">=</span> <span class="st">"cluster"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-32-1.png" width="768"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-33-1.png" width="768"></p>
 </div>
 <div class="section level2">
 <h2 id="functional-analysis">Functional analysis<a class="anchor" aria-label="anchor" href="#functional-analysis"></a>
 </h2>
-<p>The example dataset used here was generated using the 10x Xenium
-platform that measured 380 genes. More recent versions of this platform
-and competing platforms such as the NanoString CosMx are now providing
-around 5000 genes (soon whole transcriptome as well!). It is relatively
-easy to scan through the strongest differentially expressed genes from a
-list of at most 380 genes to understand the processes underpinning the
-system. With larger panel sizes, we need computational tools to perform
-such analyses, often referred to as gene-set enrichment analysis or
-functional analysis. As this is an extensive topic, it is not covered in
-depth in this workshop, however, we have previously developed a <a href="https://davislaboratory.github.io/GenesetAnalysisWorkflow/" class="external-link">workshop
+<p>The example dataset used here was generated using the
+Bruker/NanoString CosMx SMI platform that measured 960 genes. More
+recent versions of this platform provide whole transcriptome
+measurements (&gt;20k genes). It is relatively easy to scan through the
+strongest differentially expressed genes from a list of at most 960
+genes to understand the processes underpinning the system. With larger
+panel sizes, we need computational tools to perform such analyses, often
+referred to as gene-set enrichment analysis or functional analysis. As
+this is an extensive topic, it is not covered in depth in this workshop,
+however, we have previously developed a <a href="https://davislaboratory.github.io/GenesetAnalysisWorkflow/" class="external-link">workshop
 on gene-set enrichment analysis</a> and refer the attendees to that if
-they are interested. A non-programmatic interface of some of the tools
-in our workshop can be accessed through <a href="https://visse.cloud/" class="external-link">vissE.cloud</a>.</p>
+they are interested. A web-based interface of some of the tools in our
+workshop can be accessed through <a href="https://visse.cloud/" class="external-link">vissE.cloud</a>.</p>
 <blockquote>
 <p>Optional: You can also explore the full dataset from this workshop on
 vissE.cloud through the following <a href="https://visse.cloud/galleryexample/cosmx_NSCLCLung5Rep3_PCA" class="external-link">link</a>.
@@ -1216,7 +1277,7 @@ analysis on the factor loadings to explain the biological processes.</p>
 Bioconductor project, running on R version 4.5.1 (2025-06-13) or higher.
 The complete list of the packages used for this workflow are shown
 below:</p>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## R version 4.5.1 (2025-06-13)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
@@ -1247,7 +1308,7 @@ below:</p>
 <span><span class="co">##  [9] scater_1.36.0                      scran_1.36.0                      </span></span>
 <span><span class="co">## [11] scuttle_1.18.0                     SingleCellExperiment_1.30.1       </span></span>
 <span><span class="co">## [13] SummarizedExperiment_1.38.1        Biobase_2.68.0                    </span></span>
-<span><span class="co">## [15] GenomicRanges_1.60.0               GenomeInfoDb_1.44.0               </span></span>
+<span><span class="co">## [15] GenomicRanges_1.60.0               GenomeInfoDb_1.44.1               </span></span>
 <span><span class="co">## [17] IRanges_2.42.0                     S4Vectors_0.46.0                  </span></span>
 <span><span class="co">## [19] BiocGenerics_0.54.0                generics_0.1.4                    </span></span>
 <span><span class="co">## [21] MatrixGenerics_1.20.0              matrixStats_1.5.0                 </span></span>
@@ -1262,7 +1323,7 @@ below:</p>
 <span><span class="co">##  [11] memoise_2.0.1             DelayedMatrixStats_1.30.0</span></span>
 <span><span class="co">##  [13] prettydoc_0.4.1           htmltools_0.5.8.1        </span></span>
 <span><span class="co">##  [15] S4Arrays_1.8.1            BiocNeighbors_2.2.0      </span></span>
-<span><span class="co">##  [17] SparseArray_1.8.0         sass_0.4.10              </span></span>
+<span><span class="co">##  [17] SparseArray_1.8.1         sass_0.4.10              </span></span>
 <span><span class="co">##  [19] bslib_0.9.0               htmlwidgets_1.6.4        </span></span>
 <span><span class="co">##  [21] desc_1.4.3                plyr_1.8.9               </span></span>
 <span><span class="co">##  [23] cachem_1.1.0              igraph_2.1.4             </span></span>
@@ -1290,7 +1351,7 @@ below:</p>
 <span><span class="co">##  [67] XVector_0.48.0            RcppAnnoy_0.0.22         </span></span>
 <span><span class="co">##  [69] RANN_2.6.2                ggrepel_0.9.6            </span></span>
 <span><span class="co">##  [71] pillar_1.11.0             stringr_1.5.1            </span></span>
-<span><span class="co">##  [73] limma_3.64.1              RcppHungarian_0.3        </span></span>
+<span><span class="co">##  [73] limma_3.64.3              RcppHungarian_0.3        </span></span>
 <span><span class="co">##  [75] splines_4.5.1             dplyr_1.1.4              </span></span>
 <span><span class="co">##  [77] lattice_0.22-7            bit_4.6.0                </span></span>
 <span><span class="co">##  [79] annotate_1.86.1           tidyselect_1.2.1         </span></span>
@@ -1314,10 +1375,6 @@ below:</p>
 <span><span class="co">## [115] purrr_1.1.0               crayon_1.5.3             </span></span>
 <span><span class="co">## [117] rlang_1.1.6               cowplot_1.2.0            </span></span>
 <span><span class="co">## [119] KEGGREST_1.48.1</span></span></code></pre>
-</div>
-<div class="section level2">
-<h2 class="unnumbered" id="acknowledgments">Acknowledgments<a class="anchor" aria-label="anchor" href="#acknowledgments"></a>
-</h2>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
@@ -1380,6 +1437,12 @@ Totty, Michael, Stephanie C Hicks, and Boyi Guo. 2024.
 <span>“SpotSweeper: Spatially-Aware Quality Control for Spatial
 Transcriptomics.”</span> <em>bioRxiv</em>.
 </div>
+<div id="ref-townes2019feature" class="csl-entry">
+Townes, F William, Stephanie C Hicks, Martin J Aryee, and Rafael A
+Irizarry. 2019. <span>“Feature Selection and Dimension Reduction for
+Single-Cell RNA-Seq Based on a Multinomial Model.”</span> <em>Genome
+Biology</em> 20 (1): 295.
+</div>
 <div id="ref-R-ggplot2" class="csl-entry">
 Wickham, Hadley, Winston Chang, Lionel Henry, Thomas Lin Pedersen,
 Kohske Takahashi, Claus Wilke, Kara Woo, Hiroaki Yutani, Dewey
@@ -1404,7 +1467,7 @@ Report Generation in r</em>. <a href="https://yihui.org/knitr/" class="external-
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Dharmesh D. Bhuva, Chin Wee Tan.</p>
+<p>Developed by Dharmesh D. Bhuva, Chin Wee Tan, Jiadong Mao, Melody Jin.</p>
 </div>
 
 <div class="pkgdown">
