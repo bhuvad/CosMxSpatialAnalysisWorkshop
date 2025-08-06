@@ -67,7 +67,7 @@ Imports:
     ComplexHeatmap
 Remotes:
     bhuvad/SpaNorm,
-    jiadongm/PhiSpace
+    jiadongm/PhiSpace/pkg
 Suggests: 
     pkgdown,
     BiocStyle,
