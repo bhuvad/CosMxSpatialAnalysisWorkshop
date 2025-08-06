@@ -17,6 +17,18 @@ Authors@R:
         email = "cwtan@wehi.edu.au",
         role = c("aut"),
         comment = c(ORCID = '0000-0001-9695-7218')
+      ),
+      person(
+        "Jiadong",
+        "Mao",
+        email = "jiadong.mao@unimelb.edu.au",
+        role = c("aut")
+      ),
+      person(
+        "Melody",
+        "Jin",
+        email = "jin.m@wehi.edu.au",
+        role = c("aut")
       )
     )
 Description: This workflow package shows how a basic analysis of spatial transcriptomics datasets is performed to gain biological insight. 
@@ -45,9 +57,17 @@ Imports:
     scater,
     scuttle,
     scran,
-    hoodscanR
+    hoodscanR,
+    PhiSpace,
+    seriation,
+    dplyr,
+    tidyr,
+    magrittr,
+    ggpubr,
+    ComplexHeatmap
 Remotes:
-    bhuvad/SpaNorm
+    bhuvad/SpaNorm,
+    jiadongm/PhiSpace
 Suggests: 
     pkgdown,
     BiocStyle,

@@ -81,9 +81,9 @@ We will use the already segmented cell-level count data. We will also use a prev
 
 # Loading prepared data
 
-The data we will use in this workshop is from the 10x Xenium platform. Since the objective of this workshop is to introduce you to spatial transcriptomics analysis, we do not work with the full dataset, which contains over 500,000 cells and instead opt to work with a smaller subset of the sample. This region contains interesting features and is therefore enough to showcase a complete spatial transcriptomics analysis workflow. The data used in this workshop is a window with the x coordinate in the interval (4800, 5800) and the y coordinate in the interval (8500, 9500). This window is shown in the context of the full tissue below.
+The data we will use in this workshop is from the Bruker/Nanostring CosMx SMI platform. Since the objective of this workshop is to introduce you to spatial transcriptomics analysis, we do not work with the full dataset, which contains over 700,000 cells from 8 samples and instead opt to work with a smaller subset of one sample. This region contains interesting features and is therefore enough to showcase a complete spatial transcriptomics analysis workflow. The data used in this workshop comes from 4 fields of view (FOVs) from the sample labeled Lung5_Rep3. This window is shown in the context of the full tissue below.
 
-![Full IDC](https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/full_tissue.png)
+![The CosMx non-small cell lung cancer (NSCLC) dataset.](https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/full_tissue.png)
 
 ```{r}
 library(SpatialExperiment)
@@ -188,7 +188,7 @@ plotColData(lung5, "detected", "sum", colour_by = "region", scattermore = TRUE) 
   geom_vline(xintercept = 75, lty = 2)
 ```
 
-However, we need to identify appropriate thresholds to classify poor quality cells. As the panel sizes and compositions for these emerging technologies are variable, there are no standards as of yet for filtering. For instance, immune cells will always have smaller library sizes and potentially a smaller number of genes expressed in a targetted panel as each cell type may be represented by a few marker genes. Additionally, these cells are smaller in size therefore could be filtered out using an area-based filter. Desipte the lack of standards, the extreme cases where cells express fewer than 20 genes and have fewer than 50 detections are clearly of poor quality. As such, we can start with these thresholds and adjust based on other metrics and visualisations.
+However, we need to identify appropriate thresholds to classify poor quality cells. As the panel sizes and compositions for these emerging technologies are variable, there are no standards as of yet for filtering. For instance, immune cells will always have smaller library sizes and potentially a smaller number of genes expressed in a targetted panel as each cell type may be represented by a few marker genes. Additionally, these cells are smaller in size therefore could be filtered out using an area-based filter. Desipte the lack of standards, the extreme cases where cells express fewer than 50 genes and have fewer than 75 detections are clearly of poor quality. As such, we can start with these thresholds and adjust based on other metrics and visualisations.
 
 ```{r}
 library(standR)
@@ -279,6 +279,8 @@ Above we plot the `sum`, which is commonly known as the library size, for the pu
 
 While library sizes are a good measure of technical variation in conventional sequencing data (bulk and single-cell RNA-seq), they are not the most appropriate in assessing technical effects in targeted panels because the panel is biased towards measuring the biology of interest. As such, we need a purely technical measurement to adjust our data. Negative control probes offer this measure of technical biases in the data as they are designed to not measure any biology (i.e., the are synthetic probes designed to not hybridise with any transcripts in the system).
 
+![Using negative control probes to normalise spatial transcriptomics data.](https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/neg_probes_normalisation.png)
+
 Though it is ideal to use negative control probes for normalisation of targeted spatial transcriptomics data, the data we are analysing is relatively old and from a prototype instrument, therefore, the negative control probe counts are too low to be used for modelling. Additionally, the current Bruker CosMx instrument uses two kinds of negative control probes, conventional negative control probes (such as in this dataset) and false codes. The latter are best used for modelling technical variation in CosMx datasets as their counts are generally higher. We recommend using false code counts for normalising Bruker CosMx datasets.
 
 ```{r}
@@ -293,9 +295,9 @@ To remove these technical biases, we perform normalisation. As measurements are 
 1. The tissue structure in one region is more rigid, thereby making it difficult for reagents to permeate.
 1. Reagents distributed unevenly due to technical issues leading to a sub-region within a tissue region being under sampled.
 
-In both cases, each cell cannot be normalised independently as nearby cells are likely to experience similar technical effects. To tackle this, our team has developed the SpaNorm normalisation method that uses spatial dependence to decouple technical and biological effects [@salim2024spanorm]. SpaNorm uses a spatially constrained regularised generalised linear model to model library size effects and subsequently adjust the data.
+In both cases, each cell cannot be normalised independently as nearby cells are likely to experience similar technical effects. To tackle this, our team has developed the SpaNorm normalisation method that uses spatial dependence to decouple technical and biological effects [@salim2024spanorm]. SpaNorm uses a spatially constrained regularised generalised linear model to model library size effects and subsequently adjust the data. This is done by calling the `SpaNorm()` function on a SpatialExperiment object.
 
-![SpaNorm schematic](https://raw.githubusercontent.com/bhuvad/SpaNorm/refs/heads/master/vignettes/SpaNormWorkflow.png)
+![A schematic diagram of the SpaNorm normalisation method.](https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/spanorm_schematic.png)
 
 The key parameters for SpaNorm normalisation that need to be adjusted are:
 
@@ -325,7 +327,7 @@ p2 = plotSpatial(lung5_pearson, what = "expression", assay = "logcounts", colour
 p1 + p2
 ```
 
-Since the SpaNorm model learns the functions for biological and technical effects for each gene, we can also investigate these to ensure that the correct biology is learnt and modelled. The `plotCovariate` functions can be used to study these. It is worth remembering that while the biological function is independent of covariates (like an intercept), the technical function is a function of the library size. To enable some interpretation, we show how the function evaluates at the mean library size below.
+Since the SpaNorm model learns the functions for biological and technical effects for each gene, we can also investigate these to ensure that the correct biology is learnt and modelled. The `plotCovariate()` functions can be used to study these. It is worth remembering that while the biological function is independent of covariates (like an intercept), the technical function is a function of the library size. To enable some interpretation, we show how the function evaluates at the mean library size below.
 
 ```{r fig.width=8, fig.height=4.5}
 p1 = plotCovariate(lung5, covariate = "biology", colour = EPCAM, alpha = 0.75) +
@@ -349,6 +351,12 @@ Library size normalisation is important to ensure technical variation is removed
 
 # Identifying spatially variable genes (SVGs)
 
+Not all genes in the study are likely to be meaningful, therefore, a key step in any transcriptomic analysis is to identify informative features/genes. In spatial transcriptomics, we are interest in identifying features that are spatially non-random. These genes should vary spatially along with biology and are thus referred to as spatially variable genes (SVGs). Common approaches to identify these genes use approaches inspired from spatial statistics such as Moran's I. However, these approaches generally work with unnormalised data and often apply their own non-spatial normalisation to the data prior to identifying SVGs. As we have a spatial normalisation approach, we want to retain our normalisation.
+
+We have recently developed a model-based SVG detection approach which makes use of the model fit for the normalisation step of SpaNorm. Note that the SpaNorm model contains coefficients to represent biological and technical variation. Genes that are spatially variable, and therefore biologically informative should have non-zero coefficients for biology. We can test for the importance of the coefficients for the biological components using a likelihood ratio test (LRT) by comparing the SpaNorm model (Model 1 below) to a nested model (Model 2) containing only the technical components. This allows us to identify statistically significant spatial variation. The `SpaNormSVG()` function fits this additional nested model, compares it to the full SpaNorm model, and performs the likelihood ratio test to identify spatially variable genes (SVGs). Results of the test are stored in the `rowData` of the SpatialExperiment object, but can also be retrieved using the `topSVGs()` function.
+
+![A schematic diagram of the SpaNormSVG normalisation method.](https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/spanorm_svg_schematic.png)
+
 ```{r}
 set.seed(1000)
 lung5 = SpaNormSVG(lung5)
@@ -370,6 +378,8 @@ lapply(rownames(topsvgs), function(gene) {
 ```
 
 # GLM-PCA
+
+Spatial transcriptomics data is usually in the form of sparse counts. Principal components analysis (PCA), which relies on Euclidean geometry is not appropriate with such data. Subsequently, PCA is usually performed on log normalised counts, a transformation which makes the data more amenable to PCA. However, this approach also introduces biases to the PCA estimation (discussed in depth in [@townes2019feature]). The GLM-PCA approach was proposed to compute PCA directly on counts, however, the approach is computationally intensive. A more practical approach was proposed by [@townes2019feature] which approximated the GLM-PCA by computing PCA on the deviance residuals from a null model (a model consisting of technical variation alone). This model is already fit to identify SVGs in the previous step (Model 2) therefore GLM-PCA can be easily computed. The `SpaNormPCA()` function can be used to compute GLM-PCA. In most cases, it will be comparable to PCA on the logPAC counts generated by SpaNorm, however, the GLM-PCA approximation is theoretically more rigorous and will poses better properties as discussed in [@townes2019feature].
 
 ```{r}
 lung5 = SpaNormPCA(lung5, svg.fdr = 0.1, ncomponents = 20, residuals = "pearson")
@@ -393,7 +403,7 @@ p1 + p2
 
 Cell typing can be performed using various approaches. Most of these were developed for the analysis of single-cell RNA-seq datasets and port across well to spatial transcriptomics datasets. The two common strategies are reference-based and reference-free annotations. In the former, annotations are mapped across from a previously annotated dataset. For a thorough discussion on this topic, review the [Orchestrating Single-Cell Analysis (OSCA) with Bioconductor](https://bioconductor.org/books/release/OSCA/) book [@amezquita2020orchestrating]. Here, we use the SingleR package [@aran2019reference] along with a reference non-small cell lung cancer (NSCLC) dataset [@salcher2022high].
 
-SingleR is a simple yet powerful algorithm that only requires a single prototype of what the cell type's expression profile should look like. As such, counts are aggregated (pseudobulked) across cells to form a reference dataset where a single expression vector is created for each cell type. Aggregation is performed using the `scater::aggregateAcrossCells` function. As the original dataset contains >96,000 cells, we only provide the aggregated counts for this workshop. Aggregated counts tend to be more robust to technical variation and are therefore more suitable for cell typing.
+SingleR is a simple yet powerful algorithm that only requires a single prototype of what the cell type's expression profile should look like. As such, counts are aggregated (pseudobulked) across cells to form a reference dataset where a single expression vector is created for each cell type. Aggregation is performed using the `scater::aggregateAcrossCells` function. While the original dataset contains >96,000 cells, we only provide the aggregated counts for this workshop. Aggregated counts tend to be more robust to technical variation and are therefore more suitable for cell typing.
 
 ```{r}
 library(scran)
@@ -414,15 +424,26 @@ library(SingleR)
 # predict cell types using SingleR
 prediction = SingleR(test = lung5, ref = ref_luca, labels = ref_luca$cell_type)
 # add prediction to the SpatialExperiment object
-lung5$cell_type = prediction$labels
+lung5$cell_type_fine = prediction$labels
+```
+
+Since the reference datasets contains highly detailed cell annotation, we are able to annotate our data to such a high degree. However, for the sake of demonstration, we simplify the annotation to collapse them to a higher order classification below.
+
+```{r}
+# load the cell type map
+data(luca_map)
+lung5$cell_type = luca_map[lung5$cell_type_fine]
 ```
 
 ```{r}
 plotSpatial(lung5, colour = cell_type, alpha = 0.75) +
   ggtitle("Predicted cell type") +
+  scale_colour_brewer(palette = "Paired") +
   theme(legend.position = "bottom") +
-  guides(colour = guide_legend(override.aes = list(shape = 15, size = 5)))
+  guides(colour = guide_legend(override.aes = list(shape = 15, size = 5, alpha = 1)))
 ```
+
+Though discrete cell type identities are appealing due to their ease of interpretation, in many biological systems, metastable cell states (also referred to as plasticity) are likely to be present. Thus, such discrete cell type annotation may force cells into states that are not representative of true biology. PhiSpace, covered in the second part of this workshop series, is a method developed to deal with this issue. PhiSpace assigns a continuous score for each cell belonging to a cell type. These scores can either be thought of as the degree of evidence towards a cell conforming to a certain cell type, or the location of a cell in a plastic trajectory. In cancer sytems, where plasticity is dominant due to regression to stem-like states, the continuous cell annotation PhiSpace provides is powerful. Part 2 of this workshop describes PhiSpace in detail and demonstrates the types of analyses it powers.
 
 # Spatial domain identification
 
@@ -461,7 +482,7 @@ set.seed(1000)
 lung5 = clustByHood(lung5, pm_cols = colnames(neighbourhoods), k = 5, val_name = "hoodscanr_region")
 # plot predictions
 p1 = plotSpatial(lung5, colour = hoodscanr_region, alpha = 0.75) +
-  scale_colour_brewer(palette = "Paired", na.value = "#333333", name = "predicted") +
+  scale_colour_brewer(palette = "Set1", na.value = "#333333", name = "predicted") +
   ggtitle("Predicted pathology") +
   theme(legend.position = "bottom") +
   guides(colour = guide_legend(nrow = 3, override.aes = list(shape = 15, size = 5)))
@@ -472,13 +493,13 @@ p2 = plotSpatial(lung5, colour = region) +
 p1 + p2 + plot_annotation(title = "Spatial domain identification")
 ```
 
-The plot above shows that hoodscanR is able to differentiate the key regions and is clearly able to separate the distinct DCIS lesions. It is also able to identify the layer of cells separating the tumour lesions from the stroma. However, it is unable to distinguish between the invasive and DCIS regions. This is because our current annotation of cell types does not discriminate between the different cellular states of cells in these regions. This is one limitation of cell type based methods - that is, they need the labels of all possible cell types and cell states we are interested. However, the power of these methods is that we can study the neighbourhood composition directly as this was used to generate the domains.
+The plot above shows that hoodscanR is able to differentiate the key regions and is clearly able to delineate the tumour regions. It is also able to identify more sophosticated structures such as region 4 which was not identified in the pathological annotation.
 
 ```{r}
 plotProbDist(lung5, pm_cols = colnames(neighbourhoods), by_cluster = TRUE, plot_all = TRUE, show_clusters = as.character(seq(5)), val_name = "hoodscanr_region")
 ```
 
-we see that cluster 5 is entirely defined by the presence of malignant cells while cluster 2 captures the tumour lining epithelial cells, malignant cells, and fibroblasts. Cluster 1 is composed of the immune cells, particularly T cells, B cells and macrophages, indicating the formation of lymphoid aggregates. Lymphoid aggregates are interesting structures in the context of solid cancers, and depending on their expression profile, these can be beneficial for patients.
+we see that cluster 5 is entirely defined by the presence of malignant cells while cluster 4 is composed of immune cells, particularly B cells, T cells and plasma cells, indicating the formation of lymphoid aggregates. Lymphoid aggregates are interesting structures in the context of solid cancers, and depending on their expression profile, these can be beneficial for patients.
 
 ```{r}
 # calculate metrics of heterogeneity - entropy
@@ -496,7 +517,7 @@ p2 = plotSpatial(lung5, colour = entropy, alpha = 0.75) +
 p1 + p2 + plot_annotation(title = "Cell type heterogeneity")
 ```
 
-Looking at the heterogeneity of cell types across space, we see that cell composition is very homogeneous within the tumour regions while it is highest in the lymphoid aggregates which are often characterised by the presence of various different types of immune cells. We emphasise again that the homogeneity of the tumour regions is determined based on their cell type call alone and not on their expression profile. As such, the tumours themselves could be heterogeneous if finer cell typing or cell phenotyping were to be performed. Additionally, any errors made in cell typing will propage to domain identification.
+Looking at the heterogeneity of cell types across space, we see that cell composition is very homogeneous within the tumour regions while it is highest in the lymphoid aggregates which are often characterised by the presence of various different types of immune cells. We emphasise here that the homogeneity of the tumour regions is determined based on their cell type call alone and not on their expression profile. As such, the tumours themselves could be heterogeneous if finer cell typing or cell phenotyping were to be performed. Additionally, any errors made in cell typing will propage to domain identification.
 
 The approach that follows allows an unbiased identification of domains using the gene expression data directly.
 
@@ -541,19 +562,21 @@ lung5 = clusterBanksy(lung5, lambda = lambda, npcs = npcs, resolution = res)
 lung5$banksy_region = lung5$`clust_M0_lam0.2_k50_res0.4`
 
 plotSpatial(lung5, colour = banksy_region, alpha = 0.75) +
-  scale_colour_brewer(palette = "Paired", na.value = "#333333", name = "predicted") +
+  scale_colour_brewer(palette = "Set1", na.value = "#333333", name = "predicted") +
   ggtitle("Mean from SpaNorm model") +
   theme(legend.position = "bottom") +
   guides(colour = guide_legend(override.aes = list(shape = 15, size = 5)))
 ```
 
-Try varying the parameters to see how the clustering changes. Do note that the results are automatically stored in a new column in the colData. Unfortunately, the function does not allow specification of the new column name so the only approach is to look at the column names using `colnames(colData(idc))` and find the name of the new column (usually the last one) containing the clustering results. We then store these to a column of our choosing to make it easier to reference it.
+Try varying the parameters to see how the clustering changes. Do note that the results are automatically stored in a new column in the colData. Unfortunately, the function does not allow specification of the new column name so the only approach is to look at the column names using `colnames(colData(lung5))` and find the name of the new column (usually the last one) containing the clustering results. We then store these to a column of our choosing to make it easier to reference it.
 
-Looking back at the original annotations, we see that clusters 3 and 5 represent the DCIS and Invasive tumours respectively. Similarly, cluster 10 represents the blood vessel annotated by the pathologist. Computational analysis reveals additional structures present in the tissue that may differ only in the genomic measurements. Clustes 6 and 7 for instance seems to represent different structures in the stroma, some of which may be visible in the histology image but are intestive to label manually. We also find cluster 4 which represents a boundary of cells surrounding invasive and DCIS lesions.
+Banksy is able to identify the tumour regions (4 and 6), lymphoid aggregates (5 and 9) and other stromal regions. However, we notice that it is not able to merge regions from the different fields of view (FOVs) which have batch effects. This is because the transcriptomic profiles may yet have batch effects following adjustment. This is one of the pit falls of methods that use expression data compared to cell-based methods. The former are more sensitive to batch effects than the latter, which use higher-order phenotypes (cell types) that are less likely to be altered due to batch effects.
+
+We highlight here that when the full dataset is used and there are more cells to learn structure from, Banksy is able to identify merged clusters across the tissue. It is worth remembering that this workshop only provides a demonstration of methods. When methods are optimised and run on more data, perfomance will vary and will generally improve.
 
 ```{r}
 p1 = plotSpatial(lung5, colour = banksy_region, alpha = 0.75) +
-  scale_colour_brewer(palette = "Paired", na.value = "#333333", name = "predicted") +
+  scale_colour_brewer(palette = "Set1", na.value = "#333333", name = "predicted") +
   ggtitle("Predicted pathology") +
   theme(legend.position = "bottom") +
   guides(colour = guide_legend(nrow = 3, override.aes = list(shape = 15, size = 5)))
@@ -568,30 +591,26 @@ The choice of the better approach amongst the two demonstrated here should be ba
 
 # Differential expression
 
-Cell type identification or clustering allows us to identify the different cellular states in a biological system. The power of spatial molecular datasets is that we can study how cellular states change in response to different structures in the tissue. For instance, in our tissue we see that there are two different types of cancer lesions, ductal carcinoma in situ and invasive. Cancer cells in the latter lesion tend to me aggresive and can spread more than those in the DCIS region. We would be interested in knowning the biological processes that make this happen.
-
-Additionally, cancer cells interact with their environment including cell types such as fibroblasts. We may be interested in identifying the differences in fibroblasts that are in close proximity to cancer cells as opposed to the distant ones. We can identify the genes that are associated with these changes below.
+Cell type identification or clustering allows us to identify the different cellular states in a biological system. The power of spatial molecular datasets is that we can study how cellular states change in response to different structures in the tissue. For instance, in our tissue we notice immune cells in lymphoid aggregates (region 4) and immune cells dispersed elsewhere in the tissue (region 3). We may be interested in studying the functional differences of cells in different domains. We can cluster the cells using a combination of cell types and regions and study phenotypic differences in a cell type within different regions.
 
 ```{r}
 # create clusters to study how cell types vary across domains
 clusters = paste(lung5$cell_type, lung5$hoodscanr_region, sep = "_")
-clusters |>
+clusters[lung5$hoodscanr_region %in% c("3", "4")] |>
   table() |>
   sort() |> 
   tail(10)
 ```
 
-We see that the two largest clusters capture malignant cells in spatial domains 2 and 5 which align with the invasive and DCIS regions respectively based on the pathology annotations. We also see that though most of the fibroblasts are dispersed in the stroma (region 6), those that are closer to the cancer lesions are clustered in region 3. We would be interested in studying the difference between these and understanding whether they contain features that promote the tumour.
-
 > The analysis below is only meant to be a demonstration of the potential of spatial transcriptomics data. A proper statistical analysis would require replicate tissue samples from across different patients. In such a case, we would aggregate transcript counts across cell types using the `scater::sumCountsAcrossCells` to create pseudo-bulk samples, and follow up with a differential expression analysis using the [`edgeR`](https://doi.org/10.12688/f1000research.8987.2) or [`limma`](https://doi.org/10.12688/f1000research.9005.3) pipelines. Alternatively, a more advanced tool such as [`nicheDE`](https://doi.org/10.1186/s13059-023-03159-6) could be used to perform analysis on a single tissue, however, it would also be more robust with biological replicates. This tool is outside the scope of this introductory workshop therefore is not covered.
 
 ```{r}
 # identify markers
-marker.info = scoreMarkers(lung5, clusters, pairings = list(c("B cell_4", "T cell regulatory_4"), c("B cell_3", "T cell regulatory_3")))
+marker.info = scoreMarkers(lung5, clusters, pairings = list(c("B cell_4", "T cell_4"), c("B cell_3", "T cell_3")))
 marker.info
 ```
 
-Below we compare the malignant (cancer) cells from region 2 (invasive) against those from region 5 (DCIS). Investigating and visialising the top genes shows that [_DHRS_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=DHRS) and [_MUC6_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=MUC6) are up-regulated in invasive cancer cells while [_GATA3_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=GATA3) and [_FLNB_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=FLNB) are moderately up-regulated in DCIS cancer cells.
+Below we compare B cells from region 4 (lymphoid aggregates) against those from region 3 (dispersed). Investigating and visualising the top genes shows that [_CD74_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=CD74), [_MS4A1_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=MS4A1), and [_IGHM_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=IGHM) are up-regulated in B cells within lymphoid aggregates compared to dispersed B cells. These genes are indicative of increased antigen presentation, B cell maturation and increased activity against the adjacent tumour regions respectively.
 
 ```{r fig.width=8, fig.height=8}
 # study markers of B cell_4
@@ -599,7 +618,7 @@ chosen_bcell = marker.info[["B cell_4"]]
 ordered_bcell = chosen_bcell[order(chosen_bcell$rank.AUC), ]
 head(ordered_bcell[, 1:4])
 
-plotExpression(lung5,
+plotExpression(lung5[, lung5$cell_type %in% "B cell"],
   features = head(rownames(ordered_bcell), 9),
   x = "hoodscanr_region",
   colour_by = "hoodscanr_region",
@@ -611,15 +630,15 @@ plotExpression(lung5,
   guides(colour = guide_legend(override.aes = list(shape = 15, size = 5)))
 ```
 
-Next we compare the fibroblasts from region 6 (stroma) against those from region 3 (tumour-adjacent). Investigating and visialising the top genes shows that [_LUM_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=LUM) and [_POSTN_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=POSTN) are up-regulated in stromal fibroblasts while [_MMP11_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=MMP11) and [_AQP1_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=AQP1) are up-regulated in the tumour-adjacent fibroblasts.
+Next we compare T cells from region 4 (lymphoid aggregates) against those from region 3 (dispersed). Investigating and visualising the top genes shows that [_FYB1_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=FYB1), [_FYN_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=FYN), [_CD37_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=CD37), and [_CXCR4_](https://www.genecards.org/cgi-bin/carddisp.pl?gene=CXCR4) are up-regulated in T cells. The first two genes indicate increased T-cell receptor (TCR) signalling while the latter two are involved in immune cell recruitment and infiltration. These genes suggest increased activity and infiltration of T cells in the lymphoid aggregates.
 
 ```{r fig.width=8, fig.height=8}
-# study markers of T cell regulatory_4
-chosen_tcell = marker.info[["T cell regulatory_4"]]
+# study markers of T cell_4
+chosen_tcell = marker.info[["T cell_4"]]
 ordered_tcell = chosen_tcell[order(chosen_tcell$rank.AUC), ]
 head(ordered_tcell[, 1:4])
 
-plotExpression(lung5,
+plotExpression(lung5[, lung5$cell_type %in% "T cell"],
   features = head(rownames(ordered_tcell), 9),
   x = "hoodscanr_region",
   colour_by = "hoodscanr_region",
@@ -633,7 +652,7 @@ plotExpression(lung5,
 
 # Functional analysis
 
-The example dataset used here was generated using the 10x Xenium platform that measured 380 genes. More recent versions of this platform and competing platforms such as the NanoString CosMx are now providing around 5000 genes (soon whole transcriptome as well!). It is relatively easy to scan through the strongest differentially expressed genes from a list of at most 380 genes to understand the processes underpinning the system. With larger panel sizes, we need computational tools to perform such analyses, often referred to as gene-set enrichment analysis or functional analysis. As this is an extensive topic, it is not covered in depth in this workshop, however, we have previously developed a [workshop on gene-set enrichment analysis](https://davislaboratory.github.io/GenesetAnalysisWorkflow/) and refer the attendees to that if they are interested. A non-programmatic interface of some of the tools in our workshop can be accessed through [vissE.cloud](https://visse.cloud/).
+The example dataset used here was generated using the Bruker/NanoString CosMx SMI platform that measured 960 genes. More recent versions of this platform provide whole transcriptome measurements (>20k genes). It is relatively easy to scan through the strongest differentially expressed genes from a list of at most 960 genes to understand the processes underpinning the system. With larger panel sizes, we need computational tools to perform such analyses, often referred to as gene-set enrichment analysis or functional analysis. As this is an extensive topic, it is not covered in depth in this workshop, however, we have previously developed a [workshop on gene-set enrichment analysis](https://davislaboratory.github.io/GenesetAnalysisWorkflow/) and refer the attendees to that if they are interested. A web-based interface of some of the tools in our workshop can be accessed through [vissE.cloud](https://visse.cloud/).
 
 > Optional: You can also explore the full dataset from this workshop on vissE.cloud through the following [link](https://visse.cloud/galleryexample/cosmx_NSCLCLung5Rep3_PCA). This exploratory analysis performs principal components analysis (PCA) or non-negative matrix factorisation (NMF) on the dataset to identify macroscopic biological programs. It then performs gene-set enrichment analysis on the factor loadings to explain the biological processes.
 
@@ -644,8 +663,5 @@ This workflow depends on various packages from version `r BiocManager::version()
 ```{r session_info}
 sessionInfo()
 ```
-
-# Acknowledgments {.unnumbered}
-
 
 # References {.unnumbered}
