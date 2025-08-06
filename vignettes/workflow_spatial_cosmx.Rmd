@@ -83,7 +83,7 @@ We will use the already segmented cell-level count data. We will also use a prev
 
 The data we will use in this workshop is from the Bruker/Nanostring CosMx SMI platform. Since the objective of this workshop is to introduce you to spatial transcriptomics analysis, we do not work with the full dataset, which contains over 700,000 cells from 8 samples and instead opt to work with a smaller subset of one sample. This region contains interesting features and is therefore enough to showcase a complete spatial transcriptomics analysis workflow. The data used in this workshop comes from 4 fields of view (FOVs) from the sample labeled Lung5_Rep3. This window is shown in the context of the full tissue below.
 
-![The CosMx non-small cell lung cancer (NSCLC) dataset.](https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/full_tissue.png)
+![The CosMx non-small cell lung cancer (NSCLC) dataset.](https://raw.githubusercontent.com/bhuvad/CosMxSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/full_tissue.png)
 
 ```{r}
 library(SpatialExperiment)
@@ -279,7 +279,7 @@ Above we plot the `sum`, which is commonly known as the library size, for the pu
 
 While library sizes are a good measure of technical variation in conventional sequencing data (bulk and single-cell RNA-seq), they are not the most appropriate in assessing technical effects in targeted panels because the panel is biased towards measuring the biology of interest. As such, we need a purely technical measurement to adjust our data. Negative control probes offer this measure of technical biases in the data as they are designed to not measure any biology (i.e., the are synthetic probes designed to not hybridise with any transcripts in the system).
 
-![Using negative control probes to normalise spatial transcriptomics data.](https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/neg_probes_normalisation.png)
+![Using negative control probes to normalise spatial transcriptomics data.](https://raw.githubusercontent.com/bhuvad/CosMxSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/neg_probes_normalisation.png)
 
 Though it is ideal to use negative control probes for normalisation of targeted spatial transcriptomics data, the data we are analysing is relatively old and from a prototype instrument, therefore, the negative control probe counts are too low to be used for modelling. Additionally, the current Bruker CosMx instrument uses two kinds of negative control probes, conventional negative control probes (such as in this dataset) and false codes. The latter are best used for modelling technical variation in CosMx datasets as their counts are generally higher. We recommend using false code counts for normalising Bruker CosMx datasets.
 
@@ -297,7 +297,7 @@ To remove these technical biases, we perform normalisation. As measurements are 
 
 In both cases, each cell cannot be normalised independently as nearby cells are likely to experience similar technical effects. To tackle this, our team has developed the SpaNorm normalisation method that uses spatial dependence to decouple technical and biological effects [@salim2024spanorm]. SpaNorm uses a spatially constrained regularised generalised linear model to model library size effects and subsequently adjust the data. This is done by calling the `SpaNorm()` function on a SpatialExperiment object.
 
-![A schematic diagram of the SpaNorm normalisation method.](https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/spanorm_schematic.png)
+![A schematic diagram of the SpaNorm normalisation method.](https://raw.githubusercontent.com/bhuvad/CosMxSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/spanorm_schematic.png)
 
 The key parameters for SpaNorm normalisation that need to be adjusted are:
 
@@ -355,7 +355,7 @@ Not all genes in the study are likely to be meaningful, therefore, a key step in
 
 We have recently developed a model-based SVG detection approach which makes use of the model fit for the normalisation step of SpaNorm. Note that the SpaNorm model contains coefficients to represent biological and technical variation. Genes that are spatially variable, and therefore biologically informative should have non-zero coefficients for biology. We can test for the importance of the coefficients for the biological components using a likelihood ratio test (LRT) by comparing the SpaNorm model (Model 1 below) to a nested model (Model 2) containing only the technical components. This allows us to identify statistically significant spatial variation. The `SpaNormSVG()` function fits this additional nested model, compares it to the full SpaNorm model, and performs the likelihood ratio test to identify spatially variable genes (SVGs). Results of the test are stored in the `rowData` of the SpatialExperiment object, but can also be retrieved using the `topSVGs()` function.
 
-![A schematic diagram of the SpaNormSVG normalisation method.](https://raw.githubusercontent.com/bhuvad/XeniumSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/spanorm_svg_schematic.png)
+![A schematic diagram of the SpaNormSVG normalisation method.](https://raw.githubusercontent.com/bhuvad/CosMxSpatialAnalysisWorkshop/refs/heads/main/inst/extdata/spanorm_svg_schematic.png)
 
 ```{r}
 set.seed(1000)
