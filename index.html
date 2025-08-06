@@ -95,10 +95,13 @@
 <div class="section level2">
 <h2 id="time-outline">Time outline<a class="anchor" aria-label="anchor" href="#time-outline"></a>
 </h2>
+<div class="section level3">
+<h3 id="session-1---an-introduction-to-spatial-analysis">Session 1 - An introduction to spatial analysis<a class="anchor" aria-label="anchor" href="#session-1---an-introduction-to-spatial-analysis"></a>
+</h3>
 <table class="table">
 <colgroup>
-<col width="91%">
-<col width="8%">
+<col width="92%">
+<col width="7%">
 </colgroup>
 <thead><tr class="header">
 <th>Activity</th>
@@ -110,7 +113,7 @@
 <td>30m</td>
 </tr>
 <tr class="even">
-<td>Part 1. Preprocess spatial `omics data (QC and Normalisation)</td>
+<td>Part 1. Preprocess spatial `omics data (QC, Normalisation, SVG, PCA)</td>
 <td>45m</td>
 </tr>
 <tr class="odd">
@@ -127,6 +130,55 @@
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section level3">
+<h3 id="session-2---exploring-cell-states-using-phispace">Session 2 - Exploring cell states using PhiSpace<a class="anchor" aria-label="anchor" href="#session-2---exploring-cell-states-using-phispace"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="92%">
+<col width="7%">
+</colgroup>
+<thead><tr class="header">
+<th>Activity</th>
+<th>Time</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Introduction &amp; setup</td>
+<td>30m</td>
+</tr>
+<tr class="even">
+<td>Q &amp; A</td>
+<td>15m</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="session-3---deciphering-spatial-marker-genes-using-jazzpanda">Session 3 - Deciphering spatial marker genes using JazzPanda<a class="anchor" aria-label="anchor" href="#session-3---deciphering-spatial-marker-genes-using-jazzpanda"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="92%">
+<col width="7%">
+</colgroup>
+<thead><tr class="header">
+<th>Activity</th>
+<th>Time</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Introduction &amp; setup</td>
+<td>30m</td>
+</tr>
+<tr class="even">
+<td>Q &amp; A</td>
+<td>15m</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="section level2">
 <h2 id="workshop-goals-and-objectives">Workshop goals and objectives<a class="anchor" aria-label="anchor" href="#workshop-goals-and-objectives"></a>
@@ -155,20 +207,20 @@
 <div class="section level3">
 <h3 id="guide">Guide<a class="anchor" aria-label="anchor" href="#guide"></a>
 </h3>
-<p>This is necessary in order to reproduce the code shown in the workshop. The workshop is designed for R <code>4.4.1</code> and Bioconductor <code>3.20</code>, and can be installed as instructed below.</p>
+<p>This is necessary in order to reproduce the code shown in the workshop. The workshop is designed for R <code>4.5.0</code> and Bioconductor <code>3.21</code>, and can be installed as instructed below.</p>
 </div>
 <div class="section level3">
 <h3 id="via-github">Via GitHub<a class="anchor" aria-label="anchor" href="#via-github"></a>
 </h3>
-<p>Alternatively, you could install the workshop using the commands below in R <code>&gt;4.4.1</code> and BioConductor <code>&gt;3.20</code>.</p>
+<p>Alternatively, you could install the workshop using the commands below in R <code>&gt;4.5.0</code> and BioConductor <code>&gt;3.21</code>.</p>
 <pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'remotes'</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Install workshop package</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"bhuvad/XeniumSpatialAnalysisWorkshop"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"bhuvad/CosMxSpatialAnalysisWorkshop"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># To view vignettes</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">XeniumSpatialAnalysisWorkshop</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/browseVignettes.html" class="external-link">browseVignettes</a></span><span class="op">(</span><span class="st">"XeniumSpatialAnalysisWorkshop"</span><span class="op">)</span></span></code></pre>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bhuvad.github.io/CosMxSpatialAnalysisWorkshop/" class="external-link">CosMxSpatialAnalysisWorkshop</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/browseVignettes.html" class="external-link">browseVignettes</a></span><span class="op">(</span><span class="st">"CosMxSpatialAnalysisWorkshop"</span><span class="op">)</span></span></code></pre>
 </div>
 </div>
 </div>
