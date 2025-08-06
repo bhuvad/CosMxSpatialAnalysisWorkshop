@@ -14,13 +14,29 @@ Attendees will require a laptop with internet access and should have familiarity
 
 ## Time outline
 
-| Activity                                                        | Time |
-|-----------------------------------------------------------------|------|
-| Introduction & setup                                            | 30m  |
-| Part 1. Preprocess spatial `omics data (QC and Normalisation)   | 45m  |
-| Part 2. Infer spatial biology (cell typing, spatial domains)    | 45m  |
-| Part 3. Interpret spatial biology (DE, GSEA)                    | 45m  |
-| Q & A                                                           | 15m  |
+### Session 1 - An introduction to spatial analysis
+
+| Activity                                                             | Time |
+|----------------------------------------------------------------------|------|
+| Introduction & setup                                                 | 30m  |
+| Part 1. Preprocess spatial `omics data (QC, Normalisation, SVG, PCA) | 45m  |
+| Part 2. Infer spatial biology (cell typing, spatial domains)         | 45m  |
+| Part 3. Interpret spatial biology (DE, GSEA)                         | 45m  |
+| Q & A                                                                | 15m  |
+
+### Session 2 - Exploring cell states using PhiSpace
+
+| Activity                                                             | Time |
+|----------------------------------------------------------------------|------|
+| Introduction & setup                                                 | 30m  |
+| Q & A                                                                | 15m  |
+
+### Session 3 - Deciphering spatial marker genes using JazzPanda
+
+| Activity                                                             | Time |
+|----------------------------------------------------------------------|------|
+| Introduction & setup                                                 | 30m  |
+| Q & A                                                                | 15m  |
 
 
 ## Workshop goals and objectives
@@ -41,19 +57,19 @@ Attendees will require a laptop with internet access and should have familiarity
 ### Guide
 
 This is necessary in order to reproduce the code shown in the workshop. 
-The workshop is designed for R `4.4.1` and Bioconductor `3.20`, and can be installed as instructed below.
+The workshop is designed for R `4.5.0` and Bioconductor `3.21`, and can be installed as instructed below.
 
 ### Via GitHub
 
-Alternatively, you could install the workshop using the commands below in R `>4.4.1` and BioConductor `>3.20`.
+Alternatively, you could install the workshop using the commands below in R `>4.5.0` and BioConductor `>3.21`.
 
 ```
 install.packages('remotes')
 
 # Install workshop package
-remotes::install_github("bhuvad/XeniumSpatialAnalysisWorkshop", build_vignettes = TRUE)
+remotes::install_github("bhuvad/CosMxSpatialAnalysisWorkshop", build_vignettes = TRUE)
 
 # To view vignettes
-library(XeniumSpatialAnalysisWorkshop)
-browseVignettes("XeniumSpatialAnalysisWorkshop")
+library(CosMxSpatialAnalysisWorkshop)
+browseVignettes("CosMxSpatialAnalysisWorkshop")
 ```

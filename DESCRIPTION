@@ -39,7 +39,7 @@ Workflow: True
 biocViews: GeneExpressionWorkflow, Workflow
 VignetteBuilder: knitr
 Depends: 
-    R (>= 4.4.1)
+    R (>= 4.5.0)
 Imports: 
     ggplot2,
     GSEABase,
