@@ -82,6 +82,8 @@ Make sure that you've installed the newest version of key packages, including Ph
 Loading packages.
 
 ```{r}
+# remotes::install_github("bhuvad/CosMxSpatialAnalysisWorkshop", ref = "PhiSpace")
+
 # Key methods
 suppressPackageStartupMessages(library(PhiSpace))
 suppressPackageStartupMessages(library(SpaNorm))
@@ -93,6 +95,8 @@ suppressPackageStartupMessages(library(ggpubr))
 suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(ComplexHeatmap))
 suppressPackageStartupMessages(library(seriation))
+
+suppressPackageStartupMessages(library(CosMxSpatial))
 
 
 ## Some parameters and functions
@@ -175,10 +179,10 @@ We've already seen the PhiSpace annotation of a small subsection of Lung5 from t
 Load the reference and query data.
 
 ```{r}
-data("lung5_norm")
-data("ref_luca")
-# load("~/Desktop/MIG_spatial_data/ref_luca.rda")
-# load("~/Desktop/MIG_spatial_data/lung5_norm.rda")
+# data("lung5_norm")
+# data("ref_luca")
+load("~/Desktop/MIG_spatial_data/ref_luca.rda")
+load("~/Desktop/MIG_spatial_data/lung5_norm.rda")
 ```
 
 Then we normalise the gene counts in reference and query. By default, we do a log(counts + 1) normalisation of both count matrices via `PhiSpace::logTransf`. Note that this is just a log1p transform of raw counts, not relative counts as in standard sc pipelines such as Seurat and scanpy. This is because library sizes confound biology in many ST datasets.
@@ -254,8 +258,8 @@ Since the lung fibrosis dataset was too big. Here we provide the output, ie PhiS
 ```{r eval=FALSE}
 # sc_lung5_norm_sub <- readRDS("~/Desktop/MIG_spatial_data/lung5_norm_sub_PhiSpace.rds")
 # use_data(sc_lung5_norm_sub, overwrite = T)
-# load("~/Desktop/MIG_spatial_data/sc_lung5_norm_sub.rda")
-data("sc_lung5_norm_sub")
+load("~/Desktop/MIG_spatial_data/sc_lung5_norm_sub.rda")
+# data("sc_lung5_norm_sub")
 reducedDim(lung5_norm, "Phi5Ref") <- sc_lung5_norm_sub
 tempSavePlots(lung5_norm, tissueName = "lung5_norm_sub", methodName = "Phi5Ref", freeColScale = T, censQuant = 0.5, psize = 0.8)
 ```
