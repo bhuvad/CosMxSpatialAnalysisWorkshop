@@ -28,7 +28,8 @@ Authors@R:
         "Melody",
         "Jin",
         email = "jin.m@wehi.edu.au",
-        role = c("aut")
+        role = c("aut"),
+        comment = c(ORCID = '0000-0002-2222-0958')
       )
     )
 Description: This workflow package shows how a basic analysis of spatial transcriptomics datasets is performed to gain biological insight. 
