@@ -64,7 +64,12 @@ Imports:
     tidyr,
     magrittr,
     ggpubr,
-    ComplexHeatmap
+    ComplexHeatmap,
+    jazzPanda, 
+    corrplot,
+    pheatmap,
+    ComplexUpset,
+    Seurat
 Remotes:
     bhuvad/SpaNorm,
     jiadongm/PhiSpace/pkg
