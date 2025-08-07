@@ -96,8 +96,6 @@ suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(ComplexHeatmap))
 suppressPackageStartupMessages(library(seriation))
 
-suppressPackageStartupMessages(library(CosMxSpatial))
-
 
 ## Some parameters and functions
 tissueNames_CosMx <- c(
