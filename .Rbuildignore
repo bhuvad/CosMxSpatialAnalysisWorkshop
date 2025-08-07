@@ -3,3 +3,5 @@
 ^LICENSE\.md$
 vignettes/*_files
 ^\.github$
+^doc$
+^Meta$

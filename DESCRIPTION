@@ -66,10 +66,11 @@ Imports:
     tidyr,
     magrittr,
     ggpubr,
-    ComplexHeatmap
+    ComplexHeatmap,
+    kerndwd
 Remotes:
     bhuvad/SpaNorm,
-    jiadongm/PhiSpace
+    jiadongm/PhiSpace/pkg
 Suggests: 
     pkgdown,
     BiocStyle,

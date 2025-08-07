@@ -42,3 +42,5 @@ vignettes/*_files
 .Rdata
 .DS_Store
 .quarto
+/doc/
+/Meta/
