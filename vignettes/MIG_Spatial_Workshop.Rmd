@@ -26,6 +26,10 @@ CAF: cancer-associated fibroblast
 
 TLS: tertiary lymphoid structure
 
+LUAD: lung ardenocarcinoma (a type of NSCLC)
+
+LUSC: lung squamous cell carcinoma (a type of NSCLC)
+
 # What's covered in Part II
 
 Characterising cell states is an important component of spatial omics studies. By *cell states* we mean transcriptional programs of cells at the time of sequencing, which provides a snapshot of what the cells are doing. Cell state characterisation goes beyond individual marker genes and look at transcriptional programs, and is essential for a more interpretable biological story: instead of saying 'gene A promotes gene B's function', cell state characterisation allows us to say things like 'A type cells interacted with B type cells to promote certain function'.
@@ -179,9 +183,9 @@ First we load the list of spe objects corresponding to the 8 NSCLC tissue sample
 
 ```{r}
 allTissues <- readRDS("~/Dropbox/MIG_Spatial_Workshop/output/PhiSpaceResSPE_0.5subsample.rds")
-saveRDS(allTissues[1:3], "~/Dropbox/MIG_Spatial_Workshop/output/PhiSpaceResSPE_0.5subsample1.rds")
-saveRDS(allTissues[4:5], "~/Dropbox/MIG_Spatial_Workshop/output/PhiSpaceResSPE_0.5subsample2.rds")
-saveRDS(allTissues[6:8], "~/Dropbox/MIG_Spatial_Workshop/output/PhiSpaceResSPE_0.5subsample3.rds")
+# saveRDS(allTissues[1:3], "~/Dropbox/MIG_Spatial_Workshop/output/PhiSpaceResSPE_0.5subsample1.rds")
+# saveRDS(allTissues[4:5], "~/Dropbox/MIG_Spatial_Workshop/output/PhiSpaceResSPE_0.5subsample2.rds")
+# saveRDS(allTissues[6:8], "~/Dropbox/MIG_Spatial_Workshop/output/PhiSpaceResSPE_0.5subsample3.rds")
 ```
 
 Each spe object contains empty gene expression (NB the dimension is 1 by 43296).
@@ -352,7 +356,6 @@ We choose number of clusters equal to 9 to match the Banksy result.
 ```{r fig.asp=1}
 clustResPath <- "~/Dropbox/MIG_Spatial_Workshop/output/Lung5_Rep1_PhiClusts5Refs.rds"
 if(!file.exists(clustResPath)){
-  
   PhiPCRes <- getPC(reducedDim(query, "PhiSpace"), ncomp = ncol(reducedDim(query, "PhiSpace")) - 1)
   mat2clust <- PhiPCRes$scores[,1:30]
   set.seed(94863)
@@ -500,7 +503,7 @@ plotSpatial(query, colour = region, size = 0.3) +
 
 PhiSpace is useful for multi-sample analysis, where we have a collection of tissue sections, consecutive or from different patients. 
 
-First let's look at these tissues and the pathological annotation. They have very different niche compositions. Different 
+First let's look at these tissues and the pathological annotation. They have very different niche compositions. 
 ```{r fig.asp=1}
 lapply(1:length(allTissues), function(ii){
   p <- VizSpatial(
@@ -511,78 +514,43 @@ lapply(1:length(allTissues), function(ii){
 ```
 
 
+
+
 ## Tumour heterogeneity
 
+
+Apart from Lung6, which was from a LUSC patient, all remaining lung samples were from LUAD patients. PhiSpace scores can be used to examine the heterogeneity of lung tumours.
 ```{r}
-tumourSig <- tumourSig_indiv  <- regCoef_list <- regCoefIndiv_list <-  vector("list", length(tissueNames)) %>%
-  `names<-`(tissueNames)
+tumourNames <- c("Lung5_Rep1", "Lung5_Rep2", "Lung5_Rep3", "Lung6", "Lung9_Rep1", "Lung12", "Lung13")
+tumourSig <- vector("list", length(tumourNames)) 
+names(tumourSig) <- tumourNames
 #Individual tumours
-for(ii in 1:length(tissueNames)){
-  
-  tissueName <- tissueNames[ii]
-  query <- query_list[[tissueName]]
-  Y <- codeY(query, "cell_type")
-  X <- reducedDims(query)[["PhiSpace"]]
-  ncomp <- ncol(Y) - 1
+for(ii in 1:length(tumourNames)){
+  tissueName <- tumourNames[ii]
+  query <- allTissues[[tissueName]]
+  query <- query[,!is.na(query$region)]
+  Y <- PhiSpace:::codeY_vec(query$region)
+  X <- reducedDim(query, "PhiSpace")
+  ncomp <- ncol(Y)
   pls_res <- mvr(X, Y, ncomp = ncomp, method = "PLS")
   regCoef <- pls_res$coefficients[,,ncomp]
-  regCoefIndiv_list[[ii]] <- regCoef
   selectedPheno <- selectFeat(regCoef, nfeat = 5, absVal = F)
-  tumourSig_indiv[[ii]] <- selectedPheno$orderedFeatMat[,grepl("tumor", selectedPheno$orderedFeatMat %>% colnames)]
-}
-# Niche
-for(ii in 1:length(tissueNames)){
-  
-  tissueName <- tissueNames[ii]
-  query <- query_list[[tissueName]]
-  Y <- codeY(query, "niche")
-  X <- reducedDims(query)[["PhiSpace"]]
-  ncomp <- ncol(Y) - 1
-  pls_res <- mvr(X, Y, ncomp = ncomp, method = "PLS")
-  regCoef <- pls_res$coefficients[,,ncomp]
-  regCoef_list[[ii]] <- regCoef
-  selectedPheno <- selectFeat(regCoef, nfeat = 5, absVal = F)
-  tumourSig[[ii]] <- selectedPheno$orderedFeatMat[,"tumor interior"]
+  tumourSig[[ii]] <- selectedPheno$orderedFeatMat[,"Tumour"]
 }
 ```
 
-Print top 5 markers of each niche, in different tissues
 
+Only Lung6 tumour showed a strong presence of immune cells, including natural killers, neutrophils and CD4 T cells. Tumours in the three biological repeats from Lung5 (consecutive sections) had very similar cell states. 
 ```{r}
-nMks <- 5
-nicheNames <- lapply(
-  regCoef_list, function(x) colnames(x)
-) %>% unlist() %>% unique() %>% sort()
-nicheMkTab <- lapply(
-  regCoef_list,
-  function(x){
-    
-    featTab <- selectFeat(x, absVal = F)$orderedFeat[1:nMks,]
-    commonNiche <- intersect(colnames(featTab), nicheNames)
-    out <- matrix(NA, nrow = nMks, ncol = length(nicheNames)) %>%
-      `colnames<-`(nicheNames)
-    out[,commonNiche] <- featTab[,commonNiche]
-    return(out)
-  }
-)
-xtable::xtable(nicheMkTab[[1]], type = "latex")
-tab <- selectFeat(regCoef_list$Lung5_Rep1, absVal = F)$orderedFeat[1:nMks,]
-knitr::kable(tab)
-write.csv(tab, "figs/4Refs/signatures/Lung5_Rep1_tumour.csv")
+do.call(cbind, tumourSig)[1:10,]
 ```
 
-Phenotypic signatures of individual tumours.
 
-```{r}
-tumTab <- do.call("cbind", tumourSig)[1:10,]
-knitr::kable(tumTab)
-# xtable::xtable(tumTab, type = "latex")
-write.csv(tumTab, "figs/4Refs/signatures/allTumours.csv")
-```
 
 
 ## Niches across samples
-Identify niches across samples.
+
+We've seen that PhiSpace clustering revealed more fine-grained niches compared to pathological annotations. Can we identify niches across tissues, so that the same niche has the same cell states across tissue samples? Multi-sample niche identification based on gene expression is challenging since there might be batch effects between tissue slides. PhiSpace scores from multiple samples do not suffer from batch effects since they were obtained using the same references. Hence to obtain cross-sample niches we simply concatenate the PhiSpace scores of all tissues and then do a k-means clustering.
 ```{r}
 if(F){
   allTissues <- lapply(
@@ -592,26 +560,26 @@ if(F){
   )
   mat2clust <- lapply(1:length(allTissues), function(x) reducedDim(allTissues[[x]], "PhiSpace_smoothed")) 
   mat2clust <- do.call(rbind, mat2clust)
+  set.seed(763)
   pcaRes <- getPC(mat2clust, ncomp = 30)
   mat2clust <- pcaRes$scores
-  multiClustRes <- kmeans(mat2clust, centers = 9, iter.max = 500L, nstart = 20, algorithm = "Lloyd")
-  saveRDS(multiClustRes$cluster, "/data/projects/punim0613/JiaDong/PhiSpace/MIG_workshop/output/multiPhiClustRes.rds")
+  multiClustRes <- kmeans(mat2clust, centers = 9, iter.max = 1000L, nstart = 20, algorithm = "Lloyd")
+  saveRDS(multiClustRes, "~/Dropbox/MIG_Spatial_Workshop/output/multiPhiClustRes.rds")
 } else {
-  multiClustRes <- readRDS("/data/projects/punim0613/JiaDong/PhiSpace/MIG_workshop/output/multiPhiClustRes.rds")
+  multiClustRes <- readRDS("~/Dropbox/MIG_Spatial_Workshop/output/multiPhiClustRes.rds")
+}
+for(ii in 1:length(allTissues)){
+  spe <- allTissues[[ii]]
+  spe$multiSampClust <- as.character(multiClustRes$cluster[colnames(spe)])
+  allTissues[[ii]] <- spe
 }
 ```
 
-Viz
-
+Visualise PhiSpace niches.
 ```{r fig.asp=1}
-for(ii in 1:length(allTissues)){
-  spe <- allTissues[[ii]]
-  spe$multiSampClust <- as.character(multiClustRes[colnames(spe)])
-  allTissues[[ii]] <- spe
-}
 multiSampClustCols <- c(
-  "1" = "#FF7F00", "2" = "gray50", "3" = "#E41A1C", "4" = "#1F78B4" , 
-  "5" = "#A6CEE3", "6" =  "#33A02C", "7" = "#B15928", "8" = "black", "9" = "#FFFF99"
+  "1" = "#FF7F00", "2" ="gray50", "3" =  "#FFFF99", "4" = "#A6CEE3", 
+  "5" = "#1F78B4", "6" =  "#E41A1C", "7" = "#6A3D9A", "8" = "#B15928", "9" = "black", "10" = "#FB9A99", "11" = "#B2DF8A", "12" = "#33A02C"
 )
 lapply(1:length(allTissues), function(ii){
   p <- VizSpatial(allTissues[[ii]], ptSize = 1, groupBy = "multiSampClust", legend.position = "bottom", legend.symb.size = 2) + scale_colour_manual(values = multiSampClustCols)
@@ -619,15 +587,20 @@ lapply(1:length(allTissues), function(ii){
 })
 ```
 
+
+What are these niches? As usual, we can do a PLS analysis to see which cell types are enriched in each niche.
 ```{r}
-saveRDS(allTissues, "/data/projects/punim0613/JiaDong/PhiSpace/MIG_workshop/output/all_tissue.rds")
-names(allTissues)
-multiSampClustCols <- c(
-  "1" = "#FF7F00", "2" = "gray50", "3" = "#E41A1C", "4" = "#1F78B4" , 
-  "5" = "#A6CEE3", "6" =  "#33A02C", "7" = "#B15928", "8" = "black", "9" = "#FFFF99"
-)
-nicheAnn <- c("1" = "Lymphoid", "2" = "Tumour/Stroma", "3" = "Stroma", "4" = "Immune/Stroma",
-              "5" = "Macrophages", "6" = "Immune", "7" = "Tumour1", "8" = "Tumour2", "9" = "Plasmablast-stroma")
+XX <- lapply(1:length(allTissues), function(x) reducedDim(allTissues[[x]], "PhiSpace_smoothed")) 
+XX <- do.call(rbind, XX)
+YY <- codeY_vec(multiClustRes$cluster)
+ncomp = ncol(YY)
+plsRes <- PhiSpace:::mvr(XX, YY, ncomp = ncomp, method = "PLS")
+impScores <- plsRes$coefficients[,,ncomp]
+```
+
+Recall that only lung6 was from LUSC patients and all other samples were from LUAD patients. Cluster 1 (black), a cancer niche common in lung5, didn't appear in lung6 at all. There are also niches that are more abundant, eg clusters 11 (purple) and 2 (red), that were more common in lung6 compared to other than lungs.
+```{r}
+selectFeat(impScores, absVal = F)$orderedFeatMat[1:10,]
 ```
 
 
@@ -635,19 +608,19 @@ nicheAnn <- c("1" = "Lymphoid", "2" = "Tumour/Stroma", "3" = "Stroma", "4" = "Im
 
 
 
-## Cell type colocalisation
+## Cell type co-presence
 
-Hypothesis: combinations of cell states in cancer cells are very unique, enough to distinguish them from other niche. First check if correlation matrices (vectorised) indeed cluster according to niche label.
+In a complex tissue environment, such as tumour microenvironment, cells often exhibit hybrid cell states. For example, we have seen that tumour cells can even simultaneously resemble cell types from different lineages. Another for this hybridity is due to technical reasons, such as imperfect cell segmentation and transcript diffusion. That is, cells may not be perfectly segmented, so that a segmented cell may actually contain transcripts from neighbouring cells. Transcript diffusion refers to the phenomenon that transcripts drift to different locations during the sequencing process, which is a common phenomenon in data from sequencing-based ST platforms ([You et al., 2024](https://www.nature.com/articles/s41592-024-02325-3)).
 
-Co-presence matrix of tumour interior niche of Lung5_Rep1, as an example.
-
+With PhiSpace scores, we can look at cell type co-presence in each spatial unit. These co-presence patterns often have power to differentiate different niches from different tissue samples. As an example, we first compute the cell type co-presence matrices of different pathological niches in Lung5_Rep1. Here we only 
 ```{r eval=FALSE}
 tissueName <- "Lung5_Rep1"
-PhiSc <- allSc[[tissueName]]$PhiSpace
-colDat <- allSc[[tissueName]]$colData
-coords <- allSc[[tissueName]]$coord
+PhiSc <- reducedDim(allTissues[[tissueName]], "PhiSpace")
+# PhiSc <- PhiSc[,!grepl("(luca)", colnames(PhiSc))]
+colDat <- colData(allTissues[[tissueName]])
+coords <- spatialCoords(allTissues[[tissueName]])
 
-unique(colDat$region)
+table(colDat$region)
 
 corMat <- cor(PhiSc[colDat$region=="Tumour",])
 cVars <- colVars(corMat)
@@ -668,8 +641,10 @@ corMat <- corMat[selectedTypes, selectedTypes]
 tempHeatmap(corMat, binColour = F, useSeriate = T)
 ```
 
-Generate niche-specific co-localisation matrices. Only use luca reference
+In the tumour niche, we see co-presence of 
 
+
+Generate niche-specific co-localisation matrices. Only use luca reference
 ```{r fig.asp=1}
 nicheVarName <- "multiSampClust"
 corMatVec <- lapply(
@@ -682,8 +657,8 @@ corMatVec <- lapply(
     
     # Only use annotations from Luca reference
     sc <- reducedDim(query, "PhiSpace")
-    sc <- sc[,colnames(sc)[!grepl("(luca)", colnames(sc))]]
-    colnames(sc) <- gsub("\\([^)]*\\)", "", colnames(sc))
+    # sc <- sc[,colnames(sc)[grepl("(luca)", colnames(sc))]]
+    # colnames(sc) <- gsub("\\([^)]*\\)", "", colnames(sc))
     reducedDim(query, "PhiSpace") <- sc
     
     niches <- colData(query)[,nicheVarName]
@@ -737,9 +712,8 @@ minNicheCells <- 50
 nicheTabs <- lapply(
   1:length(allTissues),
   function(x){
-
     tissueName <- names(allTissues)[x]
-    out <- table(allTi[[x]]$niche)
+    out <- table(colData(allTissues[[x]])[,nicheVarName])
     names(out) <- paste0(names(out), "_", tissueName)
     return(out)
   }
@@ -749,26 +723,32 @@ corMatVec <- corMatVec[names(nPerNiche)[nPerNiche >= minNicheCells], ]
 
 set.seed(12361)
 pca_res <- getPC(corMatVec %>% select(!c(niche, sample)) %>% as.matrix(), ncomp = 5)
+
+matrixPlot(pca_res$scores, comp_idx = 1:5, colBy = corMatVec$niche, manualCol = multiSampClustCols, pointSize = 2)
 ```
 
 PCA analysis
 
 ```{r fig.asp=1}
-matrixPlot(pca_res$scores, comp_idx = 1:2, pointSize = 3, colBy = corMatVec$niche, manualCol = multiSampClustCols) 
+df <- as.data.frame(pca_res$scores)
+df$sampIDs <- gsub("^[^_]*_", "", rownames(df))
+df$niche <- corMatVec$niche
+ggplot(df, aes(x = comp1, y = comp2, colour = niche)) +
+  geom_text(aes(label = sampIDs)) +
+  theme_bw() + scale_colour_manual(values = multiSampClustCols) + xlim(-6.5, 7)
 
-# Loading
+# Loading# Loadingniche
 loadBarplot(pca_res$loadings, "comp1", showNeg = F, absVal = T, nfeat = 10)
 loadBarplot(pca_res$loadings, "comp2", showNeg = F, absVal = T, nfeat = 10)
-loadBarplot(pca_res$loadings, "comp3", showNeg = F, absVal = T, nfeat = 10)
-loadBarplot(pca_res$loadings, "comp4", showNeg = F, absVal = T, nfeat = 10)
 ```
 
-## Discriminant analysis
+
+
 
 ```{r}
 suppressPackageStartupMessages(library(kerndwd))
 # Binarise niches
-nicheBinary <- as.numeric(corMatVec$niche %in% c("2", "7", "8"))
+nicheBinary <- as.numeric(corMatVec$niche %in% c("2", "7", "9"))
 nicheBinary[nicheBinary == 0] <- -1
 nicheBinaryByName <- rep("Non-cancer niches", length(nicheBinary))
 nicheBinaryByName[nicheBinary == 1] <- "Cancer niches"
@@ -782,9 +762,7 @@ da_res = kerndwd(X_cent, nicheBinary, kern, qval=1, lambda=cv_res$lambda.min, ep
 A <- da_res$alpha[-1,,drop=F]
 dwdLoad <- crossprod(X_cent, A) %>% `colnames<-`("comp1") # worked out by looking at predict.dwd
 dwdScore <- predict.kerndwd(da_res, kern, X_cent, X_cent, "link") %>% `colnames<-`("comp1")
-dwd_res <- list(
-  scores = dwdScore %>% as.data.frame(), loadings = dwdLoad %>% as.data.frame()
-)
+dwd_res <- list(scores = dwdScore %>% as.data.frame(), loadings = dwdLoad %>% as.data.frame())
 ```
 
 Viz DWD
@@ -794,5 +772,6 @@ dwd_res$scores %>% mutate(niche = nicheBinaryByName) %>%
   ggplot() + geom_density(aes(comp1, fill = niche), alpha = 0.5) +
   theme_bw() + theme(legend.title = element_text(face ="bold")) + xlab("DWD score")
 
-loadBarplot(dwd_res$loadings, "comp1", nfeat = 10)
+loadBarplot(dwd_res$loadings, "comp1", nfeat = 20)
 ```
+
