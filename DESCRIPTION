@@ -22,6 +22,7 @@ Authors@R:
         "Jiadong",
         "Mao",
         email = "jiadong.mao@unimelb.edu.au",
+        comment = c(ORCID = '0000-0002-3818-1981'),
         role = c("aut")
       ),
       person(

@@ -1,0 +1,317 @@
+---
+title: "MIG Spatial Transcriptomics Workshop 2025"
+subtitle: "Part II: Identify cell states using PhiSpace"
+date: "`r format(Sys.time(), '%b %Y')`"
+title-block-banner: true
+author: 
+  - name: Jiadong Mao
+    orcid: 0000-0002-3818-1981
+    url: https://jiadongm.github.io/
+    email: jiadong.mao@unimelb.edu.au
+    affiliation:
+      - Melbourne Integrative Genomics (MIG), The University of Melbourne
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    toc: yes
+    toc_depth: 2
+    number_sections: yes
+    fig_caption: yes
+    df_print: paged
+comments:
+  hypothesis: 
+    theme: clean
+editor: source
+nocite: | 
+  @R-ggplot2, @R-knitr, @R-rmarkdown, @R-prettydoc
+bibliography: [bibliography.bib, packages.bib]
+vignette: >
+  %\VignetteIndexEntry{Introduction to cell state analysis using PhiSpace.}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+keywords: spatial transcriptomics, cell typing, normalisation, signature scoring, visualisation
+---
+
+
+### Acronyms
+
+ST: spatial transcriptomics
+
+sc: single-cell
+
+sce: `SingleCellExperiment`
+
+spe: `SpatialExperiment`
+
+NSCLC: non-small cell lung cancer
+
+H&E: hematoxylin and eosin (staining)
+
+EMT: epithelial-to-mesenchymal transition
+
+PLS: partial least squares
+
+CAF: cancer-associated fibroblast
+
+TLS: tertiary lymphoid structure
+
+LUAD: lung ardenocarcinoma (a type of NSCLC)
+
+LUSC: lung squamous cell carcinoma (a type of NSCLC)
+
+# What's covered in Part II
+
+Characterising cell states is an important component of spatial omics studies. By *cell states* we mean transcriptional programs of cells at the time of sequencing, which provides a snapshot of what the cells are doing. Cell state characterisation goes beyond individual marker genes and look at transcriptional programs, and is essential for a more interpretable biological story: instead of saying 'gene A promotes gene B's function', cell state characterisation allows us to say things like 'A type cells interacted with B type cells to promote certain function'.
+
+A common way to characterise cell states is based on scRNA-seq *references*. That is, to see what cell states there are in a tissue section, we take an existing scRNA-seq dataset with well defined cell state annotation, and then *transfer* the cell states from sc reference to spatial query.
+
+However, ST is not sc. Mixture of cell identity problem. spatial units
+
+Reference is essential. Matching sample sc + spatial.
+
+Gist of PhiSpace.
+
+Summary of this part.
+
+# A first example
+
+Make sure that you've installed the newest version of key packages, including PhiSpace, SpaNorm and jazzPanda, as these packages are under active maintenance and development.
+
+## Running PhiSpace is easy and fast
+
+Loading packages.
+
+```{r}
+# Key methods
+suppressPackageStartupMessages(library(PhiSpace))
+suppressPackageStartupMessages(library(SpaNorm))
+# Plotting and publishing results
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(magrittr))
+suppressPackageStartupMessages(library(ggpubr))
+suppressPackageStartupMessages(library(tidyr))
+suppressPackageStartupMessages(library(ComplexHeatmap))
+suppressPackageStartupMessages(library(seriation))
+#
+suppressPackageStartupMessages(library(usethis))
+
+
+## Some parameters and functions
+tissueNames_CosMx <- c(
+  "Lung5_Rep1", "Lung5_Rep2", "Lung5_Rep3",
+  "Lung6", "Lung9_Rep1", "Lung9_Rep2", "Lung12", "Lung13"
+)
+
+# Save PhiSpace heatmaps 
+tempSavePlots <- function(
+    spe, methodName = "PhiSpace", tissueName = "Lung", coordNames = c("x", "y"), 
+    saveDir = "~/Desktop/spatialCellTypeHeatmaps/",
+    legendPosition = "none", censQuant = 1, freeColScale = F, quants = c(0.1,1), psize = 0.5,
+    width = 10, height = 10, fignrow = 4, figncol = 4, fsize_title = 10, plot_margin = c(0,0,0,0)
+){
+  
+  scores <- as.matrix(reducedDim(spe, methodName))
+  
+  if(freeColScale){
+    lmts <- NULL
+  } else {
+    lmts <- quantile(scores, quants)
+  }
+  
+  ctypes <- colnames(scores) %>% sort()
+  outPlots <- vector("list", length(ctypes)) 
+  names(outPlots) <- ctypes
+  for(i in 1:length(ctypes)){
+    ctype <- ctypes[i]
+    cols <- scores[, ctype]
+    cols <- PhiSpace:::censor(cols, quant = censQuant)
+    df <- spe@colData %>% as.data.frame()
+    df <- cbind(df, spatialCoords(spe))
+    outPlots[[i]] <- df %>% mutate(cols = cols) %>% arrange(cols) %>%
+      ggplot(aes(x = !!sym(coordNames[1]), y = !!sym(coordNames[2]))) +
+      geom_point(aes(colour = cols), size = psize, alpha = 1, stroke = 0) +
+      theme_void() + scale_colour_gradientn(colours = PhiSpace:::MATLAB_cols, limits = lmts) + 
+      ggtitle(ctype) + theme(
+        legend.position = legendPosition, 
+        plot.title = element_text(size = fsize_title, hjust = 0.5, vjust = -1),
+        plot.margin = unit(plot_margin, "points")
+      )
+  }
+  
+  npheno <- length(outPlots)
+  nFigPerPlot <- fignrow * figncol
+  for(ii in 1:ceiling(npheno/nFigPerPlot)){
+    idx_start <- (ii-1)*nFigPerPlot + 1
+    idx_end <- min(ii*nFigPerPlot, npheno)
+    ggsave(
+      paste0(saveDir, tissueName, "/", tissueName, "_", methodName, "_", ii, ".png"),
+      ggpubr::ggarrange(plotlist = outPlots[idx_start:idx_end], ncol = figncol, nrow = fignrow), 
+      width = width, height = height
+    )
+  }
+}
+
+# Plot cell type copresence matrix as heatmap
+tempCopresence <- function(interaction_matrix, fsize = 12, useSeriate = T){
+  o <- seriate(interaction_matrix)
+  hm <- Heatmap(
+    interaction_matrix, name = "Correlation",
+    show_row_names = T, show_column_names = F, show_heatmap_legend = F,
+    row_order = get_order(o, 1), column_order = get_order(o, 2), 
+    row_names_gp = gpar(fontsize = fsize), column_names_gp = gpar(fontsize = fsize)
+  )
+  
+  return(hm)
+}
+```
+
+Running PhiSpace is straightforward. We need:
+
+-   A reference sce object, containing normalised gene expression and cell phenotypes of interest (discrete or continuous) in `colData(sce)`;
+-   Query spe object, containing normalised gene expression and spatial coordinates of spatial units;
+-   A set of genes shared between reference and query.
+
+We've already seen the PhiSpace annotation of a small subsection of Lung5 from the CosMx dataset (He et al., 2022) in Part I. Now let's see how the annotation was computed.
+
+Load the reference and query data.
+
+```{r}
+data("lung5_norm")
+data("ref_luca")
+# load("~/Desktop/MIG_spatial_data/ref_luca.rda")
+# load("~/Desktop/MIG_spatial_data/lung5_norm.rda")
+```
+
+Then we normalise the gene counts in reference and query. By default, we do a log(counts + 1) normalisation of both count matrices via `PhiSpace::logTransf`. Note that this is just a log1p transform of raw counts, not relative counts as in standard sc pipelines such as Seurat and scanpy. This is because library sizes confound biology in many ST datasets.
+
+Alternatively, we also recommend trying more sophisticated normalisation methods:
+
+-   Normalise sc reference by scran;
+
+-   Normalise spatial query by SpaNorm.
+
+```{r}
+ref_luca <- scranTransf(ref_luca)
+# lung5_norm already normalised by SpaNorm
+```
+
+The column containing cell type annotations is `cell_type`.
+
+```{r}
+colData(ref_luca) 
+YtrainName <- "cell_type"
+```
+
+PhiSpace::PhiSpace is a convenient wrapper of the PhiSpace annotation method. It can take a list of sce objects as reference and a list of spe objects as query. First let's try PhiSpace using one reference and one query.
+
+```{r}
+lung5_norm <- PhiSpace(
+  reference = ref_luca, query = lung5_norm,
+  phenotypes = YtrainName, refAssay = "logcounts", regMethod = "PLS"
+)
+reducedDim(lung5_norm, "PhiSpace")[1:5,1:5]
+```
+
+The first output of PhiSpace is a spatial unit by cell type matrix deposited in `reducedDim(lung5_norm, "PhiSpace")`. It's a `reducedDim` object since we view cell state characterisation as *dimension reduction* from the *omics space* to the **phenotype space**. That is, after PhiSpace, the cell state of each cell is characterised by (dozens of) cell types in the reference, instead of expression levels of (tens of thousands of) genes.
+
+All our downstream analyses will be based on `reducedDim(lung5_norm, "PhiSpace")`, which we simply refer to as PhiSpace scores.
+
+We can use `PhiSpace::getClass` to discretise PhiSpace scores, so that each spatial unit gets a single cell type label receiving the highest score compared to other cell types. Note that this discretisation makes sense if your spatial units can be viewed as cells, eg via cell segmentation.
+
+```{r}
+lung5_norm$PhiCellType <- getClass(reducedDim(lung5_norm, "PhiSpace"))
+```
+
+Dozens of cell types are difficult to visualise using a standard scatter plot. We could try interactive plots instead.
+
+```{r}
+p <- VizSpatial(lung5_norm, ptSize = 1, groupBy = "PhiCellType") 
+p
+plotly::ggplotly(p)
+```
+
+What about cases where you do not have reliable cell segmentation? Generally we do not recommend discretisation. There are many other platform-agnostic tools for analysing PhiSpace scores. For example, we can plot spatial heatmaps to show the spatial distribution of all PhiSpace scores. Often by viewing these heatmaps, we can already see a lot of intriguing biology.
+
+Run the following code and the function will ask you to create a directory to store all heatmaps.
+
+```{r eval=FALSE}
+tempSavePlots(lung5_norm, tissueName = "lung5_norm_sub", freeColScale = T, censQuant = 0.5, psize = 0.8)
+```
+
+Now let's look at these heatmaps. What can you see?
+
+## Multiple references?
+
+Sometimes it might be preferable to use multiple references to annotate a single query. This could be due to
+
+-   cross-validation of annotation results;
+
+-   leveraging cell states defined in multiple disease systems (healthy and fibrotic lungs);
+
+Here in addition to the Luca reference from NSCLC, we took a scRNA-seq dataset from patients with lung fibrosis ([Natri et al., 2024](https://www.nature.com/articles/s41588-024-01702-0)). Although fibrotic lungs do not have cancer cells, it contains rich cell states from complex inflammatory microenvironment, which contributes to characterising cancer cell states.
+
+Since the lung fibrosis dataset was too big. Here we provide the output, ie PhiSpace scores derived from both the Luca and the fibrosis references.
+
+```{r eval=FALSE}
+# sc_lung5_norm_sub <- readRDS("~/Desktop/MIG_spatial_data/lung5_norm_sub_PhiSpace.rds")
+# use_data(sc_lung5_norm_sub, overwrite = T)
+# load("~/Desktop/MIG_spatial_data/sc_lung5_norm_sub.rda")
+data("sc_lung5_norm_sub")
+reducedDim(lung5_norm, "Phi5Ref") <- sc_lung5_norm_sub
+tempSavePlots(lung5_norm, tissueName = "lung5_norm_sub", methodName = "Phi5Ref", freeColScale = T, censQuant = 0.5, psize = 0.8)
+```
+
+Delete data objects to free up RAM.
+
+```{r}
+rm(sc, lung5_norm, ref_luca, p); gc()
+```
+
+[Total memory usage at this point: 1.62 GiB]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
