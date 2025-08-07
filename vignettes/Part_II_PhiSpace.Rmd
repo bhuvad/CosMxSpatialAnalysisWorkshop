@@ -93,8 +93,6 @@ suppressPackageStartupMessages(library(ggpubr))
 suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(ComplexHeatmap))
 suppressPackageStartupMessages(library(seriation))
-#
-suppressPackageStartupMessages(library(usethis))
 
 
 ## Some parameters and functions
@@ -262,13 +260,55 @@ reducedDim(lung5_norm, "Phi5Ref") <- sc_lung5_norm_sub
 tempSavePlots(lung5_norm, tissueName = "lung5_norm_sub", methodName = "Phi5Ref", freeColScale = T, censQuant = 0.5, psize = 0.8)
 ```
 
-Delete data objects to free up RAM.
 
-```{r}
-rm(sc, lung5_norm, ref_luca, p); gc()
-```
 
-[Total memory usage at this point: 1.62 GiB]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
