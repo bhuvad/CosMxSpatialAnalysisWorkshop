@@ -87,6 +87,7 @@ Loading packages.
 # Key methods
 suppressPackageStartupMessages(library(PhiSpace))
 suppressPackageStartupMessages(library(SpaNorm))
+suppressPackageStartupMessages(library(hoodscanR))
 # Plotting and publishing results
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(dplyr))
@@ -296,9 +297,9 @@ First we load the list of spe objects corresponding to the 8 NSCLC tissue sample
 # allTissues1 <- allTissues[1:3]
 # allTissues2 <- allTissues[4:6]
 # allTissues3 <- allTissues[7:8]
-# usethis::use_data(allTissues1)
-# usethis::use_data(allTissues2)
-# usethis::use_data(allTissues3)
+# usethis::use_data(allTissues1, overwrite = T)
+# usethis::use_data(allTissues2, overwrite = T)
+# usethis::use_data(allTissues3, overwrite = T)
 # load("~/Documents/GitHub/CosMxSpatialAnalysisWorkshop/data/allTissues1.rda")
 # load("~/Documents/GitHub/CosMxSpatialAnalysisWorkshop/data/allTissues2.rda")
 # load("~/Documents/GitHub/CosMxSpatialAnalysisWorkshop/data/allTissues3.rda")
@@ -419,9 +420,9 @@ rm(Lung5Rep1GEX); gc()
 In fact Banksy clusters have already been computed and stored in the metadata of spe objects in `allTissues`. Let's visualise them.
 ```{r fig.asp=1}
 tempClustCols <- c(
-  "1" = "#B15928", "2" = "#1F78B4", "3" = "black", 
-  "4" = "#33A02C", "5" = "gray50", "6" =  "#FFFF99", 
-  "7" = "#A6CEE3" , "8" =  "#FF7F00", "9" = "#E41A1C"
+  "1" = "#B15928", "2" = "black", "3" = "#1F78B4", 
+  "4" = "#33A02C", "5" = "#FFFF99", "6" =  "gray50", 
+  "7" = "#A6CEE3" , "8" =  "#FF7F00", "9" = "#E41A1C", "10" = "#6A3D9A"
 )
 VizSpatial(allTissues[["Lung5_Rep1"]], ptSize = 1, groupBy = "BanksyClust", legend.position = "bottom", legend.symb.size = 2) + 
   scale_colour_manual(values = tempClustCols)
@@ -453,13 +454,11 @@ selectFeat(impScores, absVal = F)$orderedFeatMat[1:5,]
 
 This is quite interesting:
 
-- Cluster 3 (black) as annotated as Tumour with strong mesothelial (possibly EMT), basal (stemness) and secretory cell (cell of origin) identities; cluster 5 (gray) had strong activated myofibroblast identity (CAF?).
+- Cluster 2 (black) as annotated as Tumour with strong mesothelial (possibly EMT), basal (stemness) and secretory cell (cell of origin) identities; cluster 6 (gray) had strong activated myofibroblast identity (CAF?).
 
-- In stromal area, cluster 4 (green) had stronger endothelial identities; cluster 2 (blue) was myeloid-enriched.
+- In stromal area, cluster 3 (blue) and 5 (yellow) were enriched by different myeloid cells.
 
-- Cluster 1 (brown) might include lymphoid structures.
-
-- Cluster 9 (red)
+- Cluster 1 (brown) might be lymphoid structures.
 
 
 
@@ -484,14 +483,15 @@ We choose number of clusters equal to 9 to match the Banksy result.
 PhiPCRes <- getPC(reducedDim(query, "PhiSpace"), ncomp = ncol(reducedDim(query, "PhiSpace")) - 1)
 mat2clust <- PhiPCRes$scores[,1:30]
 set.seed(94863)
-Lung5Rep1_PhiClusts <- kmeans(mat2clust, centers = 9, iter.max = 200L, nstart = 50, algorithm = "Lloyd") 
+Lung5Rep1_PhiClusts <- kmeans(mat2clust, centers = 10, iter.max = 500L, nstart = 20, algorithm = "Lloyd") 
+# saveRDS(Lung5Rep1_PhiClusts, "~/Dropbox/MIG_Spatial_Workshop/output/Lung5_Rep1_PhiClusts5Refs.rds")
 ```
 
 
-If you haven't run the above chunck, simply load the pre-computed clustering result.
+If you haven't run the above chunk, simply load the pre-computed clustering result.
 ```{r fig.asp=1}
 # Lung5Rep1_PhiClusts <- readRDS("~/Dropbox/MIG_Spatial_Workshop/output/Lung5_Rep1_PhiClusts5Refs.rds")
-# usethis::use_data(Lung5Rep1_PhiClusts)
+# usethis::use_data(Lung5Rep1_PhiClusts, overwrite = T)
 data("Lung5Rep1_PhiClusts")
 query$PhiClustRaw <- as.character(Lung5Rep1_PhiClusts$cluster)
 VizSpatial(query,  groupBy = "PhiClustRaw", ptSize = 1, legend.position = "top", legend.symb.size = 2) + 
@@ -533,14 +533,15 @@ plot(1-PhiPCRes$accuProps)
 mat2clust <- PhiPCRes$scores[,1:30]
 set.seed(94863)
 # If see Quick-TRANSfer error, may try Lloyd algorithm instead
-Lung5Rep1_PhiSmoothClusts <- kmeans(mat2clust, centers = 9, iter.max = 500L, nstart = 50, algorithm = "Lloyd")
+Lung5Rep1_PhiSmoothClusts <- kmeans(mat2clust, centers = 10, iter.max = 500L, nstart = 20, algorithm = "Lloyd")
+# saveRDS(Lung5Rep1_PhiSmoothClusts, "~/Dropbox/MIG_Spatial_Workshop/output/Lung5_Rep1_PhiClusts5Refs_smoothed.rds")
 ```
 
 
 
 ```{r fig.asp=1}
 # Lung5Rep1_PhiSmoothClusts <- readRDS("~/Dropbox/MIG_Spatial_Workshop/output/Lung5_Rep1_PhiClusts5Refs_smoothed.rds")
-# usethis::use_data(Lung5Rep1_PhiSmoothClusts)
+# usethis::use_data(Lung5Rep1_PhiSmoothClusts, overwrite = T)
 data("Lung5Rep1_PhiSmoothClusts")
 PhiClust_smooth <- as.character(Lung5Rep1_PhiSmoothClusts$cluster)
 # Align clusters
@@ -554,6 +555,35 @@ Look how a simple smoothing step has greatly enhanced the spatial continuity of 
 
 
 
+Alternatively, we can use `hoodscanR`, a package dedicated to niche identification based on discrete or continuous cell type annotation.
+```{r eval=FALSE, fig.asp=1}
+query$PhiCellType <- getClass(reducedDim(query, "PhiSpace"))
+# find neighbouring cells using an approximate nearest neighbour search
+set.seed(1000)
+nb_cells = findNearCells(query, k = 100, anno_col = "PhiCellType")
+nb_cells$cells[1:5, 1:5]
+nb_cells$distance[1:5, 1:5]
+probmat = scanHoods(nb_cells$distance)
+dim(probmat)
+# compute probability of each each cell type in the neighbour hood of each cell
+hoods <- mergeByGroup(probmat, reducedDim(query,"PhiSpace"), continuousAnnotation = T) 
+query <- mergeHoodSpe(query, hoods)
+query <- clustByHood(query, pm_cols = colnames(hoods), k = 10)
+
+neighbourhoods = hoodscanR::mergeByGroup(probmat, nb_cells$cells)
+neighbourhoods[1:5, 1:5]
+query <- mergeHoodSpe(query, neighbourhoods)
+set.seed(1000)
+query = clustByHood(query, pm_cols = colnames(neighbourhoods), k = 10, val_name = "hsR_clusters")
+
+# Align clusters
+query$hsR_clusters <- align_clusters(query$hsR_clusters, query$BanksyClust)
+VizSpatial(query,  groupBy = "hsR_clusters", ptSize = 1, legend.position = "bottom", legend.symb.size = 2) + 
+  scale_colour_manual(values = tempClustCols) 
+```
+
+
+
 
 ### What are these niches?
 
@@ -563,7 +593,7 @@ The second thing is that there were some interesting subclusters emerging in the
 
 Let's use PLS again to see what cell types are enriched in these newly identified niches.
 
-```{r}
+```{r fig.asp=1}
 XX <- reducedDim(query, "PhiSpace")
 YY <- codeY_vec(query$PhiClust)
 ncomp = ncol(YY)
@@ -573,15 +603,7 @@ selectFeat(impScores, absVal = F)$orderedFeatMat[1:5,]
 ```
 
 
-C'est intéressant:
 
-- Again we have a cluster (cluster 9, red) that's predominantly tumourous, mesothelial, basal and secretory. 
-
-- The gray cluster is similar to the Banksy gray cluster, with fibroblast identities.
-
-- This time we have yet the other tumour niche (cluster 3, black), which is somewhat similar to cluster 9 in Banksy result.
-
-- Cluster 1 (brown) has a mixture of myeloid and lymphoid cells, and has this islandular structure, which is idiocyncratic of TLS.
 
 
 
@@ -666,6 +688,7 @@ set.seed(763)
 pcaRes <- getPC(mat2clust, ncomp = 30)
 mat2clust <- pcaRes$scores
 multiClustRes <- kmeans(mat2clust, centers = 9, iter.max = 1000L, nstart = 20, algorithm = "Lloyd")
+# saveRDS(multiClustRes, "~/Dropbox/MIG_Spatial_Workshop/output/multiPhiClustRes.rds")
 ```
 
 
@@ -673,7 +696,7 @@ multiClustRes <- kmeans(mat2clust, centers = 9, iter.max = 1000L, nstart = 20, a
 Or load pre-computed clustering results.
 ```{r}
 # multiClustRes <- readRDS("~/Dropbox/MIG_Spatial_Workshop/output/multiPhiClustRes.rds")
-# usethis::use_data(multiClustRes)
+# usethis::use_data(multiClustRes,overwrite = T)
 data("multiClustRes")
 for(ii in 1:length(allTissues)){
   spe <- allTissues[[ii]]
@@ -715,6 +738,9 @@ selectFeat(impScores, absVal = F)$orderedFeatMat[1:10,]
 
 ## Cell type co-presence
 In a complex tissue environment, such as tumour microenvironment, cells often exhibit hybrid cell states. For example, we have seen that tumour cells can even simultaneously resemble cell types from different lineages. Another for this hybridity is due to technical reasons, such as imperfect cell segmentation and transcript diffusion. That is, cells may not be perfectly segmented, so that a segmented cell may actually contain transcripts from neighbouring cells. Transcript diffusion refers to the phenomenon that transcripts drift to different locations during the sequencing process, which is a common phenomenon in data from sequencing-based ST platforms ([You et al., 2024](https://www.nature.com/articles/s41592-024-02325-3)).
+
+
+
 
 With PhiSpace scores, we can look at cell type co-presence in each spatial unit. These co-presence patterns often have power to differentiate different niches from different tissue samples. As an example, we first compute the cell type co-presence matrices of different pathological niches in Lung5_Rep1. Here we only 
 ```{r eval=FALSE}

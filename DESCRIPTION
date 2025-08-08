@@ -71,7 +71,7 @@ Imports:
 Remotes:
     bhuvad/SpaNorm,
     jiadongm/PhiSpace/pkg,
-    bioc::ComplexHeatmap
+    DavisLaboratory/hoodscanR
 Suggests: 
     pkgdown,
     BiocStyle,
