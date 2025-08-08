@@ -70,7 +70,8 @@ Imports:
     kerndwd
 Remotes:
     bhuvad/SpaNorm,
-    jiadongm/PhiSpace/pkg
+    jiadongm/PhiSpace/pkg,
+    bioc::ComplexHeatmap
 Suggests: 
     pkgdown,
     BiocStyle,
