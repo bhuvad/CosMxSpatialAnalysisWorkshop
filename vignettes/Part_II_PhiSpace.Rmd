@@ -418,8 +418,8 @@ In fact Banksy clusters have already been computed and stored in the metadata of
 ```{r fig.asp=1}
 tempClustCols <- c(
   "1" = "#B15928", "2" = "black", "3" = "#1F78B4", 
-  "4" = "#33A02C", "5" = "#FFFF99", "6" =  "gray50",  
-  "7" = "#A6CEE3" , "8" =  "#FF7F00", "9" = "#E41A1C", "10" = "#6A3D9A"
+  "4" = "gray50", "5" = "#33A02C", "6" =  "#FFFF99",  
+  "7" = "#A6CEE3" , "8" =  "#6A3D9A", "9" = "#E41A1C", "10" = "#FF7F00"
 )
 VizSpatial(allTissues[["Lung5_Rep1"]], ptSize = 1, groupBy = "BanksyClust", legend.position = "bottom", legend.symb.size = 2) + 
   scale_colour_manual(values = tempClustCols)
@@ -480,7 +480,7 @@ We choose number of clusters equal to 9 to match the Banksy result.
 PhiPCRes <- getPC(reducedDim(query, "PhiSpace"), ncomp = ncol(reducedDim(query, "PhiSpace")) - 1)
 mat2clust <- PhiPCRes$scores[,1:30]
 set.seed(94863)
-Lung5Rep1_PhiClusts <- kmeans(mat2clust, centers = 8, iter.max = 500L, nstart = 20, algorithm = "Lloyd") 
+Lung5Rep1_PhiClusts <- kmeans(mat2clust, centers = 9, iter.max = 500L, nstart = 20, algorithm = "Lloyd") 
 # saveRDS(Lung5Rep1_PhiClusts, "~/Dropbox/MIG_Spatial_Workshop/output/Lung5_Rep1_PhiClusts5Refs.rds")
 ```
 
@@ -503,12 +503,12 @@ It is possible to align cluster labels across clustering results using algorithm
 oldClust <- query$PhiClustRaw
 refClust <- query$BanksyClust
 newClust <- align_clusters(oldClust, refClust)
-query$PhiClust <- newClust
+query$PhiClust_align <- newClust
 ```
 
 Now visualise the aligned PhiSpace clusters.
 ```{r fig.asp=1}
-VizSpatial(query,  groupBy = "PhiClust", ptSize = 1, legend.position = "top", legend.symb.size = 2) + 
+VizSpatial(query,  groupBy = "PhiClust_align", ptSize = 1, legend.position = "top", legend.symb.size = 2) + 
   scale_colour_manual(values = tempClustCols) 
 ```
 
@@ -530,7 +530,7 @@ plot(1-PhiPCRes$accuProps)
 mat2clust <- PhiPCRes$scores[,1:30]
 set.seed(94863)
 # If see Quick-TRANSfer error, may try Lloyd algorithm instead
-Lung5Rep1_PhiSmoothClusts <- kmeans(mat2clust, centers = 8, iter.max = 500L, nstart = 20, algorithm = "Lloyd")
+Lung5Rep1_PhiSmoothClusts <- kmeans(mat2clust, centers = 9, iter.max = 500L, nstart = 20, algorithm = "Lloyd")
 # saveRDS(Lung5Rep1_PhiSmoothClusts, "~/Dropbox/MIG_Spatial_Workshop/output/Lung5_Rep1_PhiClusts5Refs_smoothed.rds")
 ```
 
@@ -538,13 +538,13 @@ Lung5Rep1_PhiSmoothClusts <- kmeans(mat2clust, centers = 8, iter.max = 500L, nst
 
 ```{r fig.asp=1}
 # Lung5Rep1_PhiSmoothClusts <- readRDS("~/Dropbox/MIG_Spatial_Workshop/output/Lung5_Rep1_PhiClusts5Refs_smoothed.rds")
-usethis::use_data(Lung5Rep1_PhiSmoothClusts, overwrite = T)
+# usethis::use_data(Lung5Rep1_PhiSmoothClusts, overwrite = T)
 data("Lung5Rep1_PhiSmoothClusts")
 PhiClust_smooth <- as.character(Lung5Rep1_PhiSmoothClusts$cluster)
 # Align clusters
-query$PhiClust_smooth <- align_clusters(PhiClust_smooth, query$BanksyClust)
+query$PhiClust <- align_clusters(PhiClust_smooth, query$BanksyClust)
 VizSpatial(allTissues[["Lung5_Rep1"]], ptSize = 0.5, groupBy = "region", legend.position = "bottom", legend.symb.size = 2) 
-VizSpatial(query,  groupBy = "PhiClust_smooth", ptSize = 1, legend.position = "bottom", legend.symb.size = 2) + 
+VizSpatial(query,  groupBy = "PhiClust", ptSize = 1, legend.position = "bottom", legend.symb.size = 2) + 
   scale_colour_manual(values = tempClustCols) 
 ```
 
@@ -575,7 +575,7 @@ query = clustByHood(query, pm_cols = colnames(neighbourhoods), k = 10, val_name 
 
 # Align clusters
 query$hsR_clusters <- align_clusters(query$hsR_clusters, query$BanksyClust)
-VizSpatial(query,  groupBy = "hsR_clusters", ptSize = 1, legend.position = "bottom", legend.symb.size = 2) + 
+VizSpatial(query,  groupBy = "hsR_clusters", ptSize = 1, legend.position = "bottom", legend.symb.size = 2) +
   scale_colour_manual(values = tempClustCols) 
 ```
 
@@ -671,20 +671,18 @@ do.call(cbind, tumourSig)[1:10,]
 
 ## Niches across samples
 We've seen that PhiSpace clustering revealed more fine-grained niches compared to pathological annotations. Can we identify niches across tissues, so that the same niche has the same cell states across tissue samples? Multi-sample niche identification based on gene expression is challenging since there might be batch effects between tissue slides. PhiSpace scores from multiple samples do not suffer from batch effects since they were obtained using the same references. Hence to obtain cross-sample niches we simply concatenate the PhiSpace scores of all tissues and then do a k-means clustering.
-```{r}
-allTissues <- lapply(
-  allTissues, function(spe) spatialSmoother(spe, smoothReducedDim = T, kernel = "gaussian", k = 15, verbose = F)
-)
-```
 
 Run clustering.
 ```{r eval=FALSE}
+allTissues <- lapply(
+  allTissues, function(spe) spatialSmoother(spe, smoothReducedDim = T, kernel = "gaussian", k = 15, verbose = F)
+)
 mat2clust <- lapply(1:length(allTissues), function(x) reducedDim(allTissues[[x]], "PhiSpace_smoothed")) 
 mat2clust <- do.call(rbind, mat2clust)
 set.seed(763)
 pcaRes <- getPC(mat2clust, ncomp = 30)
 mat2clust <- pcaRes$scores
-multiClustRes <- kmeans(mat2clust, centers = 10, iter.max = 1000L, nstart = 20, algorithm = "Lloyd")
+multiClustRes <- kmeans(mat2clust, centers = 9, iter.max = 1000L, nstart = 20, algorithm = "Lloyd")
 # saveRDS(multiClustRes, "~/Dropbox/MIG_Spatial_Workshop/output/multiPhiClustRes.rds")
 ```
 
@@ -705,8 +703,8 @@ for(ii in 1:length(allTissues)){
 Visualise PhiSpace niches.
 ```{r fig.asp=1}
 multiSampClustCols <- c(
-  "1" = "#FFFF99", "2" = "#FF7F00", "3" = "#6A3D9A" , "4" = "#1F78B4" , 
-  "5" = "black", "6" = "#33A02C", "7" = "#A6CEE3", "8" = "gray50", "9" = "#B15928", "10" = "#E41A1C", "11" = "#B2DF8A", "12" = "#FB9A99"
+  "1" =  "gray40", "2" = "#FF7F00", "3" = "#6A3D9A" , "4" = "#33A02C", 
+  "5" = "#B15928", "6" = "black", "7" = "#A6CEE3", "8" = "#E41A1C", "9" = "#1F78B4", "10" = "#FFFF99", "11" = "#B2DF8A", "12" = "#FB9A99"
 )
 lapply(1:length(allTissues), function(ii){
   p <- VizSpatial(
@@ -716,21 +714,59 @@ lapply(1:length(allTissues), function(ii){
 })
 ```
 
+```{r fig.asp=1}
+df <- lapply(1:length(allTissues), function(x) reducedDim(allTissues[[x]], "PhiSpace_smoothed"))
+df <- do.call(rbind, df)
+df <- as.data.frame(df) %>% mutate(cluster = as.character(multiClustRes$cluster))
 
-What are these niches? As usual, we can do a PLS analysis to see which cell types are enriched in each niche.
-```{r}
-XX <- lapply(1:length(allTissues), function(x) reducedDim(allTissues[[x]], "PhiSpace")) 
-XX <- do.call(rbind, XX)
-YY <- codeY_vec(multiClustRes$cluster)
-ncomp = ncol(YY)
-plsRes <- PhiSpace:::mvr(XX, YY, ncomp = ncomp, method = "PLS")
-impScores <- plsRes$coefficients[,,ncomp]
+df_long <- df %>%
+  pivot_longer(
+    cols = -cluster,
+    names_to = "cell_type",
+    values_to = "score"
+  )
+
+# Calculate median scores per cell type per cluster
+cluster_celltype_medians <- df_long %>%
+  group_by(cluster, cell_type) %>%
+  summarise(median_score = median(score, na.rm = TRUE), .groups = 'drop')
+
+top5_per_cluster <- cluster_celltype_medians %>%
+  group_by(cluster) %>%
+  top_n(5, median_score) %>%
+  ungroup()
+
+# Get the data for boxplots (only for top 5 cell types)
+boxplot_data <- df_long %>%
+  inner_join(top5_per_cluster %>% select(cluster, cell_type), 
+             by = c("cluster", "cell_type"))
+
+# Add median scores to boxplot data for ordering
+boxplot_data <- boxplot_data %>%
+  left_join(cluster_celltype_medians, by = c("cluster", "cell_type"))
+
+# Method 1: Faceted boxplots ordered by median within each cluster
+boxplot_data %>%
+  group_by(cluster) %>%
+  mutate(cell_type_ordered = reorder(cell_type, median_score)) %>%
+  ungroup() %>%
+  ggplot(aes(x = cell_type_ordered, y = score, fill = cell_type_ordered)) +
+  geom_boxplot(alpha = 0.7, outlier.size = 1) +
+  facet_wrap(~ paste("Cluster", cluster), scales = "free", ncol = 3) +
+  coord_flip() +
+  theme_minimal() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        strip.text = element_text(face = "bold")) +
+  labs(title = "Top 5 Cell Types per Cluster (Ordered by Median Score)",
+       subtitle = "Boxplots show distribution of scores within each cluster",
+       x = "Cell Type",
+       y = "Score")
 ```
 
-Recall that only lung6 was from LUSC patients and all other samples were from LUAD patients. Cluster 1 (black), a cancer niche common in lung5, didn't appear in lung6 at all. There are also niches that are more abundant, eg clusters 11 (purple) and 2 (red), that were more common in lung6 compared to other than lungs.
-```{r}
-selectFeat(impScores, absVal = F)$orderedFeatMat[1:10,]
-```
+
+
+
 
 
 
@@ -880,7 +916,7 @@ loadBarplot(pca_res$loadings, "comp2", showNeg = F, absVal = T, nfeat = 10)
 ```{r}
 suppressPackageStartupMessages(library(kerndwd))
 # Binarise niches
-nicheBinary <- as.numeric(corMatVec$niche %in% c("2", "7", "9"))
+nicheBinary <- as.numeric(corMatVec$niche %in% c("1", "3", "6"))
 nicheBinary[nicheBinary == 0] <- -1
 nicheBinaryByName <- rep("Non-cancer niches", length(nicheBinary))
 nicheBinaryByName[nicheBinary == 1] <- "Cancer niches"
