@@ -300,9 +300,6 @@ First we load the list of spe objects corresponding to the 8 NSCLC tissue sample
 # usethis::use_data(allTissues1, overwrite = T)
 # usethis::use_data(allTissues2, overwrite = T)
 # usethis::use_data(allTissues3, overwrite = T)
-# load("~/Documents/GitHub/CosMxSpatialAnalysisWorkshop/data/allTissues1.rda")
-# load("~/Documents/GitHub/CosMxSpatialAnalysisWorkshop/data/allTissues2.rda")
-# load("~/Documents/GitHub/CosMxSpatialAnalysisWorkshop/data/allTissues3.rda")
 data("allTissues1")
 data("allTissues2")
 data("allTissues3")
@@ -397,14 +394,14 @@ Banksy is a spatially-aware clustering algorithm for identifying niches. By 'spa
 
 It takes a few minutes to run Banksy. If you want, you can execute the following code block to run the whole workflow for Lung5_Rep1.
 ```{r eval=FALSE}
-# Lung5Rep1GEX <- readRDS("~/Dropbox/MIG_Spatial_Workshop/data/Lung5Rep1_0.5sub.rds")
-# usethis::use_data(Lung5Rep1GEX)
-data("Lung5Rep1GEX")
+Lung5Rep1GEX <- readRDS("~/Dropbox/MIG_Spatial_Workshop/data/Lung5Rep1_0.5sub.rds")
+# usethis::use_data(Lung5Rep1GEX, overwrite = T)
+# data("Lung5Rep1GEX")
 # Banksy parameters
 lambda = 0.2
 npcs = 50
 k_geom = 30
-res = 0.3
+res = 0.37
 # Compute the features required by Banksy
 Lung5Rep1GEX <- Banksy::computeBanksy(Lung5Rep1GEX, assay_name = "logcounts", k_geom = k_geom)
 # compute PCA on the features
@@ -413,7 +410,7 @@ Lung5Rep1GEX <- Banksy::runBanksyPCA(Lung5Rep1GEX, lambda = lambda, npcs = npcs)
 # perform graph-based clusering
 set.seed(1000)
 Lung5Rep1GEX <- Banksy::clusterBanksy(Lung5Rep1GEX, lambda = lambda, npcs = npcs, resolution = res)
-allTissues[["Lung5_Rep1"]]$BanksyClust <- query$clust_M0_lam0.2_k50_res0.3
+allTissues[["Lung5_Rep1"]]$BanksyClust <- Lung5Rep1GEX$clust_M0_lam0.2_k50_res0.37
 rm(Lung5Rep1GEX); gc()
 ```
 
@@ -421,7 +418,7 @@ In fact Banksy clusters have already been computed and stored in the metadata of
 ```{r fig.asp=1}
 tempClustCols <- c(
   "1" = "#B15928", "2" = "black", "3" = "#1F78B4", 
-  "4" = "#33A02C", "5" = "#FFFF99", "6" =  "gray50", 
+  "4" = "#33A02C", "5" = "#FFFF99", "6" =  "gray50",  
   "7" = "#A6CEE3" , "8" =  "#FF7F00", "9" = "#E41A1C", "10" = "#6A3D9A"
 )
 VizSpatial(allTissues[["Lung5_Rep1"]], ptSize = 1, groupBy = "BanksyClust", legend.position = "bottom", legend.symb.size = 2) + 
@@ -483,7 +480,7 @@ We choose number of clusters equal to 9 to match the Banksy result.
 PhiPCRes <- getPC(reducedDim(query, "PhiSpace"), ncomp = ncol(reducedDim(query, "PhiSpace")) - 1)
 mat2clust <- PhiPCRes$scores[,1:30]
 set.seed(94863)
-Lung5Rep1_PhiClusts <- kmeans(mat2clust, centers = 10, iter.max = 500L, nstart = 20, algorithm = "Lloyd") 
+Lung5Rep1_PhiClusts <- kmeans(mat2clust, centers = 8, iter.max = 500L, nstart = 20, algorithm = "Lloyd") 
 # saveRDS(Lung5Rep1_PhiClusts, "~/Dropbox/MIG_Spatial_Workshop/output/Lung5_Rep1_PhiClusts5Refs.rds")
 ```
 
@@ -533,7 +530,7 @@ plot(1-PhiPCRes$accuProps)
 mat2clust <- PhiPCRes$scores[,1:30]
 set.seed(94863)
 # If see Quick-TRANSfer error, may try Lloyd algorithm instead
-Lung5Rep1_PhiSmoothClusts <- kmeans(mat2clust, centers = 10, iter.max = 500L, nstart = 20, algorithm = "Lloyd")
+Lung5Rep1_PhiSmoothClusts <- kmeans(mat2clust, centers = 8, iter.max = 500L, nstart = 20, algorithm = "Lloyd")
 # saveRDS(Lung5Rep1_PhiSmoothClusts, "~/Dropbox/MIG_Spatial_Workshop/output/Lung5_Rep1_PhiClusts5Refs_smoothed.rds")
 ```
 
@@ -541,7 +538,7 @@ Lung5Rep1_PhiSmoothClusts <- kmeans(mat2clust, centers = 10, iter.max = 500L, ns
 
 ```{r fig.asp=1}
 # Lung5Rep1_PhiSmoothClusts <- readRDS("~/Dropbox/MIG_Spatial_Workshop/output/Lung5_Rep1_PhiClusts5Refs_smoothed.rds")
-# usethis::use_data(Lung5Rep1_PhiSmoothClusts, overwrite = T)
+usethis::use_data(Lung5Rep1_PhiSmoothClusts, overwrite = T)
 data("Lung5Rep1_PhiSmoothClusts")
 PhiClust_smooth <- as.character(Lung5Rep1_PhiSmoothClusts$cluster)
 # Align clusters
@@ -708,8 +705,8 @@ for(ii in 1:length(allTissues)){
 Visualise PhiSpace niches.
 ```{r fig.asp=1}
 multiSampClustCols <- c(
-  "1" = "gray50", "2" = "#FF7F00", "3" =  "#FFFF99", "4" = "#1F78B4" , 
-  "5" = "black", "6" = "#33A02C", "7" = "#A6CEE3", "8" = "#6A3D9A", "9" = "#B15928", "10" = "#E41A1C", "11" = "#B2DF8A", "12" = "#FB9A99"
+  "1" = "#FFFF99", "2" = "#FF7F00", "3" = "#6A3D9A" , "4" = "#1F78B4" , 
+  "5" = "black", "6" = "#33A02C", "7" = "#A6CEE3", "8" = "gray50", "9" = "#B15928", "10" = "#E41A1C", "11" = "#B2DF8A", "12" = "#FB9A99"
 )
 lapply(1:length(allTissues), function(ii){
   p <- VizSpatial(
@@ -722,7 +719,7 @@ lapply(1:length(allTissues), function(ii){
 
 What are these niches? As usual, we can do a PLS analysis to see which cell types are enriched in each niche.
 ```{r}
-XX <- lapply(1:length(allTissues), function(x) reducedDim(allTissues[[x]], "PhiSpace_smoothed")) 
+XX <- lapply(1:length(allTissues), function(x) reducedDim(allTissues[[x]], "PhiSpace")) 
 XX <- do.call(rbind, XX)
 YY <- codeY_vec(multiClustRes$cluster)
 ncomp = ncol(YY)
