@@ -687,7 +687,7 @@ mat2clust <- do.call(rbind, mat2clust)
 set.seed(763)
 pcaRes <- getPC(mat2clust, ncomp = 30)
 mat2clust <- pcaRes$scores
-multiClustRes <- kmeans(mat2clust, centers = 9, iter.max = 1000L, nstart = 20, algorithm = "Lloyd")
+multiClustRes <- kmeans(mat2clust, centers = 10, iter.max = 1000L, nstart = 20, algorithm = "Lloyd")
 # saveRDS(multiClustRes, "~/Dropbox/MIG_Spatial_Workshop/output/multiPhiClustRes.rds")
 ```
 
@@ -708,11 +708,13 @@ for(ii in 1:length(allTissues)){
 Visualise PhiSpace niches.
 ```{r fig.asp=1}
 multiSampClustCols <- c(
-  "1" = "#FF7F00", "2" ="gray50", "3" =  "#FFFF99", "4" = "#A6CEE3", 
-  "5" = "#1F78B4", "6" =  "#E41A1C", "7" = "#6A3D9A", "8" = "#B15928", "9" = "black", "10" = "#FB9A99", "11" = "#B2DF8A", "12" = "#33A02C"
+  "1" = "gray50", "2" = "#FF7F00", "3" =  "#FFFF99", "4" = "#1F78B4" , 
+  "5" = "black", "6" = "#33A02C", "7" = "#A6CEE3", "8" = "#6A3D9A", "9" = "#B15928", "10" = "#E41A1C", "11" = "#B2DF8A", "12" = "#FB9A99"
 )
 lapply(1:length(allTissues), function(ii){
-  p <- VizSpatial(allTissues[[ii]], ptSize = 1, groupBy = "multiSampClust", legend.position = "bottom", legend.symb.size = 2) + scale_colour_manual(values = multiSampClustCols)
+  p <- VizSpatial(
+    allTissues[[ii]], ptSize = 1, groupBy = "multiSampClust", legend.position = "bottom", legend.symb.size = 2
+  ) + scale_colour_manual(values = multiSampClustCols)
   return(p)
 })
 ```
