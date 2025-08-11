@@ -71,10 +71,12 @@ Imports:
     corrplot,
     pheatmap,
     ComplexUpset,
-    Seurat
+    Seurat,
+    kerndwd
 Remotes:
     bhuvad/SpaNorm,
-    jiadongm/PhiSpace/pkg
+    jiadongm/PhiSpace/pkg,
+    DavisLaboratory/hoodscanR
 Suggests: 
     pkgdown,
     BiocStyle,
