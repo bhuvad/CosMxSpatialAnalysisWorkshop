@@ -110,8 +110,16 @@ library(pheatmap)
 library(Seurat)
 library(dplyr)
 library(ComplexUpset)
-# Set random seed for reproducibility
 
+
+knitr::write_bib(c(
+  .packages(), 'knitr', 'rmarkdown', 'prettydoc'
+), 'packages.bib')
+
+```
+
+```{r help functions}
+# Set random seed for reproducibility
 seed_number <- 899
 set.seed(seed_number)
 
@@ -139,10 +147,6 @@ auto_hex_bin <- function(n, target_points_per_bin = 5) {
   bins <- round(sqrt(k))
   return(max(10, bins)) 
 }
-knitr::write_bib(c(
-  .packages(), 'knitr', 'rmarkdown', 'prettydoc'
-), 'packages.bib')
-
 ```
 
 # Data Loading
@@ -389,6 +393,25 @@ r1_sv <- get_vectors(
     test_genes = genes  # Only analyze actual genes
 )
 
+# Generate spatial vectors for genes (from transcripts) and clusters 
+# use the cell location and count matrix to create gene vectors 
+# This is useful when: Transcript coordinate data is not available
+
+# IMPORTANT: For perfect alignment, always take both `cluster_mt` and `gene_mt`
+# from the SAME `get_vectors()` call so they share the exact window/tiles and
+# bin ordering.
+# r1_sv_cm <- get_vectors(
+#     x = r1_sub_se,
+#     sample_names = "Lung5_Rep1",
+#     cluster_info = r1_cells,
+#     bin_type = "square",  # Square bins for regular tissue regions
+#     bin_param = c(grid_length, grid_length),  # 20x20 pixel bins
+#     test_genes = genes,  # Only analyze actual genes
+#     use_cm=TRUE # # Use cell count matrix instead of transcript coordinates
+# )
+
+
+
 # ============================================================================
 # INTERPRETATION OF SPATIAL VECTOR DIMENSIONS
 # ============================================================================
@@ -526,7 +549,7 @@ set.seed(seed_number)
 cat("Starting permutation testing...\n",
     "Number of permutations:", 1000, "\n",
     "Number of genes tested:", length(genes), "\n",
-    "Number of clusters:", nrow(r1_sv$cluster_mt), "\n")
+    "Number of clusters:", length(cluster_names), "\n")
 
 # Perform permutation testing for correlation-based marker detection
 # This is computationally intensive but provides robust statistical significance
@@ -558,7 +581,7 @@ for (i in cluster_names) {
 
 ### Examine Results
 This section analyzes the results of permutation testing to identify the most promising spatial marker genes. We examine both correlation strength and statistical significance to find genes with robust spatial patterns.
-```{r permutation_results,fig.width=10, fig.height=8}
+```{r permutation_results,fig.width=10, fig.height=10}
 # ============================================================================
 # EXAMINATION OF PERMUTATION TESTING RESULTS
 # ============================================================================
@@ -610,6 +633,10 @@ pheatmap(
   main = "Top 10 Spatially Correlated Genes per Cluster"
 )
 
+
+```
+
+```{r, top_hc_sig}
 
 # ============================================================================
 # INTEGRATED ANALYSIS: HIGH CORRELATION + SIGNIFICANCE
@@ -663,9 +690,8 @@ for (cl in colnames(perm_res)) {
         }
     }
 }
-
-
 ```
+
 Cluster c1 shows strong expression of classic lymphoid markers such as IL7R, PTPRC, and SELL, suggesting a robust presence of T cells, likely involved in immune surveillance or infiltration. Cluster c2 lacks clear spatially enriched markers, which may reflect a heterogeneous or transitional cell population, possibly at the interface of tumor and stroma. Cluster c3 is enriched for genes like CD163 and C1QA/B/C, indicating a population of tumor-associated macrophages, potentially contributing to immunosuppressive or tissue-remodeling functions.
 
 Cluster c4 is characterized by high spatial correlation with CXCL8, a pro-inflammatory chemokine, hinting at an inflammatory microenvironment that could influence tumor progression or immune cell recruitment. In cluster c5, although markers weren't explicitly listed, its position in the annotation likely overlaps with the macrophage-rich c3 cluster or represents a related myeloid subtype. Cluster c6 expresses high levels of FN1 and collagens (COL1A1, COL5A1), pointing to a fibroblast-like or CAF population involved in ECM remodeling and structural support. Cluster c7, marked by TPM2, may correspond to contractile stromal cells, such as smooth muscle-like or mesenchymal cells, possibly engaged in mechanical remodeling of the tumor niche.
