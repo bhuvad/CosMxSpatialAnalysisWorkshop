@@ -233,8 +233,6 @@ Load the reference and query data.
 ```{r}
 data("lung5_norm")
 data("ref_luca")
-# load("~/Desktop/MIG_spatial_data/ref_luca.rda")
-# load("~/Desktop/MIG_spatial_data/lung5_norm.rda")
 ```
 
 Then we normalise the gene counts in reference and query. By default, we do a log(counts + 1) normalisation of both count matrices via `PhiSpace::logTransf`. Note that this is just a log1p transform of raw counts, not relative counts as in standard sc pipelines such as Seurat and scanpy. This is because library sizes confound biology in many ST datasets.
@@ -309,9 +307,6 @@ Here in addition to the Luca reference from NSCLC, we took a scRNA-seq dataset f
 Since the lung fibrosis dataset was too big. Here we provide the output, ie PhiSpace scores derived from both the Luca and the fibrosis references.
 
 ```{r eval=FALSE}
-# sc_lung5_norm_sub <- readRDS("~/Desktop/MIG_spatial_data/lung5_norm_sub_PhiSpace.rds")
-# use_data(sc_lung5_norm_sub, overwrite = T)
-# load("~/Desktop/MIG_spatial_data/sc_lung5_norm_sub.rda")
 data("sc_lung5_norm_sub")
 reducedDim(lung5_norm, "Phi5Ref") <- sc_lung5_norm_sub
 tempSavePlots(lung5_norm, tissueName = "lung5_norm_sub", methodName = "Phi5Ref", freeColScale = T, censQuant = 0.5, psize = 0.8)
@@ -334,13 +329,6 @@ We've had some hands-on experience running PhiSpace on a small subset of Lung5. 
 First we load the list of spe objects corresponding to the 8 NSCLC tissue samples. To save RAM, these spe objects only contained a 50% subsample of cells. Also they did not contain gene expression matrices, which were the most RAM-intensive part of these objects. Only metadata and pre-computed PhiSpace scores were provided.
 ```{r}
 ## We splited allTissues, the list of 8 spe objects, into three parts due to GitHub file size limit
-# allTissues <- readRDS("~/Dropbox/MIG_Spatial_Workshop/output/PhiSpaceResSPE_0.5subsample.rds")
-# allTissues1 <- allTissues[1:3]
-# allTissues2 <- allTissues[4:6]
-# allTissues3 <- allTissues[7:8]
-# usethis::use_data(allTissues1, overwrite = T)
-# usethis::use_data(allTissues2, overwrite = T)
-# usethis::use_data(allTissues3, overwrite = T)
 data("allTissues1")
 data("allTissues2")
 data("allTissues3")
@@ -432,8 +420,6 @@ Banksy is a spatially-aware clustering algorithm for identifying niches. By 'spa
 
 It takes a few minutes to run Banksy. If you want, you can execute the following code block to run the whole workflow for Lung5_Rep1.
 ```{r eval=FALSE}
-# Lung5Rep1GEX <- readRDS("~/Dropbox/MIG_Spatial_Workshop/data/Lung5Rep1_0.5sub.rds")
-# usethis::use_data(Lung5Rep1GEX, overwrite = T)
 data("Lung5Rep1GEX")
 # Banksy parameters
 lambda = 0.2
@@ -533,8 +519,6 @@ Lung5Rep1_PhiClusts <- kmeans(mat2clust, centers = 9, iter.max = 500L, nstart = 
 
 If you haven't run the above chunk, simply load the pre-computed clustering result.
 ```{r fig.asp=1}
-# Lung5Rep1_PhiClusts <- readRDS("~/Dropbox/MIG_Spatial_Workshop/output/Lung5_Rep1_PhiClusts5Refs.rds")
-# usethis::use_data(Lung5Rep1_PhiClusts, overwrite = T)
 data("Lung5Rep1_PhiClusts")
 query$PhiClustRaw <- as.character(Lung5Rep1_PhiClusts$cluster)
 VizSpatial(query,  groupBy = "PhiClustRaw", ptSize = 1, legend.position = "top", legend.symb.size = 2) + 
@@ -577,14 +561,11 @@ mat2clust <- PhiPCRes$scores[,1:30]
 set.seed(94863)
 # If see Quick-TRANSfer error, may try Lloyd algorithm instead
 Lung5Rep1_PhiSmoothClusts <- kmeans(mat2clust, centers = 9, iter.max = 500L, nstart = 20, algorithm = "Lloyd")
-# saveRDS(Lung5Rep1_PhiSmoothClusts, "~/Dropbox/MIG_Spatial_Workshop/output/Lung5_Rep1_PhiClusts5Refs_smoothed.rds")
 ```
 
 
 
 ```{r fig.asp=1}
-# Lung5Rep1_PhiSmoothClusts <- readRDS("~/Dropbox/MIG_Spatial_Workshop/output/Lung5_Rep1_PhiClusts5Refs_smoothed.rds")
-# usethis::use_data(Lung5Rep1_PhiSmoothClusts, overwrite = T)
 data("Lung5Rep1_PhiSmoothClusts")
 PhiClust_smooth <- as.character(Lung5Rep1_PhiSmoothClusts$cluster)
 # Align clusters
@@ -725,15 +706,12 @@ set.seed(763)
 pcaRes <- getPC(mat2clust, ncomp = 30)
 mat2clust <- pcaRes$scores
 multiClustRes <- kmeans(mat2clust, centers = 9, iter.max = 1000L, nstart = 20, algorithm = "Lloyd")
-# saveRDS(multiClustRes, "~/Dropbox/MIG_Spatial_Workshop/output/multiPhiClustRes.rds")
 ```
 
 
 
 Or load pre-computed clustering results.
 ```{r}
-# multiClustRes <- readRDS("~/Dropbox/MIG_Spatial_Workshop/output/multiPhiClustRes.rds")
-# usethis::use_data(multiClustRes,overwrite = T)
 data("multiClustRes")
 for(ii in 1:length(allTissues)){
   spe <- allTissues[[ii]]
