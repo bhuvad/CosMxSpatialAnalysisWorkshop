@@ -39,6 +39,9 @@ Attendees will require a laptop with internet access and should have familiarity
 | Activity                                                             | Time |
 |----------------------------------------------------------------------|------|
 | Introduction & setup                                                 | 30m  |
+| Part 1. Marker gene concepts in spatial transcriptomics              | 45m  |
+| Part 2. One-sample scenario                                          | 45m  |
+| Part 3. Multiple-sample scenario                                     | 45m  |
 | Q & A                                                                | 15m  |
 
 
