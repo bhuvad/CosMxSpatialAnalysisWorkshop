@@ -52,6 +52,9 @@
       <a href="../articles/Differentially_expression_analysis.html">Spatially-Aware Marker Gene Detection in Spatial Transcriptomics Data</a>
     </li>
     <li>
+      <a href="../articles/Part_II_PhiSpace.html">MIG Spatial Transcriptomics Workshop 2025</a>
+    </li>
+    <li>
       <a href="../articles/workflow_spatial_cosmx.html">Introduction to imaging-based spatial transcriptomics analysis (Bruker CosMx NSCLC)</a>
     </li>
   </ul>
@@ -201,7 +204,7 @@ dataset.</div>
 <span><span class="co">## imgData names(1): sample_id</span></span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># retrieve column (cell) annotations</span></span>
-<span><span class="fu">colData</span><span class="op">(</span><span class="va">lung5</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">lung5</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## DataFrame with 13463 rows and 7 columns</span></span>
 <span><span class="co">##                      sample_id     cell_id              region  technology</span></span>
 <span><span class="co">##                    &lt;character&gt; &lt;character&gt;         &lt;character&gt; &lt;character&gt;</span></span>
@@ -231,7 +234,7 @@ dataset.</div>
 <span><span class="co">## Lung5_Rep3_22_999                      NA              Stroma       fov22</span></span></code></pre>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># retrieve row (gene/probe) annotations</span></span>
-<span><span class="fu">rowData</span><span class="op">(</span><span class="va">lung5</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">lung5</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## DataFrame with 980 rows and 2 columns</span></span>
 <span><span class="co">##                gene    genetype</span></span>
 <span><span class="co">##         &lt;character&gt; &lt;character&gt;</span></span>
@@ -320,7 +323,7 @@ vary across technologies and serve different purposes, we treat them
 equally for our analysis and assess them collectively. The breakdown of
 the different types of negative control probes is given below.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu">rowData</span><span class="op">(</span><span class="va">lung5</span><span class="op">)</span><span class="op">$</span><span class="va">genetype</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">lung5</span><span class="op">)</span><span class="op">$</span><span class="va">genetype</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">##   Gene NegPrb </span></span>
 <span><span class="co">##    960     20</span></span></code></pre>
@@ -354,7 +357,7 @@ the nucleus (<code>overlaps_nucleus</code>).</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">scuttle</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># identify the negative control probes</span></span>
-<span><span class="va">is_neg</span> <span class="op">=</span> <span class="fu">rowData</span><span class="op">(</span><span class="va">lung5</span><span class="op">)</span><span class="op">$</span><span class="va">genetype</span> <span class="op">!=</span> <span class="st">"Gene"</span></span>
+<span><span class="va">is_neg</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">lung5</span><span class="op">)</span><span class="op">$</span><span class="va">genetype</span> <span class="op">!=</span> <span class="st">"Gene"</span></span>
 <span><span class="co"># compute QC metrics for each cell</span></span>
 <span><span class="va">lung5</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/scuttle/man/addPerCellQCMetrics.html" class="external-link">addPerCellQCMetrics</a></span><span class="op">(</span><span class="va">lung5</span>, subsets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"neg"</span> <span class="op">=</span> <span class="va">is_neg</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <blockquote>
@@ -1306,7 +1309,7 @@ below:</p>
 <span><span class="co">## [8] base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] Banksy_1.4.0                       hoodscanR_1.6.0                   </span></span>
+<span><span class="co">##  [1] Banksy_1.4.0                       hoodscanR_1.7.1                   </span></span>
 <span><span class="co">##  [3] CosMxSpatialAnalysisWorkshop_1.0.0 singscore_1.28.0                  </span></span>
 <span><span class="co">##  [5] SpaNorm_1.3.4                      SpatialExperiment_1.18.1          </span></span>
 <span><span class="co">##  [7] SingleR_2.10.0                     standR_1.12.0                     </span></span>
