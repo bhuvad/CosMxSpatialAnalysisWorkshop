@@ -73,9 +73,10 @@ Alternatively, you could install the workshop using the commands below in R `>4.
 install.packages('remotes')
 
 # Install workshop package
-remotes::install_github("bhuvad/CosMxSpatialAnalysisWorkshop", build_vignettes = TRUE)
+remotes::install_github("bhuvad/CosMxSpatialAnalysisWorkshop")
 
-# To view vignettes
+# Alternatively, if choose to build vignettes:
+remotes::install_github("bhuvad/CosMxSpatialAnalysisWorkshop", build_vignettes = TRUE)
 library(CosMxSpatialAnalysisWorkshop)
 browseVignettes("CosMxSpatialAnalysisWorkshop")
 ```
