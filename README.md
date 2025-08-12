@@ -76,7 +76,7 @@ install.packages('remotes')
 remotes::install_github("bhuvad/CosMxSpatialAnalysisWorkshop")
 
 # Alternatively, if choose to build vignettes:
-remotes::install_github("bhuvad/CosMxSpatialAnalysisWorkshop", build_vignettes = TRUE)
-library(CosMxSpatialAnalysisWorkshop)
-browseVignettes("CosMxSpatialAnalysisWorkshop")
+# remotes::install_github("bhuvad/CosMxSpatialAnalysisWorkshop", build_vignettes = TRUE)
+# library(CosMxSpatialAnalysisWorkshop)
+# browseVignettes("CosMxSpatialAnalysisWorkshop")
 ```
