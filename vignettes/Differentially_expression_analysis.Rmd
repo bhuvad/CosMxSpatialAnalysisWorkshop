@@ -1,5 +1,5 @@
 ---
-title: "Spatially-Aware Marker Gene Detection in Spatial Transcriptomics Data"
+title: "Part III: Spatially-Aware Marker Gene Detection in Spatial Transcriptomics Data"
 date: "`r Sys.Date()`"
 title-block-banner: true
 author:
@@ -25,7 +25,7 @@ nocite: |
   @R-ggplot2, @R-knitr, @R-rmarkdown, @R-prettydoc
 bibliography: [bibliography.bib, packages.bib]
 vignette: >
-  %\VignetteIndexEntry{Spatially-Aware Marker Gene Detection in Spatial Transcriptomics Data}
+  %\VignetteIndexEntry{Part III: Spatially-Aware Marker Gene Detection in Spatial Transcriptomics Data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

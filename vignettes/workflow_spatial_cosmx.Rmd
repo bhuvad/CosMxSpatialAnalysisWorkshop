@@ -1,5 +1,5 @@
 ---
-title: "Introduction to imaging-based spatial transcriptomics analysis (Bruker CosMx NSCLC)"
+title: "Part I: Introduction to imaging-based spatial transcriptomics analysis (Bruker CosMx NSCLC)"
 date: "`r format(Sys.time(), '%b %Y')`"
 title-block-banner: true
 author: 
@@ -32,7 +32,7 @@ nocite: |
   @R-ggplot2, @R-knitr, @R-rmarkdown, @R-prettydoc
 bibliography: [bibliography.bib, packages.bib]
 vignette: >
-  %\VignetteIndexEntry{Introduction to imaging-based spatial transcriptomics analysis (Bruker CosMx NSCLC).}
+  %\VignetteIndexEntry{Part I: Introduction to imaging-based spatial transcriptomics analysis (Bruker CosMx NSCLC).}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 keywords: spatial transcriptomics, cell typing, normalisation, signature scoring, visualisation

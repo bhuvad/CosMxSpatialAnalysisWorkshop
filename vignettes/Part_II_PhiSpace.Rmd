@@ -1,6 +1,5 @@
 ---
-title: "MIG Spatial Transcriptomics Workshop 2025"
-subtitle: "Part II: Identify cell states using PhiSpace"
+title: "Part II: Identify cell states using PhiSpace"
 date: "`r format(Sys.time(), '%b %Y')`"
 title-block-banner: true
 author: 
@@ -25,7 +24,7 @@ editor: source
 nocite: | 
   @R-ggplot2, @R-knitr, @R-rmarkdown, @R-prettydoc
 vignette: >
-  %\VignetteIndexEntry{Introduction to cell state analysis using PhiSpace.}
+  %\VignetteIndexEntry{Part II: cell state analysis using PhiSpace.}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 keywords: spatial transcriptomics, cell typing, normalisation, signature scoring, visualisation
