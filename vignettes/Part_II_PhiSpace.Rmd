@@ -590,11 +590,8 @@ nb_cells$distance[1:5, 1:5]
 probmat = scanHoods(nb_cells$distance)
 dim(probmat)
 # compute probability of each each cell type in the neighbour hood of each cell
-hoods <- mergeByGroup(probmat, reducedDim(query,"PhiSpace"), continuousAnnotation = T)
-
-# TODO: add a function to convert scores to probabilities
-# Seurat dependency
-
+PhiSpaceProb <- Score2Prob(reducedDim(query,"PhiSpace"))
+# hoods <- mergeByGroup(probmat, PhiSpaceProb, continuousAnnotation = T)
 # query <- mergeHoodSpe(query, hoods)
 # query <- clustByHood(query, pm_cols = colnames(hoods), k = 9)
 neighbourhoods <- hoodscanR::mergeByGroup(probmat, nb_cells$cells)
