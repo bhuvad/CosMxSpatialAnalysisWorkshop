@@ -91,7 +91,7 @@ in Spatial Transcriptomics Data</h1>
 Melbourne<br><a class="author_email" href="mailto:#"></a><a href="mailto:jin.m@wehi.edu.au" class="email">jin.m@wehi.edu.au</a>
       </address>
                   
-            <h4 data-toc-skip class="date">2025-08-12</h4>
+            <h4 data-toc-skip class="date">2025-08-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/bhuvad/CosMxSpatialAnalysisWorkshop/blob/main/vignettes/Differentially_expression_analysis.Rmd"><code>vignettes/Differentially_expression_analysis.Rmd</code></a></small>
       <div class="hidden name"><code>Differentially_expression_analysis.Rmd</code></div>
@@ -834,9 +834,9 @@ We can use permutation testing to assess statistical significance.</p>
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="va">cluster_names</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"  %s: %d\n"</span>, <span class="va">i</span>, <span class="va">sig_counts</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<pre><code><span><span class="co">##   c1: 143</span></span>
-<span><span class="co">##   c2: 235</span></span>
-<span><span class="co">##   c3: 24</span></span>
+<pre><code><span><span class="co">##   c1: 142</span></span>
+<span><span class="co">##   c2: 243</span></span>
+<span><span class="co">##   c3: 23</span></span>
 <span><span class="co">##   c4: 4</span></span>
 <span><span class="co">##   c6: 73</span></span>
 <span><span class="co">##   c7: 149</span></span>
@@ -897,27 +897,27 @@ patterns.</p>
 <span><span class="va">top_sig</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">min_pvals</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">perm_res</span><span class="op">[</span><span class="va">top_sig</span>, <span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                 c6          c1          c9          c8 c3 c4          c7</span></span>
-<span><span class="co">## CCL19  0.707292707 0.000999001 0.790209790 1.000000000  1  1 1.000000000</span></span>
-<span><span class="co">## IGHG2  0.000999001 0.000999001 0.000999001 1.000000000  1  1 0.995004995</span></span>
-<span><span class="co">## IER3   1.000000000 1.000000000 1.000000000 0.000999001  1  1 0.006993007</span></span>
+<span><span class="co">## CCL19  0.677322677 0.000999001 0.813186813 1.000000000  1  1 1.000000000</span></span>
+<span><span class="co">## IGHG2  0.000999001 0.000999001 0.000999001 1.000000000  1  1 0.996003996</span></span>
+<span><span class="co">## IER3   1.000000000 1.000000000 1.000000000 0.000999001  1  1 0.001998002</span></span>
 <span><span class="co">## CD276  1.000000000 1.000000000 1.000000000 0.000999001  1  1 0.000999001</span></span>
-<span><span class="co">## SAA1   1.000000000 1.000000000 1.000000000 0.000999001  1  1 0.994005994</span></span>
-<span><span class="co">## TYK2   1.000000000 1.000000000 1.000000000 0.000999001  1  1 0.526473526</span></span>
+<span><span class="co">## SAA1   1.000000000 1.000000000 1.000000000 0.000999001  1  1 0.996003996</span></span>
+<span><span class="co">## TYK2   1.000000000 1.000000000 1.000000000 0.000999001  1  1 0.589410589</span></span>
 <span><span class="co">## CSF2RA 1.000000000 0.000999001 1.000000000 1.000000000  1  1 1.000000000</span></span>
-<span><span class="co">## MIF    1.000000000 1.000000000 1.000000000 0.000999001  1  1 0.052947053</span></span>
-<span><span class="co">## COL9A1 1.000000000 1.000000000 1.000000000 0.000999001  1  1 0.523476523</span></span>
-<span><span class="co">## CCR7   0.997002997 0.000999001 0.997002997 1.000000000  1  1 1.000000000</span></span>
+<span><span class="co">## MIF    1.000000000 1.000000000 1.000000000 0.000999001  1  1 0.045954046</span></span>
+<span><span class="co">## COL9A1 1.000000000 1.000000000 1.000000000 0.000999001  1  1 0.548451548</span></span>
+<span><span class="co">## CCR7   0.998001998 0.000999001 0.997002997 1.000000000  1  1 1.000000000</span></span>
 <span><span class="co">##                 c2</span></span>
-<span><span class="co">## CCL19  0.807192807</span></span>
-<span><span class="co">## IGHG2  0.670329670</span></span>
-<span><span class="co">## IER3   0.259740260</span></span>
-<span><span class="co">## CD276  0.003996004</span></span>
-<span><span class="co">## SAA1   0.368631369</span></span>
+<span><span class="co">## CCL19  0.824175824</span></span>
+<span><span class="co">## IGHG2  0.635364635</span></span>
+<span><span class="co">## IER3   0.270729271</span></span>
+<span><span class="co">## CD276  0.000999001</span></span>
+<span><span class="co">## SAA1   0.321678322</span></span>
 <span><span class="co">## TYK2   0.255744256</span></span>
-<span><span class="co">## CSF2RA 0.351648352</span></span>
-<span><span class="co">## MIF    0.135864136</span></span>
-<span><span class="co">## COL9A1 0.128871129</span></span>
-<span><span class="co">## CCR7   0.684315684</span></span></code></pre>
+<span><span class="co">## CSF2RA 0.346653347</span></span>
+<span><span class="co">## MIF    0.130869131</span></span>
+<span><span class="co">## COL9A1 0.088911089</span></span>
+<span><span class="co">## CCR7   0.691308691</span></span></code></pre>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">top_genes_per_cluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">perm_res</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">cluster</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">pvals</span> <span class="op">&lt;-</span> <span class="va">perm_res</span><span class="op">[</span>, <span class="va">cluster</span><span class="op">]</span></span>
