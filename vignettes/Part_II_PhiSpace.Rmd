@@ -9,6 +9,12 @@ author:
     email: jiadong.mao@unimelb.edu.au
     affiliation:
       - Melbourne Integrative Genomics (MIG), The University of Melbourne
+  - name: Yifan Qin
+    orcid: 0000-0002-9532-1119
+    url: https://github.com/qunatic
+    email: yifan.qin.1@unimelb.edu.au
+    affiliation:
+      - Melbourne Integrative Genomics (MIG), The University of Melbourne
 output:
   prettydoc::html_pretty:
     theme: cayman
@@ -145,54 +151,6 @@ tissueNames_CosMx <- c(
   "Lung6", "Lung9_Rep1", "Lung9_Rep2", "Lung12", "Lung13"
 )
 
-# Save PhiSpace heatmaps 
-tempSavePlots <- function(
-    spe, methodName = "PhiSpace", tissueName = "Lung", coordNames = c("x", "y"), 
-    saveDir = "~/Desktop/spatialCellTypeHeatmaps/",
-    legendPosition = "none", censQuant = 1, freeColScale = F, quants = c(0.1,1), psize = 0.5,
-    width = 10, height = 10, fignrow = 4, figncol = 4, fsize_title = 10, plot_margin = c(0,0,0,0)
-){
-  
-  scores <- as.matrix(reducedDim(spe, methodName))
-  
-  if(freeColScale){
-    lmts <- NULL
-  } else {
-    lmts <- quantile(scores, quants)
-  }
-  
-  ctypes <- colnames(scores) %>% sort()
-  outPlots <- vector("list", length(ctypes)) 
-  names(outPlots) <- ctypes
-  for(i in 1:length(ctypes)){
-    ctype <- ctypes[i]
-    cols <- scores[, ctype]
-    cols <- PhiSpace:::censor(cols, quant = censQuant)
-    df <- spe@colData %>% as.data.frame()
-    df <- cbind(df, spatialCoords(spe))
-    outPlots[[i]] <- df %>% mutate(cols = cols) %>% arrange(cols) %>%
-      ggplot(aes(x = !!sym(coordNames[1]), y = !!sym(coordNames[2]))) +
-      geom_point(aes(colour = cols), size = psize, alpha = 1, stroke = 0) +
-      theme_void() + scale_colour_gradientn(colours = PhiSpace:::MATLAB_cols, limits = lmts) + 
-      ggtitle(ctype) + theme(
-        legend.position = legendPosition, 
-        plot.title = element_text(size = fsize_title, hjust = 0.5, vjust = -1),
-        plot.margin = unit(plot_margin, "points")
-      )
-  }
-  
-  npheno <- length(outPlots)
-  nFigPerPlot <- fignrow * figncol
-  for(ii in 1:ceiling(npheno/nFigPerPlot)){
-    idx_start <- (ii-1)*nFigPerPlot + 1
-    idx_end <- min(ii*nFigPerPlot, npheno)
-    ggsave(
-      paste0(saveDir, tissueName, "/", tissueName, "_", methodName, "_", ii, ".png"),
-      ggpubr::ggarrange(plotlist = outPlots[idx_start:idx_end], ncol = figncol, nrow = fignrow), 
-      width = width, height = height
-    )
-  }
-}
 
 # Plot cell type copresence matrix as heatmap
 tempCopresence <- function(interaction_matrix, fsize = 12, useSeriate = T){
@@ -203,7 +161,6 @@ tempCopresence <- function(interaction_matrix, fsize = 12, useSeriate = T){
     row_order = get_order(o, 1), column_order = get_order(o, 2), 
     row_names_gp = gpar(fontsize = fsize), column_names_gp = gpar(fontsize = fsize)
   )
-  
   return(hm)
 }
 ```
@@ -286,7 +243,7 @@ What about cases where you do not have reliable cell segmentation? Generally we 
 Run the following code and the function will ask you to create a directory to store all heatmaps.
 
 ```{r eval=FALSE}
-tempSavePlots(lung5_norm, tissueName = "lung5_norm_sub", freeColScale = T, censQuant = 0.5, psize = 0.8)
+saveCellTypeMaps(lung5_norm, tissueName = "lung5_norm_sub", freeColScale = T, censQuant = 0.5, psize = 0.8)
 ```
 
 Now let's look at these heatmaps. What can you see?
@@ -308,7 +265,7 @@ Since the lung fibrosis dataset was too big. Here we provide the output, ie PhiS
 ```{r eval=FALSE}
 data("sc_lung5_norm_sub")
 reducedDim(lung5_norm, "Phi5Ref") <- sc_lung5_norm_sub
-tempSavePlots(lung5_norm, tissueName = "lung5_norm_sub", methodName = "Phi5Ref", freeColScale = T, censQuant = 0.5, psize = 0.8)
+saveCellTypeMaps(lung5_norm, tissueName = "lung5_norm_sub", methodName = "Phi5Ref", freeColScale = T, censQuant = 0.5, psize = 0.8)
 ```
 
 
@@ -362,7 +319,7 @@ VizSpatial(
 
 Same as before, we can save the spatial heatmaps of all cell type annotations.
 ```{r eval=FALSE}
-tempSavePlots(allTissues[["Lung5_Rep1"]], tissueName = "Lung5_Rep1", freeColScale = T, censQuant = 0.5, psize = 0.5)
+saveCellTypeMaps(allTissues[["Lung5_Rep1"]], tissueName = "Lung5_Rep1", freeColScale = T, censQuant = 0.5, psize = 0.5)
 ```
 
 These spatial heatmaps are already quite revealing. Keeping the pathological niches in mind, we can have some preliminary findings:
@@ -615,12 +572,8 @@ The second thing is that there were some interesting subclusters emerging in the
 
 Let's use PLS again to see what cell types are enriched in these newly identified niches.
 ```{r fig.asp=1}
-XX <- reducedDim(query, "PhiSpace")
-YY <- codeY_vec(query$PhiClust)
-ncomp = ncol(YY)
-plsRes <- PhiSpace:::mvr(XX, YY, ncomp = ncomp, method = "PLS", center = T)
-impScores <- plsRes$coefficients[,,ncomp]
-selectFeat(impScores, absVal = F)$orderedFeatMat[1:5,]
+featSelRes <- correlatePhiSpace(query, "PhiClust", method = "PLSDA", ncomp = length(unique(query$PhiClust)))
+selectFeat(featSelRes$importance_scores)$orderedFeatMat[1:5,]
 ```
 
 - Compare the three tumour niches, clusters 2 (black), 4 (gray) and 9 (red);
@@ -671,11 +624,7 @@ for(ii in 1:length(tumourNames)){
   tissueName <- tumourNames[ii]
   query <- allTissues[[tissueName]]
   query <- query[,!is.na(query$region)]
-  Y <- PhiSpace:::codeY_vec(query$region)
-  X <- reducedDim(query, "PhiSpace")
-  ncomp <- ncol(Y)
-  pls_res <- mvr(X, Y, ncomp = ncomp, method = "PLS")
-  regCoef <- pls_res$coefficients[,,ncomp]
+  regCoef <- correlatePhiSpace(query, "region", ncomp = length(unique(query$region)))$importance_scores
   selectedPheno <- selectFeat(regCoef, nfeat = 5, absVal = F)
   tumourSig[[ii]] <- selectedPheno$orderedFeatMat[,"Tumour"]
 }
