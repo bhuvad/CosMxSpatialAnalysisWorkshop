@@ -470,7 +470,8 @@ Lung5Rep1_PhiClusts <- clusterPhiSpace(query, k = 9, ncomp = 30, seed = 32123)
 If you haven't run the above chunk, simply load the pre-computed clustering result.
 ```{r fig.asp=1}
 data("Lung5Rep1_PhiClusts")
-query$PhiClustRaw <- as.character(Lung5Rep1_PhiClusts$cluster)
+Lung5Rep1_PhiClusts
+query$PhiClustRaw <- as.character(Lung5Rep1_PhiClusts$clusters)
 VizSpatial(query,  groupBy = "PhiClustRaw", ptSize = 1, legend.position = "top", legend.symb.size = 2) + 
   scale_colour_manual(values = tempClustCols) 
 ```
@@ -505,19 +506,15 @@ query <- spatialSmoother(query, smoothReducedDim = T, kernel = "gaussian", k = 1
 
 Run k-means again on spatially smoothed PhiSpace scores.
 ```{r eval=FALSE}
-PhiPCRes <- getPC(reducedDim(query, "PhiSpace_smoothed"), ncomp = ncol(reducedDim(query, "PhiSpace_smoothed")) - 1)
-plot(1-PhiPCRes$accuProps)
-mat2clust <- PhiPCRes$scores[,1:30]
-set.seed(94863)
-# If see Quick-TRANSfer error, may try Lloyd algorithm instead
-Lung5Rep1_PhiSmoothClusts <- kmeans(mat2clust, centers = 9, iter.max = 500L, nstart = 20, algorithm = "Lloyd")
+Lung5Rep1_PhiSmoothClusts <- clusterPhiSpace(query, k = 9, ncomp = 30, seed = 32123, reducedDimName = "PhiSpace_smoothed")
+# save(Lung5Rep1_PhiSmoothClusts, file = "~/Dropbox/Research_projects/MIG_Spatial_Workshop/output/Lung5Rep1_PhiSmoothClusts.rda")
 ```
 
 
 
 ```{r fig.asp=1}
 data("Lung5Rep1_PhiSmoothClusts")
-PhiClust_smooth <- as.character(Lung5Rep1_PhiSmoothClusts$cluster)
+PhiClust_smooth <- as.character(Lung5Rep1_PhiSmoothClusts$clusters)
 # Align clusters
 query$PhiClust <- align_clusters(PhiClust_smooth, query$BanksyClust)
 VizSpatial(allTissues[["Lung5_Rep1"]], ptSize = 0.5, groupBy = "region", legend.position = "bottom", legend.symb.size = 2) 
@@ -645,10 +642,13 @@ allTissues <- lapply(
 )
 mat2clust <- lapply(1:length(allTissues), function(x) reducedDim(allTissues[[x]], "PhiSpace_smoothed")) 
 mat2clust <- do.call(rbind, mat2clust)
-set.seed(763)
-pcaRes <- getPC(mat2clust, ncomp = 30)
-mat2clust <- pcaRes$scores
-multiClustRes <- kmeans(mat2clust, centers = 9, iter.max = 1000L, nstart = 20, algorithm = "Lloyd")
+multiClustRes <- clusterPhiSpace(mat2clust, k = 9, iter.max = 1000, seed = 83904)
+# save(Lung5Rep1_PhiSmoothClusts, file = "~/Dropbox/Research_projects/MIG_Spatial_Workshop/output/multiClustRes.rda")
+
+# set.seed(763)
+# pcaRes <- getPC(mat2clust, ncomp = 30)
+# mat2clust <- pcaRes$scores
+# multiClustRes <- kmeans(mat2clust, centers = 9, iter.max = 1000L, nstart = 20, algorithm = "Lloyd")
 ```
 
 
@@ -658,7 +658,7 @@ Or load pre-computed clustering results.
 data("multiClustRes")
 for(ii in 1:length(allTissues)){
   spe <- allTissues[[ii]]
-  spe$multiSampClust <- as.character(multiClustRes$cluster[colnames(spe)])
+  spe$multiSampClust <- as.character(multiClustRes$clusters[colnames(spe)])
   allTissues[[ii]] <- spe
 }
 ```
