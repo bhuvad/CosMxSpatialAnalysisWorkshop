@@ -643,12 +643,7 @@ allTissues <- lapply(
 mat2clust <- lapply(1:length(allTissues), function(x) reducedDim(allTissues[[x]], "PhiSpace_smoothed")) 
 mat2clust <- do.call(rbind, mat2clust)
 multiClustRes <- clusterPhiSpace(mat2clust, k = 9, iter.max = 1000, seed = 83904)
-# save(Lung5Rep1_PhiSmoothClusts, file = "~/Dropbox/Research_projects/MIG_Spatial_Workshop/output/multiClustRes.rda")
-
-# set.seed(763)
-# pcaRes <- getPC(mat2clust, ncomp = 30)
-# mat2clust <- pcaRes$scores
-# multiClustRes <- kmeans(mat2clust, centers = 9, iter.max = 1000L, nstart = 20, algorithm = "Lloyd")
+# save(multiClustRes, file = "~/Dropbox/Research_projects/MIG_Spatial_Workshop/output/multiClustRes.rda")
 ```
 
 
