@@ -842,7 +842,7 @@ df$sampIDs <- gsub("^[^_]*_", "", rownames(df))
 df$niche <- corMatVec$niche
 ggplot(df, aes(x = comp1, y = comp2, colour = niche)) +
   geom_text(aes(label = sampIDs)) +
-  theme_bw() + scale_colour_manual(values = multiSampClustCols) + xlim(-6.5, 7)
+  theme_bw() + scale_colour_brewer(palette = "Set1") + xlim(-6.5, 7)
 
 # Loading# Loadingniche
 loadBarplot(pca_res$loadings, "comp1", showNeg = F, absVal = T, nfeat = 10)
