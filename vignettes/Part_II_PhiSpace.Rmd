@@ -414,12 +414,9 @@ VizSpatial(allTissues[["Lung5_Rep1"]], ptSize = 1, groupBy = "BanksyClust", lege
 Comparing them to the pathological niche annotation, we can see, for example, the tumour niche was further clustered into two sub-niches, one black, on gray; and the stroma was further clustered into several sub-niches. What are they? We can do a 'differential cell state analysis' based on PhiSpace scores of cells in each niche. Similar to differential gene expression analysis, this can be done in several ones. Here we use a supervised classification based approach. Namely we use PhiSpace scores of the cells to predict their Bansky cluster memberships. Any classification method will do, as long as they can rank the importance of features in predicting the cluster membership. Here we use PLS:
 ```{r}
 query <- allTissues[["Lung5_Rep1"]]
-XX <- reducedDim(query, "PhiSpace")
-# Convert Banksy cluster memberships to a dummy matrix
-YY <- codeY_vec(query$BanksyClust)
-ncomp = ncol(YY)
-plsRes <- PhiSpace:::mvr(XX, YY, ncomp = ncomp, method = "PLS", center = T)
-impScores <- plsRes$coefficients[,,ncomp]
+response <- query$BanksyClust
+selectRes <- correlatePhiSpace(query, response, method = "PLSDA", ncomp = length(unique(response)))
+impScores <- selectRes$importance_scores
 ```
 
 `impScores` is a cell type by cluster membership matrix, giving the importance of cell type scores for predicting each cluster membership.
@@ -465,11 +462,8 @@ Another possible reason why people do not favour k-means is due to the awful imp
 
 We choose number of clusters equal to 9 to match the Banksy result.
 ```{r fig.asp=1, eval=FALSE}
-PhiPCRes <- getPC(reducedDim(query, "PhiSpace"), ncomp = ncol(reducedDim(query, "PhiSpace")) - 1)
-mat2clust <- PhiPCRes$scores[,1:30]
-set.seed(94863)
-Lung5Rep1_PhiClusts <- kmeans(mat2clust, centers = 9, iter.max = 500L, nstart = 20, algorithm = "Lloyd") 
-# saveRDS(Lung5Rep1_PhiClusts, "~/Dropbox/MIG_Spatial_Workshop/output/Lung5_Rep1_PhiClusts5Refs.rds")
+Lung5Rep1_PhiClusts <- clusterPhiSpace(query, k = 9, ncomp = 30, seed = 32123)
+# save(Lung5Rep1_PhiClusts, file = "~/Dropbox/Research_projects/MIG_Spatial_Workshop/output/Lung5Rep1_PhiClusts.rda")
 ```
 
 
