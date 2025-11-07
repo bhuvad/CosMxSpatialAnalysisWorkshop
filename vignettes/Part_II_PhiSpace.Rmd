@@ -660,14 +660,10 @@ for(ii in 1:length(allTissues)){
 
 Visualise PhiSpace niches.
 ```{r fig.asp=1}
-multiSampClustCols <- c(
-  "1" =  "gray40", "2" = "#FF7F00", "3" = "#6A3D9A" , "4" = "#33A02C", 
-  "5" = "#B15928", "6" = "black", "7" = "#A6CEE3", "8" = "#E41A1C", "9" = "#1F78B4", "10" = "#FFFF99", "11" = "#B2DF8A", "12" = "#FB9A99"
-)
 lapply(1:length(allTissues), function(ii){
   p <- VizSpatial(
     allTissues[[ii]], ptSize = 1, groupBy = "multiSampClust", legend.position = "bottom", legend.symb.size = 2
-  ) + scale_colour_manual(values = multiSampClustCols)
+  ) + scale_colour_brewer(palette = "Set1")
   return(p)
 })
 ```
@@ -676,7 +672,7 @@ We can see that some niches only appeared in certain tissue sections. Let's visu
 ```{r fig.asp=1, fig.width=10}
 df <- lapply(1:length(allTissues), function(x) reducedDim(allTissues[[x]], "PhiSpace"))
 df <- do.call(rbind, df)
-df <- as.data.frame(df) %>% mutate(cluster = as.character(multiClustRes$cluster))
+df <- as.data.frame(df) %>% mutate(cluster = as.character(multiClustRes$clusters))
 
 df_long <- df %>%
   pivot_longer(
