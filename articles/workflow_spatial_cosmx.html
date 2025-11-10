@@ -286,7 +286,7 @@ dataset.</div>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Dark2"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># improve legend visibility</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" width="700"></p>
 <p>For users interested in analysing the whole dataset, it can be
 obtained using the code below.</p>
 <blockquote>
@@ -398,7 +398,7 @@ low library sizes and number of genes detected.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>, title <span class="op">=</span> <span class="st">"Region"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">50</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">75</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" width="700"></p>
 <p>However, we need to identify appropriate thresholds to classify poor
 quality cells. As the panel sizes and compositions for these emerging
 technologies are variable, there are no standards as of yet for
@@ -424,7 +424,7 @@ visualisations.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_colour_viridis_c</a></span><span class="op">(</span>option <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Sum (library size)"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" width="700"></p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># UMAP plot</span></span>
 <span><span class="va">p1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/standR/man/plotDR.html" class="external-link">plotDR</a></span><span class="op">(</span><span class="va">lung5</span>, dimred <span class="op">=</span> <span class="st">"UMAP"</span>, colour <span class="op">=</span> <span class="va">detected</span>, alpha <span class="op">=</span> <span class="fl">0.75</span>, size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
@@ -436,7 +436,7 @@ visualisations.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_colour_viridis_c</a></span><span class="op">(</span>option <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Detected (number of genes expressed)"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" width="700"></p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># UMAP plot</span></span>
 <span><span class="va">p1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/standR/man/plotDR.html" class="external-link">plotDR</a></span><span class="op">(</span><span class="va">lung5</span>, dimred <span class="op">=</span> <span class="st">"UMAP"</span>, colour <span class="op">=</span> <span class="va">subsets_neg_percent</span>, alpha <span class="op">=</span> <span class="fl">0.75</span>, size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
@@ -448,7 +448,7 @@ visualisations.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_colour_viridis_c</a></span><span class="op">(</span>option <span class="op">=</span> <span class="st">"F"</span>, limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">5</span><span class="op">)</span>, oob <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/oob.html" class="external-link">squish</a></span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Proportion of negative control probes"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" width="700"></p>
 <p>Having visualised the quality metrics and their distrition across
 space and the genomic dimensions, we can now begin to test threshold
 values. We want to remove low quality cells but we have to be careful
@@ -481,7 +481,7 @@ under- filtering.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Cells retained after QC filtering"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" width="700"></p>
 <p>In practice, after poor quality cells are filtered out, we tend to
 see clearer separation of clusters in the UMAP (or equivalent
 visualisations). We also notice that poor quality cells often seem like
@@ -563,7 +563,7 @@ datasets.</p>
 <span><span class="fu"><a href="https://bhuvad.github.io/spaNorm/reference/plotSpatial.html" class="external-link">plotSpatial</a></span><span class="op">(</span><span class="va">lung5</span>, colour <span class="op">=</span> <span class="va">logLS</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_distiller</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"PRGn"</span>, limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>, oob <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/oob.html" class="external-link">squish</a></span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" width="700"></p>
 <p>To remove these technical biases, we perform normalisation. As
 measurements are independent in bulk and single-cell RNA-seq (reactions
 happen independently for each sample/cell), each cell or sample can be
@@ -642,7 +642,7 @@ to be passed to the function).</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Mean from SpaNorm model"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" width="700"></p>
 <p>Since the SpaNorm model learns the functions for biological and
 technical effects for each gene, we can also investigate these to ensure
 that the correct biology is learnt and modelled. The
@@ -665,7 +665,7 @@ function evaluates at the mean library size below.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Batch variation"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="va">p3</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-16-1.png" width="960"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" width="960"></p>
 <p><a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=DHRS" class="external-link"><em>EPCAM</em></a>
 is an epithelial cell marker gene that will also be expressed in lung
 cancer cells that are of epithelial origin. The SpaNorm model correctly
@@ -736,7 +736,7 @@ normalisation method.</div>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_colour_viridis_c</a></span><span class="op">(</span>option <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span>ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-18-1.png" width="960"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" width="960"></p>
 </div>
 <div class="section level2">
 <h2 id="dimensional-reduction-using-glm-pca">Dimensional reduction using GLM-PCA<a class="anchor" aria-label="anchor" href="#dimensional-reduction-using-glm-pca"></a>
@@ -775,7 +775,7 @@ properties as discussed in <span class="citation">(Townes et al.
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"UMAP1"</span>, y <span class="op">=</span> <span class="st">"UMAP2"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-19-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-19-1.png" class="r-plt" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="cell-typing">Cell typing<a class="anchor" aria-label="anchor" href="#cell-typing"></a>
@@ -849,7 +849,7 @@ collapse them to a higher order classification below.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Paired"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-23-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-23-1.png" class="r-plt" width="700"></p>
 <blockquote>
 <p>Though discrete cell type identities are appealing due to their ease
 of interpretation, in many biological systems, metastable cell states
@@ -973,14 +973,14 @@ method.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Pathology annotations"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">3</span>, override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Spatial domain identification"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-25-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-25-1.png" class="r-plt" width="700"></p>
 <p>The plot above shows that hoodscanR is able to differentiate the key
 regions and is clearly able to delineate the tumour regions. It is also
 able to identify more sophosticated structures such as region 4 which
 was not identified in the pathological annotation.</p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotProbDist.html" class="external-link">plotProbDist</a></span><span class="op">(</span><span class="va">lung5</span>, pm_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">neighbourhoods</span><span class="op">)</span>, by_cluster <span class="op">=</span> <span class="cn">TRUE</span>, plot_all <span class="op">=</span> <span class="cn">TRUE</span>, show_clusters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span>, val_name <span class="op">=</span> <span class="st">"hoodscanr_region"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-26-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-26-1.png" class="r-plt" width="700"></p>
 <p>we see that cluster 5 is entirely defined by the presence of
 malignant cells while cluster 4 is composed of immune cells,
 particularly B cells, T cells and plasma cells, indicating the formation
@@ -1001,7 +1001,7 @@ profile, these can be beneficial for patients.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Cell type heterogeneity"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Cell type heterogeneity"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-27-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-27-1.png" class="r-plt" width="700"></p>
 <p>Looking at the heterogeneity of cell types across space, we see that
 cell composition is very homogeneous within the tumour regions while it
 is highest in the lymphoid aggregates which are often characterised by
@@ -1084,7 +1084,7 @@ variation is minimal within this range.</li>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Mean from SpaNorm model"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-28-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-28-1.png" class="r-plt" width="700"></p>
 <p>Try varying the parameters to see how the clustering changes. Do note
 that the results are automatically stored in a new column in the
 colData. Unfortunately, the function does not allow specification of the
@@ -1118,7 +1118,7 @@ run on more data, perfomance will vary and will generally improve.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Pathology annotations"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">3</span>, override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Spatial domain identification"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-29-1.png" width="700"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-29-1.png" class="r-plt" width="700"></p>
 <p>The choice of the better approach amongst the two demonstrated here
 should be based on the question of interest. They both have their
 strengths and limitations. BANKSY allows us to identify within tumour
@@ -1215,7 +1215,7 @@ adjacent tumour regions respectively.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Paired"</span>, na.value <span class="op">=</span> <span class="st">"#333333"</span>, name <span class="op">=</span> <span class="st">"cluster"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-32-1.png" width="768"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-32-1.png" class="r-plt" width="768"></p>
 <p>Next we compare T cells from region 4 (lymphoid aggregates) against
 those from region 3 (dispersed). Investigating and visualising the top
 genes shows that <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=FYB1" class="external-link"><em>FYB1</em></a>,
@@ -1251,7 +1251,7 @@ activity and infiltration of T cells in the lymphoid aggregates.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Paired"</span>, na.value <span class="op">=</span> <span class="st">"#333333"</span>, name <span class="op">=</span> <span class="st">"cluster"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-33-1.png" width="768"></p>
+<p><img src="workflow_spatial_cosmx_files/figure-html/unnamed-chunk-33-1.png" class="r-plt" width="768"></p>
 </div>
 <div class="section level2">
 <h2 id="functional-analysis">Functional analysis<a class="anchor" aria-label="anchor" href="#functional-analysis"></a>
@@ -1374,8 +1374,8 @@ below:</p>
 <span><span class="co">##  [97] uwot_0.2.3                leidenAlg_1.1.5          </span></span>
 <span><span class="co">##  [99] xtable_1.8-4              systemfonts_1.3.1        </span></span>
 <span><span class="co">## [101] jquerylib_0.1.4           Rcpp_1.1.0               </span></span>
-<span><span class="co">## [103] png_0.1-8                 XML_3.99-0.19            </span></span>
-<span><span class="co">## [105] parallel_4.5.2            pkgdown_2.1.3            </span></span>
+<span><span class="co">## [103] png_0.1-8                 XML_3.99-0.20            </span></span>
+<span><span class="co">## [105] parallel_4.5.2            pkgdown_2.2.0            </span></span>
 <span><span class="co">## [107] blob_1.2.4                mclust_6.1.2             </span></span>
 <span><span class="co">## [109] ggalluvial_0.12.5         sparseMatrixStats_1.22.0 </span></span>
 <span><span class="co">## [111] viridisLite_0.4.2         GSEABase_1.72.0          </span></span>
@@ -1479,7 +1479,7 @@ Report Generation in r</em>. <a href="https://yihui.org/knitr/" class="external-
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>

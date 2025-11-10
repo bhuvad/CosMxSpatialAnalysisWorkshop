@@ -91,7 +91,7 @@ in Spatial Transcriptomics Data</h1>
 Melbourne<br><a class="author_email" href="mailto:#"></a><a href="mailto:jin.m@wehi.edu.au" class="email">jin.m@wehi.edu.au</a>
       </address>
                   
-            <h4 data-toc-skip class="date">2025-11-07</h4>
+            <h4 data-toc-skip class="date">2025-11-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/bhuvad/CosMxSpatialAnalysisWorkshop/blob/main/vignettes/Differentially_expression_analysis.Rmd"><code>vignettes/Differentially_expression_analysis.Rmd</code></a></small>
       <div class="hidden name"><code>Differentially_expression_analysis.Rmd</code></div>
@@ -505,7 +505,7 @@ which influence marker gene patterns.</p>
 <span>        strip.text <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">10</span>, face <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span>,</span>
 <span>        plot.title <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">14</span>, face <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span>,</span>
 <span>        plot.subtitle <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Differentially_expression_analysis_files/figure-html/spatial_clusters-1.png" width="3000"></p>
+<p><img src="Differentially_expression_analysis_files/figure-html/spatial_clusters-1.png" class="r-plt" width="3000"></p>
 </div>
 </div>
 <div class="section level2">
@@ -702,7 +702,7 @@ cases, it may be helpful to revisit the clustering resolution.</p>
 <span>    insig <span class="op">=</span> <span class="st">"blank"</span>, </span>
 <span>    title <span class="op">=</span> <span class="st">"Cluster-Cluster Spatial Correlation"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="Differentially_expression_analysis_files/figure-html/cluster_correlation-1.png" width="1500">
+<p><img src="Differentially_expression_analysis_files/figure-html/cluster_correlation-1.png" class="r-plt" width="1500">
 The spatial correlation heatmap reveals how clusters co-localize or
 segregate across the tissue. Notably, clusters c3 and c4 show a moderate
 positive correlation (r = 0.39), suggesting they tend to occupy
@@ -774,7 +774,7 @@ expression patterns and cluster distributions.</p>
 <span>    title <span class="op">=</span> <span class="st">"Cluster-Gene Spatial Correlation"</span>,</span>
 <span>    cex.main <span class="op">=</span> <span class="fl">0.7</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="Differentially_expression_analysis_files/figure-html/gene_cluster_correlation-1.png" width="1800"></p>
+<p><img src="Differentially_expression_analysis_files/figure-html/gene_cluster_correlation-1.png" class="r-plt" width="1800"></p>
 </div>
 </div>
 <div class="section level2">
@@ -835,13 +835,13 @@ We can use permutation testing to assess statistical significance.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"  %s: %d\n"</span>, <span class="va">i</span>, <span class="va">sig_counts</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <pre><code><span><span class="co">##   c1: 280</span></span>
-<span><span class="co">##   c2: 167</span></span>
-<span><span class="co">##   c3: 47</span></span>
-<span><span class="co">##   c4: 9</span></span>
-<span><span class="co">##   c6: 118</span></span>
-<span><span class="co">##   c7: 319</span></span>
-<span><span class="co">##   c8: 527</span></span>
-<span><span class="co">##   c9: 36</span></span></code></pre>
+<span><span class="co">##   c2: 165</span></span>
+<span><span class="co">##   c3: 46</span></span>
+<span><span class="co">##   c4: 8</span></span>
+<span><span class="co">##   c6: 116</span></span>
+<span><span class="co">##   c7: 320</span></span>
+<span><span class="co">##   c8: 528</span></span>
+<span><span class="co">##   c9: 35</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="examine-results">Examine Results<a class="anchor" aria-label="anchor" href="#examine-results"></a>
@@ -897,27 +897,27 @@ patterns.</p>
 <span><span class="va">top_sig</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">min_pvals</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">perm_res</span><span class="op">[</span><span class="va">top_sig</span>, <span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                 c6          c1          c9          c8        c3 c4          c7</span></span>
-<span><span class="co">## ATG12  0.986013986 0.088911089 1.000000000 0.000999001 1.0000000  1 0.057942058</span></span>
-<span><span class="co">## CCL19  0.931068931 0.000999001 0.624375624 1.000000000 1.0000000  1 1.000000000</span></span>
-<span><span class="co">## IGHG2  0.000999001 0.000999001 0.000999001 1.000000000 1.0000000  1 0.924075924</span></span>
+<span><span class="co">## ATG12  0.993006993 0.101898102 0.998001998 0.000999001 1.0000000  1 0.051948052</span></span>
+<span><span class="co">## CCL19  0.942057942 0.000999001 0.634365634 1.000000000 1.0000000  1 1.000000000</span></span>
+<span><span class="co">## IGHG2  0.000999001 0.000999001 0.000999001 1.000000000 1.0000000  1 0.915084915</span></span>
 <span><span class="co">## IER3   1.000000000 1.000000000 1.000000000 0.000999001 1.0000000  1 0.000999001</span></span>
-<span><span class="co">## CD276  0.914085914 1.000000000 1.000000000 0.000999001 1.0000000  1 0.000999001</span></span>
-<span><span class="co">## SAA1   1.000000000 0.993006993 1.000000000 0.000999001 1.0000000  1 0.705294705</span></span>
-<span><span class="co">## TYK2   1.000000000 0.711288711 1.000000000 0.000999001 1.0000000  1 0.029970030</span></span>
-<span><span class="co">## CSF2RA 0.992007992 0.000999001 0.998001998 1.000000000 0.9910090  1 1.000000000</span></span>
-<span><span class="co">## BTK    0.822177822 0.000999001 0.999000999 1.000000000 0.8871129  1 1.000000000</span></span>
+<span><span class="co">## CD276  0.916083916 1.000000000 1.000000000 0.000999001 1.0000000  1 0.000999001</span></span>
+<span><span class="co">## SAA1   1.000000000 0.985014985 1.000000000 0.000999001 1.0000000  1 0.726273726</span></span>
+<span><span class="co">## TYK2   1.000000000 0.724275724 1.000000000 0.000999001 1.0000000  1 0.029970030</span></span>
+<span><span class="co">## CSF2RA 0.993006993 0.000999001 1.000000000 1.000000000 0.9940060  1 1.000000000</span></span>
+<span><span class="co">## BTK    0.792207792 0.000999001 1.000000000 1.000000000 0.9010989  1 1.000000000</span></span>
 <span><span class="co">## MIF    1.000000000 1.000000000 1.000000000 0.000999001 1.0000000  1 0.000999001</span></span>
 <span><span class="co">##                 c2</span></span>
-<span><span class="co">## ATG12  0.005994006</span></span>
-<span><span class="co">## CCL19  0.839160839</span></span>
-<span><span class="co">## IGHG2  0.165834166</span></span>
-<span><span class="co">## IER3   0.547452547</span></span>
-<span><span class="co">## CD276  0.000999001</span></span>
-<span><span class="co">## SAA1   0.743256743</span></span>
-<span><span class="co">## TYK2   0.459540460</span></span>
-<span><span class="co">## CSF2RA 0.257742258</span></span>
-<span><span class="co">## BTK    0.468531469</span></span>
-<span><span class="co">## MIF    0.210789211</span></span></code></pre>
+<span><span class="co">## ATG12  0.003996004</span></span>
+<span><span class="co">## CCL19  0.842157842</span></span>
+<span><span class="co">## IGHG2  0.151848152</span></span>
+<span><span class="co">## IER3   0.581418581</span></span>
+<span><span class="co">## CD276  0.003996004</span></span>
+<span><span class="co">## SAA1   0.748251748</span></span>
+<span><span class="co">## TYK2   0.463536464</span></span>
+<span><span class="co">## CSF2RA 0.237762238</span></span>
+<span><span class="co">## BTK    0.433566434</span></span>
+<span><span class="co">## MIF    0.240759241</span></span></code></pre>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">top_genes_per_cluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">perm_res</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">cluster</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">pvals</span> <span class="op">&lt;-</span> <span class="va">perm_res</span><span class="op">[</span>, <span class="va">cluster</span><span class="op">]</span></span>
@@ -949,7 +949,7 @@ patterns.</p>
 <span>  color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/colorRamp.html" class="external-link">colorRampPalette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"blue"</span>, <span class="st">"white"</span>, <span class="st">"red"</span><span class="op">)</span><span class="op">)</span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>,</span>
 <span>  main <span class="op">=</span> <span class="st">"Top 10 Spatially Correlated Genes per Cluster"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="Differentially_expression_analysis_files/figure-html/permutation_results-1.png" width="3000"></p>
+<p><img src="Differentially_expression_analysis_files/figure-html/permutation_results-1.png" class="r-plt" width="3000"></p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ============================================================================</span></span>
 <span><span class="co"># INTEGRATED ANALYSIS: HIGH CORRELATION + SIGNIFICANCE</span></span>
@@ -1169,7 +1169,7 @@ the top marker genes identified by correaltion approach.</p>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">layout_design</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span>  <span class="op">}</span></span></code></pre></div>
-<p><img src="Differentially_expression_analysis_files/figure-html/permutation_visualization-1.png" width="4500"><img src="Differentially_expression_analysis_files/figure-html/permutation_visualization-2.png" width="4500"><img src="Differentially_expression_analysis_files/figure-html/permutation_visualization-3.png" width="4500"><img src="Differentially_expression_analysis_files/figure-html/permutation_visualization-4.png" width="4500"><img src="Differentially_expression_analysis_files/figure-html/permutation_visualization-5.png" width="4500"></p>
+<p><img src="Differentially_expression_analysis_files/figure-html/permutation_visualization-1.png" class="r-plt" width="4500"><img src="Differentially_expression_analysis_files/figure-html/permutation_visualization-2.png" class="r-plt" width="4500"><img src="Differentially_expression_analysis_files/figure-html/permutation_visualization-3.png" class="r-plt" width="4500"><img src="Differentially_expression_analysis_files/figure-html/permutation_visualization-4.png" class="r-plt" width="4500"><img src="Differentially_expression_analysis_files/figure-html/permutation_visualization-5.png" class="r-plt" width="4500"></p>
 </div>
 </div>
 <div class="section level3">
@@ -1193,7 +1193,7 @@ noise using negative control probes.</p>
 <span>  <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="va">defined_theme</span> <span class="op">+</span></span>
 <span>  <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Spatial Distribution of Negative Control Probes"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Differentially_expression_analysis_files/figure-html/background_preparation-1.png" width="4500"></p>
+<p><img src="Differentially_expression_analysis_files/figure-html/background_preparation-1.png" class="r-plt" width="4500"></p>
 <p><strong>Note</strong>: Negative control probes should show random
 spatial distribution. If they show spatial patterns, this may indicate
 technical artifacts that need to be addressed.</p>
@@ -1456,7 +1456,7 @@ further resolution.</p>
 <span></span>
 <span>    <span class="op">}</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="Differentially_expression_analysis_files/figure-html/lasso_visualization-1.png" width="4500"><img src="Differentially_expression_analysis_files/figure-html/lasso_visualization-2.png" width="4500"><img src="Differentially_expression_analysis_files/figure-html/lasso_visualization-3.png" width="4500"><img src="Differentially_expression_analysis_files/figure-html/lasso_visualization-4.png" width="4500"><img src="Differentially_expression_analysis_files/figure-html/lasso_visualization-5.png" width="4500"><img src="Differentially_expression_analysis_files/figure-html/lasso_visualization-6.png" width="4500"><img src="Differentially_expression_analysis_files/figure-html/lasso_visualization-7.png" width="4500"></p>
+<p><img src="Differentially_expression_analysis_files/figure-html/lasso_visualization-1.png" class="r-plt" width="4500"><img src="Differentially_expression_analysis_files/figure-html/lasso_visualization-2.png" class="r-plt" width="4500"><img src="Differentially_expression_analysis_files/figure-html/lasso_visualization-3.png" class="r-plt" width="4500"><img src="Differentially_expression_analysis_files/figure-html/lasso_visualization-4.png" class="r-plt" width="4500"><img src="Differentially_expression_analysis_files/figure-html/lasso_visualization-5.png" class="r-plt" width="4500"><img src="Differentially_expression_analysis_files/figure-html/lasso_visualization-6.png" class="r-plt" width="4500"><img src="Differentially_expression_analysis_files/figure-html/lasso_visualization-7.png" class="r-plt" width="4500"></p>
 </div>
 </div>
 <div class="section level3">
@@ -1576,7 +1576,7 @@ expression analysis using Seurat’s FindMarkers function.</p>
 <span>  <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Top 3 marker genes by jazzPanda-glm"</span>, x <span class="op">=</span> <span class="st">""</span>, y <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">p1</span> <span class="op">|</span> <span class="va">p2</span> <span class="op">|</span> <span class="va">p3</span></span></code></pre></div>
-<p><img src="Differentially_expression_analysis_files/figure-html/findmarkers_comparison-1.png" width="4500"></p>
+<p><img src="Differentially_expression_analysis_files/figure-html/findmarkers_comparison-1.png" class="r-plt" width="4500"></p>
 <div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plt_lst</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">cl</span> <span class="kw">in</span> <span class="va">cluster_names</span><span class="op">)</span><span class="op">{</span></span>
@@ -1624,7 +1624,7 @@ expression analysis using Seurat’s FindMarkers function.</p>
 <span><span class="va">combined_plot</span> <span class="op">&lt;-</span> <span class="fu">wrap_plots</span><span class="op">(</span><span class="va">plt_lst</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">combined_plot</span> </span></code></pre></div>
-<p><img src="Differentially_expression_analysis_files/figure-html/upset-compare-1.png" width="2400"></p>
+<p><img src="Differentially_expression_analysis_files/figure-html/upset-compare-1.png" class="r-plt" width="2400"></p>
 </div>
 </div>
 <div class="section level2">
@@ -1647,7 +1647,7 @@ information to identify more robust marker genes.</p>
 <span>    <span class="fu">guides</span><span class="op">(</span>colour <span class="op">=</span> <span class="fu">guide_legend</span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Spatial Distribution by Sample and Cluster"</span><span class="op">)</span><span class="op">+</span></span>
 <span>    <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Differentially_expression_analysis_files/figure-html/multi_sample_preparation-1.png" width="3000"></p>
+<p><img src="Differentially_expression_analysis_files/figure-html/multi_sample_preparation-1.png" class="r-plt" width="3000"></p>
 </div>
 <div class="section level3">
 <h3 id="multi-sample-spatial-vector-analysis">Multi-Sample Spatial Vector Analysis<a class="anchor" aria-label="anchor" href="#multi-sample-spatial-vector-analysis"></a>
@@ -1918,7 +1918,7 @@ humoral immune engagement within the tumor microenvironment.</p>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">layout_design</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="Differentially_expression_analysis_files/figure-html/multi_sample_visualization-1.png" width="3000"><img src="Differentially_expression_analysis_files/figure-html/multi_sample_visualization-2.png" width="3000"><img src="Differentially_expression_analysis_files/figure-html/multi_sample_visualization-3.png" width="3000"><img src="Differentially_expression_analysis_files/figure-html/multi_sample_visualization-4.png" width="3000"><img src="Differentially_expression_analysis_files/figure-html/multi_sample_visualization-5.png" width="3000"><img src="Differentially_expression_analysis_files/figure-html/multi_sample_visualization-6.png" width="3000"><img src="Differentially_expression_analysis_files/figure-html/multi_sample_visualization-7.png" width="3000"></p>
+<p><img src="Differentially_expression_analysis_files/figure-html/multi_sample_visualization-1.png" class="r-plt" width="3000"><img src="Differentially_expression_analysis_files/figure-html/multi_sample_visualization-2.png" class="r-plt" width="3000"><img src="Differentially_expression_analysis_files/figure-html/multi_sample_visualization-3.png" class="r-plt" width="3000"><img src="Differentially_expression_analysis_files/figure-html/multi_sample_visualization-4.png" class="r-plt" width="3000"><img src="Differentially_expression_analysis_files/figure-html/multi_sample_visualization-5.png" class="r-plt" width="3000"><img src="Differentially_expression_analysis_files/figure-html/multi_sample_visualization-6.png" class="r-plt" width="3000"><img src="Differentially_expression_analysis_files/figure-html/multi_sample_visualization-7.png" class="r-plt" width="3000"></p>
 </div>
 </div>
 <div class="section level3">
@@ -2021,11 +2021,11 @@ marker identification in complex tissue structures.</p>
 <span><span class="co">##  [37] ipred_0.9-15           lava_1.8.2             ggrepel_0.9.6         </span></span>
 <span><span class="co">##  [40] irlba_2.3.5.1          listenv_0.10.0         spatstat.utils_3.2-0  </span></span>
 <span><span class="co">##  [43] goftest_1.2-3          RSpectra_0.16-2        spatstat.random_3.4-2 </span></span>
-<span><span class="co">##  [46] fitdistrplus_1.2-4     parallelly_1.45.1      pkgdown_2.1.3         </span></span>
+<span><span class="co">##  [46] fitdistrplus_1.2-4     parallelly_1.45.1      pkgdown_2.2.0         </span></span>
 <span><span class="co">##  [49] codetools_0.2-20       DelayedArray_0.36.0    prettydoc_0.4.1       </span></span>
 <span><span class="co">##  [52] tidyselect_1.2.1       shape_1.4.6.1          farver_2.1.2          </span></span>
 <span><span class="co">##  [55] spatstat.explore_3.5-3 jsonlite_2.0.0         caret_7.0-1           </span></span>
-<span><span class="co">##  [58] progressr_0.17.0       ggridges_0.5.7         survival_3.8-3        </span></span>
+<span><span class="co">##  [58] progressr_0.18.0       ggridges_0.5.7         survival_3.8-3        </span></span>
 <span><span class="co">##  [61] iterators_1.0.14       systemfonts_1.3.1      foreach_1.5.2         </span></span>
 <span><span class="co">##  [64] tools_4.5.2            ragg_1.5.0             ica_1.0-3             </span></span>
 <span><span class="co">##  [67] Rcpp_1.1.0             glue_1.8.0             prodlim_2025.04.28    </span></span>
@@ -2096,7 +2096,7 @@ Report Generation in r</em>. <a href="https://yihui.org/knitr/" class="external-
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>
