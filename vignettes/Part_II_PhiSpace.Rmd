@@ -132,6 +132,7 @@ Load packages and define some functions.
 
 # Key methods
 suppressPackageStartupMessages(library(PhiSpace))
+suppressPackageStartupMessages(library(vizOmics)) # Sister package of PhiSpace for visualisation
 suppressPackageStartupMessages(library(SpaNorm))
 suppressPackageStartupMessages(library(hoodscanR))
 # Plotting and publishing results
@@ -150,19 +151,6 @@ tissueNames_CosMx <- c(
   "Lung5_Rep1", "Lung5_Rep2", "Lung5_Rep3",
   "Lung6", "Lung9_Rep1", "Lung9_Rep2", "Lung12", "Lung13"
 )
-
-
-# Plot cell type copresence matrix as heatmap
-tempCopresence <- function(interaction_matrix, fsize = 12, useSeriate = T){
-  o <- seriate(interaction_matrix)
-  hm <- Heatmap(
-    interaction_matrix, name = "Correlation",
-    show_row_names = T, show_column_names = F, show_heatmap_legend = F,
-    row_order = get_order(o, 1), column_order = get_order(o, 2), 
-    row_names_gp = gpar(fontsize = fsize), column_names_gp = gpar(fontsize = fsize)
-  )
-  return(hm)
-}
 ```
 
 
@@ -415,7 +403,7 @@ Comparing them to the pathological niche annotation, we can see, for example, th
 ```{r}
 query <- allTissues[["Lung5_Rep1"]]
 response <- query$BanksyClust
-selectRes <- correlatePhiSpace(query, response, method = "PLSDA", ncomp = length(unique(response)))
+selectRes <- rankFeatures(query, response, method = "PLSDA", ncomp = length(unique(response)))
 impScores <- selectRes$importance_scores
 ```
 
@@ -563,7 +551,7 @@ The second thing is that there were some interesting subclusters emerging in the
 
 Let's use PLS again to see what cell types are enriched in these newly identified niches.
 ```{r fig.asp=1}
-featSelRes <- correlatePhiSpace(query, "PhiClust", method = "PLSDA", ncomp = length(unique(query$PhiClust)))
+featSelRes <- rankFeatures(query, "PhiClust", method = "PLSDA", ncomp = length(unique(query$PhiClust)))
 selectFeat(featSelRes$importance_scores)$orderedFeatMat[1:5,]
 ```
 
@@ -615,7 +603,7 @@ for(ii in 1:length(tumourNames)){
   tissueName <- tumourNames[ii]
   query <- allTissues[[tissueName]]
   query <- query[,!is.na(query$region)]
-  regCoef <- correlatePhiSpace(query, "region", ncomp = length(unique(query$region)))$importance_scores
+  regCoef <- rankFeatures(query, "region", ncomp = length(unique(query$region)))$importance_scores
   selectedPheno <- selectFeat(regCoef, nfeat = 5, absVal = F)
   tumourSig[[ii]] <- selectedPheno$orderedFeatMat[,"Tumour"]
 }
@@ -673,47 +661,10 @@ We can see that some niches only appeared in certain tissue sections. Let's visu
 df <- lapply(1:length(allTissues), function(x) reducedDim(allTissues[[x]], "PhiSpace"))
 df <- do.call(rbind, df)
 df <- as.data.frame(df) %>% mutate(cluster = as.character(multiClustRes$clusters))
-
-df_long <- df %>%
-  pivot_longer(
-    cols = -cluster,
-    names_to = "cell_type",
-    values_to = "score"
-  )
-
-# Calculate median scores per cell type per cluster
-cluster_celltype_medians <- df_long %>%
-  group_by(cluster, cell_type) %>%
-  summarise(median_score = median(score, na.rm = TRUE), .groups = 'drop')
-
-top5_per_cluster <- cluster_celltype_medians %>%
-  group_by(cluster) %>%
-  top_n(5, median_score) %>%
-  ungroup()
-
-# Get the data for boxplots (only for top 5 cell types)
-boxplot_data <- df_long %>%
-  inner_join(top5_per_cluster %>% select(cluster, cell_type), 
-             by = c("cluster", "cell_type"))
-
-# Add median scores to boxplot data for ordering
-boxplot_data <- boxplot_data %>%
-  left_join(cluster_celltype_medians, by = c("cluster", "cell_type"))
-
-# Faceted boxplots ordered by median within each cluster
-boxplot_data %>% group_by(cluster) %>%
-  mutate(cell_type_ordered = reorder(cell_type, median_score)) %>% ungroup() %>%
-  ggplot(aes(x = cell_type_ordered, y = score, fill = median_score)) +
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red") +
-  geom_boxplot(alpha = 0.7, outlier.size = 0.5) +
-  facet_wrap(~ paste("Cluster", cluster), scales = "free", ncol = 3) +
-  coord_flip() + theme_minimal() +
-  theme(legend.position = "none",
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        strip.text = element_text(face = "bold")) +
-  labs(title = "Top 5 Cell Types per Cluster (Ordered by Median Score)",
-       subtitle = "Boxplots show distribution of scores within each cluster",
-       x = "Cell Type", y = "Score")
+plotGroups(
+  df, "cluster", title = "Top 5 Cell Types per Cluster (Ordered by Median Score)",
+  subtitle = "Boxplots show distribution of scores within each cluster"
+)
 ```
 
 
@@ -745,19 +696,19 @@ corMat <- cor(PhiSc[colDat$region=="Tumour",])
 cVars <- colVars(corMat)
 selectedTypes <- names(cVars)[rank(-cVars) <= 25]
 corMat <- corMat[selectedTypes, selectedTypes]
-tempCopresence(corMat, useSeriate = T)
+plotCorrelation(corMat, seriation_method = "PCA")
 
 corMat <- cor(PhiSc[colDat$region=="Stroma",])
 cVars <- colVars(corMat)
 selectedTypes <- names(cVars)[rank(-cVars) <= 25]
 corMat <- corMat[selectedTypes, selectedTypes]
-tempCopresence(corMat, useSeriate = T)
+plotCorrelation(corMat, seriation_method = "PCA")
 
 corMat <- cor(PhiSc[colDat$region=="Fibrotic",])
 cVars <- colVars(corMat)
 selectedTypes <- names(cVars)[rank(-cVars) <= 25]
 corMat <- corMat[selectedTypes, selectedTypes]
-tempCopresence(corMat, useSeriate = T)
+plotCorrelation(corMat, seriation_method = "PCA")
 ```
 
 
@@ -845,8 +796,8 @@ ggplot(df, aes(x = comp1, y = comp2, colour = niche)) +
   theme_bw() + scale_colour_brewer(palette = "Set1") + xlim(-6.5, 7)
 
 # Loading# Loadingniche
-loadBarplot(pca_res$loadings, "comp1", showNeg = F, absVal = T, nfeat = 10)
-loadBarplot(pca_res$loadings, "comp2", showNeg = F, absVal = T, nfeat = 10)
+plotLoadings(pca_res$loadings, "comp1", showNeg = F, absVal = T, nfeat = 10)
+plotLoadings(pca_res$loadings, "comp2", showNeg = F, absVal = T, nfeat = 10)
 ```
 
 Note: PNEC stands for pulmonary neuroendocrine cell.
@@ -863,6 +814,9 @@ nicheBinary <- as.numeric(corMatVec$niche %in% c("1", "3", "6"))
 nicheBinary[nicheBinary == 0] <- -1
 nicheBinaryByName <- rep("Non-cancer niches", length(nicheBinary))
 nicheBinaryByName[nicheBinary == 1] <- "Cancer niches"
+
+
+
 X = corMatVec %>% select(!c(niche, sample)) %>% as.matrix
 X_cent <- scale(X, center = T, scale = F)
 set.seed(012361)
@@ -882,7 +836,7 @@ dwd_res$scores %>% mutate(niche = nicheBinaryByName) %>%
   ggplot() + geom_density(aes(comp1, fill = niche), alpha = 0.5) +
   theme_bw() + theme(legend.title = element_text(face ="bold")) + xlab("DWD score")
 
-loadBarplot(dwd_res$loadings, "comp1", nfeat = 20)
+plotLoadings(dwd_res$loadings, "comp1", nfeat = 20)
 ```
 
 
