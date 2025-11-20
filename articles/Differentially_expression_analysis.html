@@ -91,7 +91,7 @@ in Spatial Transcriptomics Data</h1>
 Melbourne<br><a class="author_email" href="mailto:#"></a><a href="mailto:jin.m@wehi.edu.au" class="email">jin.m@wehi.edu.au</a>
       </address>
                   
-            <h4 data-toc-skip class="date">2025-11-10</h4>
+            <h4 data-toc-skip class="date">2025-11-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/bhuvad/CosMxSpatialAnalysisWorkshop/blob/main/vignettes/Differentially_expression_analysis.Rmd"><code>vignettes/Differentially_expression_analysis.Rmd</code></a></small>
       <div class="hidden name"><code>Differentially_expression_analysis.Rmd</code></div>
@@ -262,10 +262,10 @@ appropriate statistical power and biological validation.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Function to automatically determine hex bin size based on data density</span></span>
-<span><span class="va">auto_hex_bin</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span>, <span class="va">target_points_per_bin</span> <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="va">auto_hex_bin</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span>, <span class="va">target_points_per_bin</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">min_bins</span><span class="op">=</span><span class="fl">20</span>, <span class="va">scale</span><span class="op">=</span><span class="fl">5</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">k</span> <span class="op">&lt;-</span> <span class="va">n</span> <span class="op">/</span> <span class="va">target_points_per_bin</span></span>
-<span>  <span class="va">bins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fl">10</span>, <span class="va">bins</span><span class="op">)</span><span class="op">)</span> </span>
+<span>  <span class="va">bins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">k</span><span class="op">^</span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span> <span class="op">*</span><span class="fl">5</span><span class="op">)</span> </span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">min_bins</span>, <span class="va">bins</span><span class="op">)</span><span class="op">)</span> </span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
 </div>
@@ -834,14 +834,14 @@ We can use permutation testing to assess statistical significance.</p>
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="va">cluster_names</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"  %s: %d\n"</span>, <span class="va">i</span>, <span class="va">sig_counts</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<pre><code><span><span class="co">##   c1: 281</span></span>
-<span><span class="co">##   c2: 159</span></span>
+<pre><code><span><span class="co">##   c1: 280</span></span>
+<span><span class="co">##   c2: 158</span></span>
 <span><span class="co">##   c3: 46</span></span>
-<span><span class="co">##   c4: 9</span></span>
-<span><span class="co">##   c6: 118</span></span>
-<span><span class="co">##   c7: 318</span></span>
+<span><span class="co">##   c4: 8</span></span>
+<span><span class="co">##   c6: 117</span></span>
+<span><span class="co">##   c7: 322</span></span>
 <span><span class="co">##   c8: 527</span></span>
-<span><span class="co">##   c9: 37</span></span></code></pre>
+<span><span class="co">##   c9: 36</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="examine-results">Examine Results<a class="anchor" aria-label="anchor" href="#examine-results"></a>
@@ -858,90 +858,165 @@ patterns.</p>
 <span><span class="co"># 1. High absolute correlation (|r| &gt; 0.7)</span></span>
 <span><span class="co"># 2. Statistical significance (FDR &lt; 0.05)</span></span>
 <span><span class="co"># ============================================================================</span></span>
+<span><span class="va">top_genes_per_cluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Display top correlations (regardless of significance)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"=== TOP 10 HIGHEST CORRELATIONS ===\n"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## === TOP 10 HIGHEST CORRELATIONS ===</span></span></code></pre>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">top_cor_genes</span> <span class="op">&lt;-</span> <span class="va">obs_corr</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/order.html" class="external-link">order</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">obs_corr</span><span class="op">)</span>, <span class="fl">1</span>, <span class="va">max</span><span class="op">)</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="op">]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">top_cor_genes</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##                c6         c1         c9         c8          c3           c4</span></span>
-<span><span class="co">## TM4SF1 -0.2991453 -0.2840268 -0.2413467  0.8887982 -0.33799557 -0.398547926</span></span>
-<span><span class="co">## EPCAM  -0.2931305 -0.2979712 -0.2377324  0.8802444 -0.34708143 -0.401857956</span></span>
-<span><span class="co">## IL7R    0.1580550  0.8764424  0.1050845 -0.2516276 -0.03462523 -0.090572835</span></span>
-<span><span class="co">## CDH1   -0.2908248 -0.2784940 -0.2351191  0.8697189 -0.34103981 -0.403338510</span></span>
-<span><span class="co">## SOX9   -0.2958340 -0.2952491 -0.2391780  0.8696458 -0.36587656 -0.407928877</span></span>
-<span><span class="co">## ITGA3  -0.2526766 -0.2706077 -0.2246510  0.8638222 -0.34225581 -0.393990748</span></span>
-<span><span class="co">## ANXA2  -0.2842094 -0.2772883 -0.2506845  0.8554802 -0.34924831 -0.412158494</span></span>
-<span><span class="co">## PTPRC   0.2268234  0.8522807  0.1003832 -0.3440413  0.08507635  0.009943864</span></span>
-<span><span class="co">## KRT17  -0.3252129 -0.2916178 -0.2427163  0.8521130 -0.34949531 -0.403596449</span></span>
-<span><span class="co">## DDR1   -0.2631241 -0.2755656 -0.2315851  0.8510285 -0.36027614 -0.415757509</span></span>
-<span><span class="co">##                c7            c2</span></span>
-<span><span class="co">## TM4SF1  0.1433878 -0.0184165795</span></span>
-<span><span class="co">## EPCAM   0.2198177  0.0204416407</span></span>
-<span><span class="co">## IL7R   -0.1409226 -0.0263536846</span></span>
-<span><span class="co">## CDH1    0.1493402 -0.0057973427</span></span>
-<span><span class="co">## SOX9    0.1808889 -0.0007999045</span></span>
-<span><span class="co">## ITGA3   0.2089255  0.0397754181</span></span>
-<span><span class="co">## ANXA2   0.1994303  0.0226502453</span></span>
-<span><span class="co">## PTPRC  -0.1413400 -0.0271465417</span></span>
-<span><span class="co">## KRT17   0.1245176 -0.0243779618</span></span>
-<span><span class="co">## DDR1    0.2449628  0.0319365492</span></span></code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Display significant results (regardless of correlation strength)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n=== TOP 10 MOST SIGNIFICANT RESULTS ===\n"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">## === TOP 10 MOST SIGNIFICANT RESULTS ===</span></span></code></pre>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">min_pvals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">perm_res</span>, <span class="fl">1</span>, <span class="va">min</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="va">top_sig</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">min_pvals</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">perm_res</span><span class="op">[</span><span class="va">top_sig</span>, <span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##                 c6          c1          c9          c8        c3 c4          c7</span></span>
-<span><span class="co">## ATG12  0.988011988 0.101898102 0.998001998 0.000999001 1.0000000  1 0.060939061</span></span>
-<span><span class="co">## CCL19  0.922077922 0.000999001 0.639360639 1.000000000 1.0000000  1 1.000000000</span></span>
-<span><span class="co">## IGHG2  0.000999001 0.000999001 0.000999001 1.000000000 1.0000000  1 0.930069930</span></span>
-<span><span class="co">## IER3   1.000000000 1.000000000 1.000000000 0.000999001 1.0000000  1 0.000999001</span></span>
-<span><span class="co">## CD276  0.907092907 1.000000000 1.000000000 0.000999001 1.0000000  1 0.000999001</span></span>
-<span><span class="co">## SAA1   1.000000000 0.996003996 1.000000000 0.000999001 1.0000000  1 0.717282717</span></span>
-<span><span class="co">## TYK2   1.000000000 0.706293706 1.000000000 0.000999001 1.0000000  1 0.028971029</span></span>
-<span><span class="co">## CSF2RA 0.992007992 0.000999001 0.998001998 1.000000000 0.9890110  1 1.000000000</span></span>
-<span><span class="co">## BTK    0.794205794 0.000999001 0.999000999 1.000000000 0.8901099  1 1.000000000</span></span>
-<span><span class="co">## MIF    1.000000000 1.000000000 1.000000000 0.000999001 1.0000000  1 0.000999001</span></span>
-<span><span class="co">##                 c2</span></span>
-<span><span class="co">## ATG12  0.004995005</span></span>
-<span><span class="co">## CCL19  0.840159840</span></span>
-<span><span class="co">## IGHG2  0.152847153</span></span>
-<span><span class="co">## IER3   0.562437562</span></span>
-<span><span class="co">## CD276  0.000999001</span></span>
-<span><span class="co">## SAA1   0.769230769</span></span>
-<span><span class="co">## TYK2   0.500499500</span></span>
-<span><span class="co">## CSF2RA 0.230769231</span></span>
-<span><span class="co">## BTK    0.437562438</span></span>
-<span><span class="co">## MIF    0.251748252</span></span></code></pre>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">top_genes_per_cluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">perm_res</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">cluster</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">cluster</span> <span class="kw">in</span> <span class="va">cluster_names</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  </span>
 <span>  <span class="va">pvals</span> <span class="op">&lt;-</span> <span class="va">perm_res</span><span class="op">[</span>, <span class="va">cluster</span><span class="op">]</span></span>
 <span>  <span class="va">corrs</span> <span class="op">&lt;-</span> <span class="va">obs_corr</span><span class="op">[</span>, <span class="va">cluster</span><span class="op">]</span></span>
 <span>  </span>
-<span>  <span class="co"># Combine and sort</span></span>
+<span>  <span class="co"># Build dataframe per column</span></span>
 <span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>    gene <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">perm_res</span><span class="op">)</span>,</span>
 <span>    pval <span class="op">=</span> <span class="va">pvals</span>,</span>
-<span>    corr <span class="op">=</span> <span class="va">corrs</span></span>
+<span>    corr <span class="op">=</span> <span class="va">corrs</span>,</span>
+<span>    stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span>
 <span>  </span>
-<span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">pval</span><span class="op">)</span>, <span class="op">]</span>  <span class="co"># remove NA</span></span>
-<span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">pval</span>, <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">corr</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span>  <span class="co"># first by pval, then by abs(corr)</span></span>
+<span>  <span class="co"># Remove NA p-values</span></span>
+<span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">pval</span><span class="op">)</span>, <span class="op">]</span></span>
 <span>  </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">gene</span>, <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span>
+<span>  <span class="co"># Sort: smallest p-value → largest |corr|</span></span>
+<span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">pval</span>, <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">corr</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></span>
+<span>  </span>
+<span>  <span class="co"># Print table for this column</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n=====================================\n"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"CLUSTER:"</span>, <span class="va">cluster</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"=====================================\n"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.dataframe.html" class="external-link">print.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">top_genes_per_cluster</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">perm_res</span><span class="op">)</span></span>
+<span>  <span class="co"># Store top 10 genes for heatmap</span></span>
+<span>  <span class="va">top_genes_per_cluster</span><span class="op">[[</span><span class="va">cluster</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">gene</span>, <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">## CLUSTER: c1 </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">##            gene        pval      corr</span></span>
+<span><span class="co">## IL7R       IL7R 0.000999001 0.8764424</span></span>
+<span><span class="co">## PTPRC     PTPRC 0.000999001 0.8522807</span></span>
+<span><span class="co">## CD37       CD37 0.000999001 0.8405502</span></span>
+<span><span class="co">## FYN         FYN 0.000999001 0.8293216</span></span>
+<span><span class="co">## CD2         CD2 0.000999001 0.8273075</span></span>
+<span><span class="co">## SELL       SELL 0.000999001 0.8185771</span></span>
+<span><span class="co">## IL16       IL16 0.000999001 0.8125734</span></span>
+<span><span class="co">## ITK         ITK 0.000999001 0.8043521</span></span>
+<span><span class="co">## PTPRCAP PTPRCAP 0.000999001 0.7989507</span></span>
+<span><span class="co">## CD52       CD52 0.000999001 0.7900805</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">## CLUSTER: c2 </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">##            gene        pval      corr</span></span>
+<span><span class="co">## COL4A2   COL4A2 0.000999001 0.3551229</span></span>
+<span><span class="co">## IGFBP5   IGFBP5 0.000999001 0.3336459</span></span>
+<span><span class="co">## COL4A1   COL4A1 0.000999001 0.3166579</span></span>
+<span><span class="co">## ACTA2     ACTA2 0.000999001 0.3115161</span></span>
+<span><span class="co">## COL18A1 COL18A1 0.000999001 0.3102501</span></span>
+<span><span class="co">## LGALS1   LGALS1 0.000999001 0.3094356</span></span>
+<span><span class="co">## PDGFRB   PDGFRB 0.000999001 0.3000209</span></span>
+<span><span class="co">## CALD1     CALD1 0.000999001 0.2977794</span></span>
+<span><span class="co">## TPSAB1   TPSAB1 0.000999001 0.2849365</span></span>
+<span><span class="co">## CYTOR     CYTOR 0.000999001 0.2838954</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">## CLUSTER: c3 </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">##          gene        pval      corr</span></span>
+<span><span class="co">## GPNMB   GPNMB 0.000999001 0.8162929</span></span>
+<span><span class="co">## C1QB     C1QB 0.000999001 0.8098124</span></span>
+<span><span class="co">## C1QC     C1QC 0.000999001 0.7733877</span></span>
+<span><span class="co">## C1QA     C1QA 0.000999001 0.7688607</span></span>
+<span><span class="co">## CD163   CD163 0.000999001 0.7373224</span></span>
+<span><span class="co">## GLUL     GLUL 0.000999001 0.6751602</span></span>
+<span><span class="co">## TYROBP TYROBP 0.000999001 0.6634486</span></span>
+<span><span class="co">## CD68     CD68 0.000999001 0.6501136</span></span>
+<span><span class="co">## CD14     CD14 0.000999001 0.6478440</span></span>
+<span><span class="co">## PSAP     PSAP 0.000999001 0.6147385</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">## CLUSTER: c4 </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">##            gene        pval      corr</span></span>
+<span><span class="co">## CXCL8     CXCL8 0.000999001 0.7203607</span></span>
+<span><span class="co">## CCL3L3   CCL3L3 0.000999001 0.4071648</span></span>
+<span><span class="co">## CCL3       CCL3 0.001998002 0.3814657</span></span>
+<span><span class="co">## C1QB       C1QB 0.004995005 0.3429668</span></span>
+<span><span class="co">## CSF3R     CSF3R 0.014985015 0.3873404</span></span>
+<span><span class="co">## GPNMB     GPNMB 0.017982018 0.3277676</span></span>
+<span><span class="co">## GADD45B GADD45B 0.030969031 0.3891473</span></span>
+<span><span class="co">## TLR2       TLR2 0.039960040 0.3755449</span></span>
+<span><span class="co">## C1QA       C1QA 0.050949051 0.3395048</span></span>
+<span><span class="co">## S100A8   S100A8 0.129870130 0.3195000</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">## CLUSTER: c6 </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">##          gene        pval      corr</span></span>
+<span><span class="co">## COL1A1 COL1A1 0.000999001 0.6322389</span></span>
+<span><span class="co">## FN1       FN1 0.000999001 0.6313079</span></span>
+<span><span class="co">## COL5A1 COL5A1 0.000999001 0.6228402</span></span>
+<span><span class="co">## COL1A2 COL1A2 0.000999001 0.6114374</span></span>
+<span><span class="co">## THBS1   THBS1 0.000999001 0.6087943</span></span>
+<span><span class="co">## BGN       BGN 0.000999001 0.6070948</span></span>
+<span><span class="co">## COL4A2 COL4A2 0.000999001 0.6021212</span></span>
+<span><span class="co">## CALD1   CALD1 0.000999001 0.5813293</span></span>
+<span><span class="co">## COL5A2 COL5A2 0.000999001 0.5807035</span></span>
+<span><span class="co">## COL4A1 COL4A1 0.000999001 0.5786901</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">## CLUSTER: c7 </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">##              gene        pval      corr</span></span>
+<span><span class="co">## SERPINA1 SERPINA1 0.000999001 0.4130884</span></span>
+<span><span class="co">## COL18A1   COL18A1 0.000999001 0.4090221</span></span>
+<span><span class="co">## TPM2         TPM2 0.000999001 0.3998218</span></span>
+<span><span class="co">## COL12A1   COL12A1 0.000999001 0.3995828</span></span>
+<span><span class="co">## COL4A2     COL4A2 0.000999001 0.3916874</span></span>
+<span><span class="co">## IGFBP5     IGFBP5 0.000999001 0.3909441</span></span>
+<span><span class="co">## COL4A1     COL4A1 0.000999001 0.3743570</span></span>
+<span><span class="co">## SERPINA3 SERPINA3 0.000999001 0.3734047</span></span>
+<span><span class="co">## PDGFB       PDGFB 0.000999001 0.3682661</span></span>
+<span><span class="co">## MYH11       MYH11 0.000999001 0.3654952</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">## CLUSTER: c8 </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">##          gene        pval      corr</span></span>
+<span><span class="co">## TM4SF1 TM4SF1 0.000999001 0.8887982</span></span>
+<span><span class="co">## EPCAM   EPCAM 0.000999001 0.8802444</span></span>
+<span><span class="co">## CDH1     CDH1 0.000999001 0.8697189</span></span>
+<span><span class="co">## SOX9     SOX9 0.000999001 0.8696458</span></span>
+<span><span class="co">## ITGA3   ITGA3 0.000999001 0.8638222</span></span>
+<span><span class="co">## ANXA2   ANXA2 0.000999001 0.8554802</span></span>
+<span><span class="co">## KRT17   KRT17 0.000999001 0.8521130</span></span>
+<span><span class="co">## DDR1     DDR1 0.000999001 0.8510285</span></span>
+<span><span class="co">## RAC1     RAC1 0.000999001 0.8506763</span></span>
+<span><span class="co">## KRT19   KRT19 0.000999001 0.8496787</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">## CLUSTER: c9 </span></span>
+<span><span class="co">## =====================================</span></span>
+<span><span class="co">##          gene        pval      corr</span></span>
+<span><span class="co">## IGHG2   IGHG2 0.000999001 0.5862883</span></span>
+<span><span class="co">## IGHG1   IGHG1 0.000999001 0.5762169</span></span>
+<span><span class="co">## MZB1     MZB1 0.000999001 0.5678362</span></span>
+<span><span class="co">## IGKC     IGKC 0.000999001 0.5383846</span></span>
+<span><span class="co">## IGHA1   IGHA1 0.000999001 0.4750610</span></span>
+<span><span class="co">## JCHAIN JCHAIN 0.000999001 0.4573819</span></span>
+<span><span class="co">## IGHM     IGHM 0.000999001 0.3590988</span></span>
+<span><span class="co">## CD38     CD38 0.000999001 0.3337502</span></span>
+<span><span class="co">## DCN       DCN 0.000999001 0.3262639</span></span>
+<span><span class="co">## VCAN     VCAN 0.000999001 0.3123587</span></span></code></pre>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># ---- Extract all unique top genes across clusters ----</span></span>
 <span><span class="va">top_genes_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">top_genes_per_cluster</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">heatmap_matrix</span> <span class="op">&lt;-</span> <span class="va">obs_corr</span><span class="op">[</span><span class="va">top_genes_all</span>, <span class="op">]</span></span>
+<span></span>
+<span><span class="co"># ---- Build heatmap matrix ----</span></span>
+<span><span class="va">heatmap_matrix</span> <span class="op">&lt;-</span> <span class="va">obs_corr</span><span class="op">[</span><span class="va">top_genes_all</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span></span>
 <span><span class="va">heatmap_matrix</span> <span class="op">&lt;-</span> <span class="va">heatmap_matrix</span><span class="op">[</span>, <span class="va">cluster_names</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span></span>
 <span></span>
-<span></span>
+<span><span class="co"># ---- Plot heatmap ----</span></span>
 <span><span class="fu">pheatmap</span><span class="op">(</span></span>
 <span>  <span class="va">heatmap_matrix</span>,</span>
 <span>  cluster_rows <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -950,7 +1025,7 @@ patterns.</p>
 <span>  main <span class="op">=</span> <span class="st">"Top 10 Spatially Correlated Genes per Cluster"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="Differentially_expression_analysis_files/figure-html/permutation_results-1.png" class="r-plt" width="3000"></p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ============================================================================</span></span>
 <span><span class="co"># INTEGRATED ANALYSIS: HIGH CORRELATION + SIGNIFICANCE</span></span>
 <span><span class="co"># ============================================================================</span></span>
@@ -960,7 +1035,7 @@ patterns.</p>
 <span><span class="va">sig_threshold</span> <span class="op">&lt;-</span> <span class="fl">0.05</span></span>
 <span></span>
 <span><span class="co"># For each cluster, find top markers</span></span>
-<span><span class="kw">for</span> <span class="op">(</span><span class="va">cl</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">perm_res</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">cl</span> <span class="kw">in</span> <span class="va">cluster_names</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n--- Top markers for cluster"</span>, <span class="va">cl</span>, <span class="st">"---\n"</span><span class="op">)</span></span>
 <span>    </span>
 <span>    <span class="co"># Get correlations and p-values for this cluster</span></span>
@@ -1004,13 +1079,6 @@ patterns.</p>
 <span>    <span class="op">}</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
-<span><span class="co">## --- Top markers for cluster c6 ---</span></span>
-<span><span class="co">## No genes meet both criteria. Relaxing thresholds...</span></span>
-<span><span class="co">## Genes with |r| &gt; 0.5 and FDR &lt; 0.05 :</span></span>
-<span><span class="co">##    COL1A1 : r = 0.632 , FDR = 0.001 </span></span>
-<span><span class="co">##    FN1 : r = 0.631 , FDR = 0.001 </span></span>
-<span><span class="co">##    COL5A1 : r = 0.623 , FDR = 0.001 </span></span>
-<span><span class="co">## </span></span>
 <span><span class="co">## --- Top markers for cluster c1 ---</span></span>
 <span><span class="co">## Genes with |r| &gt; 0.7 and FDR &lt; 0.05 :</span></span>
 <span><span class="co">##    IL7R : r = 0.876 , FDR = 0.001 </span></span>
@@ -1019,20 +1087,9 @@ patterns.</p>
 <span><span class="co">##    FYN : r = 0.829 , FDR = 0.001 </span></span>
 <span><span class="co">##    CD2 : r = 0.827 , FDR = 0.001 </span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## --- Top markers for cluster c9 ---</span></span>
+<span><span class="co">## --- Top markers for cluster c2 ---</span></span>
 <span><span class="co">## No genes meet both criteria. Relaxing thresholds...</span></span>
-<span><span class="co">## Genes with |r| &gt; 0.5 and FDR &lt; 0.05 :</span></span>
-<span><span class="co">##    IGHG2 : r = 0.586 , FDR = 0.001 </span></span>
-<span><span class="co">##    IGHG1 : r = 0.576 , FDR = 0.001 </span></span>
-<span><span class="co">##    MZB1 : r = 0.568 , FDR = 0.001 </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## --- Top markers for cluster c8 ---</span></span>
-<span><span class="co">## Genes with |r| &gt; 0.7 and FDR &lt; 0.05 :</span></span>
-<span><span class="co">##    TM4SF1 : r = 0.889 , FDR = 0.001 </span></span>
-<span><span class="co">##    EPCAM : r = 0.88 , FDR = 0.001 </span></span>
-<span><span class="co">##    CDH1 : r = 0.87 , FDR = 0.001 </span></span>
-<span><span class="co">##    SOX9 : r = 0.87 , FDR = 0.001 </span></span>
-<span><span class="co">##    ITGA3 : r = 0.864 , FDR = 0.001 </span></span>
+<span><span class="co">## No significant markers found even with relaxed criteria.</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## --- Top markers for cluster c3 ---</span></span>
 <span><span class="co">## Genes with |r| &gt; 0.7 and FDR &lt; 0.05 :</span></span>
@@ -1046,13 +1103,31 @@ patterns.</p>
 <span><span class="co">## Genes with |r| &gt; 0.7 and FDR &lt; 0.05 :</span></span>
 <span><span class="co">##    CXCL8 : r = 0.72 , FDR = 0.001 </span></span>
 <span><span class="co">## </span></span>
+<span><span class="co">## --- Top markers for cluster c6 ---</span></span>
+<span><span class="co">## No genes meet both criteria. Relaxing thresholds...</span></span>
+<span><span class="co">## Genes with |r| &gt; 0.5 and FDR &lt; 0.05 :</span></span>
+<span><span class="co">##    COL1A1 : r = 0.632 , FDR = 0.001 </span></span>
+<span><span class="co">##    FN1 : r = 0.631 , FDR = 0.001 </span></span>
+<span><span class="co">##    COL5A1 : r = 0.623 , FDR = 0.001 </span></span>
+<span><span class="co">## </span></span>
 <span><span class="co">## --- Top markers for cluster c7 ---</span></span>
 <span><span class="co">## No genes meet both criteria. Relaxing thresholds...</span></span>
 <span><span class="co">## No significant markers found even with relaxed criteria.</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## --- Top markers for cluster c2 ---</span></span>
+<span><span class="co">## --- Top markers for cluster c8 ---</span></span>
+<span><span class="co">## Genes with |r| &gt; 0.7 and FDR &lt; 0.05 :</span></span>
+<span><span class="co">##    TM4SF1 : r = 0.889 , FDR = 0.001 </span></span>
+<span><span class="co">##    EPCAM : r = 0.88 , FDR = 0.001 </span></span>
+<span><span class="co">##    CDH1 : r = 0.87 , FDR = 0.001 </span></span>
+<span><span class="co">##    SOX9 : r = 0.87 , FDR = 0.001 </span></span>
+<span><span class="co">##    ITGA3 : r = 0.864 , FDR = 0.001 </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## --- Top markers for cluster c9 ---</span></span>
 <span><span class="co">## No genes meet both criteria. Relaxing thresholds...</span></span>
-<span><span class="co">## No significant markers found even with relaxed criteria.</span></span></code></pre>
+<span><span class="co">## Genes with |r| &gt; 0.5 and FDR &lt; 0.05 :</span></span>
+<span><span class="co">##    IGHG2 : r = 0.586 , FDR = 0.001 </span></span>
+<span><span class="co">##    IGHG1 : r = 0.576 , FDR = 0.001 </span></span>
+<span><span class="co">##    MZB1 : r = 0.568 , FDR = 0.001</span></span></code></pre>
 <p>Cluster c1 shows strong expression of classic lymphoid markers such
 as IL7R, PTPRC, and SELL, suggesting a robust presence of T cells,
 likely involved in immune surveillance or infiltration. Cluster c2 lacks
@@ -1087,7 +1162,7 @@ interactions within the cancer microenvironment.</p>
 </h4>
 <p>This section creates spatial plots showing the expression patterns of
 the top marker genes identified by correaltion approach.</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ============================================================================</span></span>
 <span><span class="co"># SPATIAL VISUALIZATION OF TOP MARKER GENES</span></span>
 <span><span class="co"># ============================================================================</span></span>
@@ -1160,8 +1235,8 @@ the top marker genes identified by correaltion approach.</p>
 <span>    <span class="va">gene_pt</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">gene_pt</span> <span class="op">|</span> <span class="fu">plot_spacer</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>       <span class="fu">plot_layout</span><span class="op">(</span>widths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">perm_cl</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">gene_pt</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">gene_pt</span> <span class="op">|</span> <span class="fu">plot_spacer</span><span class="op">(</span><span class="op">)</span> <span class="op">|</span> <span class="fu">plot_spacer</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>    <span class="fu">plot_layout</span><span class="op">(</span>widths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span>        <span class="va">gene_pt</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">gene_pt</span> <span class="op">|</span> <span class="fu">plot_spacer</span><span class="op">(</span><span class="op">)</span> <span class="op">|</span> <span class="fu">plot_spacer</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>        <span class="fu">plot_layout</span><span class="op">(</span>widths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="op">}</span> </span>
 <span>    </span>
 <span>    <span class="va">lyt</span> <span class="op">&lt;-</span> <span class="fu">wrap_plots</span><span class="op">(</span><span class="va">cl_pt</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|</span> <span class="va">gene_pt</span></span>
@@ -1181,7 +1256,7 @@ noise using negative control probes.</p>
 <div class="section level4">
 <h4 id="prepare-background-data">Prepare Background Data<a class="anchor" aria-label="anchor" href="#prepare-background-data"></a>
 </h4>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Extract negative control probe data</span></span>
 <span><span class="va">r1_nc_tx</span> <span class="op">=</span> <span class="va">r1_tx</span><span class="op">[</span><span class="va">r1_tx</span><span class="op">$</span><span class="va">gene</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">%in%</a></span> <span class="va">nc_names</span>, <span class="op">]</span></span>
 <span></span>
@@ -1201,7 +1276,7 @@ technical artifacts that need to be addressed.</p>
 <div class="section level4">
 <h4 id="create-background-vectors">Create Background Vectors<a class="anchor" aria-label="anchor" href="#create-background-vectors"></a>
 </h4>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create spatial vectors for negative control probes</span></span>
 <span><span class="va">r1_nc_vectors</span> <span class="op">&lt;-</span> <span class="fu">create_genesets</span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Lung5_Rep1"</span> <span class="op">=</span> <span class="va">r1_nc_tx</span><span class="op">)</span>,</span>
@@ -1224,7 +1299,7 @@ generalized linear models to identify spatially enriched marker genes
 across tissue clusters. This framework supports multi-sample designs and
 can incorporate background correction to account for spatial patterns
 unrelated to cell identity.</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ============================================================================</span></span>
 <span><span class="co"># Linear modelling FOR SPATIAL MARKER GENE DETECTION</span></span>
 <span><span class="co"># ============================================================================</span></span>
@@ -1240,7 +1315,7 @@ unrelated to cell identity.</p>
 <span><span class="co">##  Number of clusters: 8 </span></span>
 <span><span class="co">##  Number of spatial bins: 400 </span></span>
 <span><span class="co">##  Background correction: Enabled</span></span></code></pre>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Perform linear model-based marker detection with background correction</span></span>
 <span><span class="va">r1_lasso_lst</span> <span class="op">&lt;-</span> <span class="fu">lasso_markers</span><span class="op">(</span></span>
 <span>  gene_mt <span class="op">=</span> <span class="va">r1_sv</span><span class="op">$</span><span class="va">gene_mt</span>,</span>
@@ -1253,7 +1328,7 @@ unrelated to cell identity.</p>
 <div class="section level4">
 <h4 id="examine-results-1">Examine Results<a class="anchor" aria-label="anchor" href="#examine-results-1"></a>
 </h4>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Top result table </span></span>
 <span><span class="co"># coef_cutoff = 0.2: Only keep genes with coefficient &gt; 0.2</span></span>
 <span><span class="co"># This threshold can be adjusted based on your needs</span></span>
@@ -1264,32 +1339,34 @@ unrelated to cell identity.</p>
 <span></span>
 <span></span>
 <span><span class="co"># Display top results</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">r1_top</span><span class="op">[</span><span class="va">r1_top</span><span class="op">$</span><span class="va">top_cluster</span><span class="op">==</span><span class="st">"c8"</span>, <span class="op">]</span>,<span class="fl">10</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##              gene top_cluster  glm_coef   pearson max_gg_corr max_gc_corr</span></span>
-<span><span class="co">## IER3         IER3          c8  6.683405 0.8346768   0.9183692   0.8346768</span></span>
-<span><span class="co">## KLF2         KLF2          c8  1.656944 0.7101147   0.7919465   0.7101147</span></span>
-<span><span class="co">## S100P       S100P          c8  4.113066 0.8191546   0.9539447   0.8191546</span></span>
-<span><span class="co">## PSCA         PSCA          c8  1.337675 0.6890283   0.7736751   0.6890283</span></span>
-<span><span class="co">## OLFM4       OLFM4          c8 25.940637 0.7245326   0.8787571   0.7245326</span></span>
-<span><span class="co">## COL17A1   COL17A1          c8  2.403210 0.8359307   0.9414497   0.8359307</span></span>
-<span><span class="co">## TNFRSF21 TNFRSF21          c8  1.273456 0.8088336   0.9229993   0.8088336</span></span>
-<span><span class="co">## MMP1         MMP1          c8  5.254117 0.6547984   0.8430438   0.6547984</span></span>
-<span><span class="co">## ITGB6       ITGB6          c8  2.951298 0.7710545   0.9014812   0.7710545</span></span>
-<span><span class="co">## EPCAM       EPCAM          c8  5.379782 0.8802444   0.9595961   0.8802444</span></span></code></pre>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<span><span class="va">subset</span> <span class="op">&lt;-</span> <span class="va">r1_top</span><span class="op">[</span><span class="va">r1_top</span><span class="op">$</span><span class="va">top_cluster</span> <span class="op">==</span> <span class="st">"c8"</span>, <span class="op">]</span></span>
+<span><span class="va">top10</span> <span class="op">&lt;-</span> <span class="va">subset</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/order.html" class="external-link">order</a></span><span class="op">(</span><span class="op">-</span><span class="va">subset</span><span class="op">$</span><span class="va">glm_coef</span><span class="op">)</span>, <span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">top10</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##          gene top_cluster  glm_coef   pearson max_gg_corr max_gc_corr</span></span>
+<span><span class="co">## KRT19   KRT19          c8 38.746050 0.8496787   0.9783053   0.8496787</span></span>
+<span><span class="co">## OLFM4   OLFM4          c8 25.940637 0.7245326   0.8787571   0.7245326</span></span>
+<span><span class="co">## KRT17   KRT17          c8 13.752392 0.8521130   0.9772504   0.8521130</span></span>
+<span><span class="co">## TM4SF1 TM4SF1          c8 12.751228 0.8887982   0.9550882   0.8887982</span></span>
+<span><span class="co">## KRT8     KRT8          c8 11.735089 0.8270018   0.9662221   0.8270018</span></span>
+<span><span class="co">## IER3     IER3          c8  6.683405 0.8346768   0.9183692   0.8346768</span></span>
+<span><span class="co">## EPCAM   EPCAM          c8  5.379782 0.8802444   0.9595961   0.8802444</span></span>
+<span><span class="co">## MMP1     MMP1          c8  5.254117 0.6547984   0.8430438   0.6547984</span></span>
+<span><span class="co">## HSPA1A HSPA1A          c8  5.102012 0.6063274   0.9455907   0.6063274</span></span>
+<span><span class="co">## S100P   S100P          c8  4.113066 0.8191546   0.9539447   0.8191546</span></span></code></pre>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Display full results</span></span>
 <span><span class="va">r1_full</span><span class="op">[</span><span class="va">r1_full</span><span class="op">$</span><span class="va">gene</span><span class="op">==</span><span class="st">"EPCAM"</span>, <span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##      gene cluster glm_coef      p_value   pearson max_gg_corr max_gc_corr</span></span>
 <span><span class="co">## 802 EPCAM      c8 5.379782 9.332458e-65 0.8802444   0.9595961   0.8802444</span></span>
 <span><span class="co">## 803 EPCAM   probe 1.014454 4.117359e-34 0.6393969   0.9595961   0.8802444</span></span></code></pre>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">r1_full</span><span class="op">[</span><span class="va">r1_full</span><span class="op">$</span><span class="va">gene</span><span class="op">==</span><span class="st">"MZB1"</span>, <span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##      gene cluster  glm_coef      p_value    pearson max_gg_corr max_gc_corr</span></span>
 <span><span class="co">## 1679 MZB1      c9 2.8938386 6.787812e-38 0.56783620   0.8133965   0.5678362</span></span>
 <span><span class="co">## 1680 MZB1      c1 0.5726382 9.099616e-12 0.37393987   0.8133965   0.5678362</span></span>
 <span><span class="co">## 1681 MZB1   probe 0.1584260 1.712163e-09 0.05897335   0.8133965   0.5678362</span></span>
 <span><span class="co">## 1682 MZB1      c6 0.2918781 7.190581e-03 0.20962845   0.8133965   0.5678362</span></span></code></pre>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">cl</span> <span class="kw">in</span> <span class="va">cluster_names</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Subset to top genes for this cluster</span></span>
 <span>  <span class="va">cluster_genes</span> <span class="op">&lt;-</span> <span class="va">r1_top</span><span class="op">[</span><span class="va">r1_top</span><span class="op">$</span><span class="va">top_cluster</span> <span class="op">==</span> <span class="va">cl</span>, <span class="op">]</span></span>
@@ -1389,7 +1466,7 @@ further resolution.</p>
 <div class="section level4">
 <h4 id="visualize-top-marker-genes-from-linear-modelling">Visualize Top Marker Genes from Linear Modelling<a class="anchor" aria-label="anchor" href="#visualize-top-marker-genes-from-linear-modelling"></a>
 </h4>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ============================================================================</span></span>
 <span><span class="co"># SPATIAL VISUALIZATION OF TOP MARKER GENES</span></span>
 <span><span class="co"># ============================================================================</span></span>
@@ -1398,7 +1475,7 @@ further resolution.</p>
 <span><span class="co"># - Color intensity: Transcript density (darker = more transcripts)</span></span>
 <span><span class="co"># - Hexagonal bins: Smooth spatial representation of expression</span></span>
 <span><span class="co"># ============================================================================</span></span>
-<span><span class="kw">for</span> <span class="op">(</span><span class="va">cl</span> <span class="kw">in</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="va">cluster_names</span>, <span class="st">"NoSig"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">cl</span> <span class="kw">in</span> <span class="va">cluster_names</span><span class="op">[</span><span class="va">cluster_names</span> <span class="op">!=</span> <span class="st">"NoSig"</span><span class="op">]</span><span class="op">)</span>  <span class="op">{</span></span>
 <span>    <span class="co"># Get top genes for this cluster</span></span>
 <span>    <span class="va">inters</span> <span class="op">&lt;-</span> <span class="va">r1_top</span><span class="op">[</span><span class="va">r1_top</span><span class="op">$</span><span class="va">top_cluster</span> <span class="op">==</span> <span class="va">cl</span>, <span class="st">"gene"</span><span class="op">]</span></span>
 <span>    </span>
@@ -1464,7 +1541,7 @@ further resolution.</p>
 </h3>
 <p>Let’s compare jazzPanda results with traditional differential
 expression analysis using Seurat’s FindMarkers function.</p>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert to Seurat object for FindMarkers analysis)</span></span>
 <span><span class="va">r1_seu</span> <span class="op">&lt;-</span> <span class="fu">as.Seurat</span><span class="op">(</span><span class="va">r1_sub_se</span>, data <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
@@ -1577,7 +1654,7 @@ expression analysis using Seurat’s FindMarkers function.</p>
 <span></span>
 <span><span class="va">p1</span> <span class="op">|</span> <span class="va">p2</span> <span class="op">|</span> <span class="va">p3</span></span></code></pre></div>
 <p><img src="Differentially_expression_analysis_files/figure-html/findmarkers_comparison-1.png" class="r-plt" width="4500"></p>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plt_lst</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">cl</span> <span class="kw">in</span> <span class="va">cluster_names</span><span class="op">)</span><span class="op">{</span></span>
 <span></span>
@@ -1635,7 +1712,7 @@ expression analysis using Seurat’s FindMarkers function.</p>
 </h3>
 <p>When multiple replicates are available, jazzPanda can leverage this
 information to identify more robust marker genes.</p>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Combine cell information from both replicates</span></span>
 <span><span class="va">cluster_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">r1_cells</span>, <span class="va">r3_cells</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -1652,7 +1729,7 @@ information to identify more robust marker genes.</p>
 <div class="section level3">
 <h3 id="multi-sample-spatial-vector-analysis">Multi-Sample Spatial Vector Analysis<a class="anchor" aria-label="anchor" href="#multi-sample-spatial-vector-analysis"></a>
 </h3>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Prepare transcript data for multi-sample analysis</span></span>
 <span><span class="va">r3_tx</span><span class="op">$</span><span class="va">feature_name</span> <span class="op">&lt;-</span> <span class="va">r3_tx</span><span class="op">$</span><span class="va">gene</span></span>
 <span></span>
@@ -1688,7 +1765,7 @@ information to identify more robust marker genes.</p>
 <div class="section level3">
 <h3 id="multi-sample-linear-modelling">Multi-Sample Linear modelling<a class="anchor" aria-label="anchor" href="#multi-sample-linear-modelling"></a>
 </h3>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Set seed for reproducible results</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">seed_number</span><span class="op">)</span></span>
 <span></span>
@@ -1707,7 +1784,7 @@ information to identify more robust marker genes.</p>
 <div class="section level4">
 <h4 id="examine-results-2">Examine Results<a class="anchor" aria-label="anchor" href="#examine-results-2"></a>
 </h4>
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Display top results</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">multi_sample_top</span><span class="op">[</span><span class="va">multi_sample_top</span><span class="op">$</span><span class="va">top_cluster</span><span class="op">==</span><span class="st">"c8"</span>, <span class="op">]</span>,<span class="fl">10</span><span class="op">)</span></span></code></pre></div>
@@ -1722,7 +1799,7 @@ information to identify more robust marker genes.</p>
 <span><span class="co">## IFNGR2   IFNGR2          c8 0.9538648 0.7365735   0.8838138   0.7365735</span></span>
 <span><span class="co">## KRT6B     KRT6B          c8 0.2700517 0.5763834   0.7012584   0.5763834</span></span>
 <span><span class="co">## TACSTD2 TACSTD2          c8 1.7754709 0.7596782   0.9166281   0.7596782</span></span></code></pre>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">cl</span> <span class="kw">in</span> <span class="va">cluster_names</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Subset to top genes for this cluster</span></span>
 <span>  <span class="va">cluster_genes</span> <span class="op">&lt;-</span> <span class="va">multi_sample_top</span><span class="op">[</span><span class="va">multi_sample_top</span><span class="op">$</span><span class="va">top_cluster</span> <span class="op">==</span> <span class="va">cl</span>, <span class="op">]</span></span>
@@ -1789,7 +1866,7 @@ information to identify more robust marker genes.</p>
 <span><span class="co">##   1. IGHG1      | glm_coef: 30.2   | corr: 0.588 </span></span>
 <span><span class="co">##   2. IGKC       | glm_coef: 26.6   | corr: 0.549 </span></span>
 <span><span class="co">##   3. IGHA1      | glm_coef: 25     | corr: 0.497</span></span></code></pre>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Display full results</span></span>
 <span><span class="va">multi_sample_full</span><span class="op">[</span><span class="va">multi_sample_full</span><span class="op">$</span><span class="va">gene</span><span class="op">==</span><span class="st">"EPCAM"</span>, <span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##       gene    cluster  glm_coef       p_value   pearson max_gg_corr max_gc_corr</span></span>
@@ -1797,7 +1874,7 @@ information to identify more robust marker genes.</p>
 <span><span class="co">## 1027 EPCAM      probe 0.9958870  5.964892e-39 0.6082681   0.9549687   0.8713871</span></span>
 <span><span class="co">## 1028 EPCAM         c7 0.7697306  2.537929e-02 0.1993796   0.9549687   0.8713871</span></span>
 <span><span class="co">## 1029 EPCAM Lung5_Rep1 6.1786780  3.399385e-02 0.2503660   0.9549687   0.8713871</span></span></code></pre>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">multi_sample_full</span><span class="op">[</span><span class="va">multi_sample_full</span><span class="op">$</span><span class="va">gene</span><span class="op">==</span><span class="st">"MZB1"</span>, <span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##      gene cluster   glm_coef      p_value   pearson max_gg_corr max_gc_corr</span></span>
 <span><span class="co">## 2180 MZB1      c9 2.90344066 3.560845e-73 0.5514670   0.8099188    0.551467</span></span>
@@ -1834,7 +1911,7 @@ humoral immune engagement within the tumor microenvironment.</p>
 <div class="section level4">
 <h4 id="visualize-multi-sample-results">Visualize Multi-Sample Results<a class="anchor" aria-label="anchor" href="#visualize-multi-sample-results"></a>
 </h4>
-<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ============================================================================</span></span>
 <span><span class="co"># SPATIAL VISUALIZATION OF TOP MARKER GENES</span></span>
 <span><span class="co"># ============================================================================</span></span>
@@ -1864,7 +1941,7 @@ humoral immune engagement within the tumor microenvironment.</p>
 <span>    <span class="va">vis_r1</span> <span class="op">&lt;-</span> <span class="va">r1_tx</span><span class="op">[</span><span class="va">iters_rep1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"feature_name"</span><span class="op">)</span><span class="op">]</span></span>
 <span>    <span class="va">vis_r1</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="va">inters_df</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">vis_r1</span><span class="op">$</span><span class="va">feature_name</span>, <span class="va">inters_df</span><span class="op">$</span><span class="va">gene</span><span class="op">)</span>, <span class="st">"value"</span><span class="op">]</span></span>
 <span>    <span class="va">vis_r1</span><span class="op">$</span><span class="va">text_label</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">vis_r1</span><span class="op">$</span><span class="va">feature_name</span>, <span class="va">vis_r1</span><span class="op">$</span><span class="va">value</span>, sep <span class="op">=</span> <span class="st">": "</span><span class="op">)</span></span>
-<span>    <span class="va">vis_r1</span><span class="op">$</span><span class="va">text_label</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">vis_r1</span><span class="op">$</span><span class="va">text_label</span><span class="op">)</span></span>
+<span>    <span class="va">vis_r1</span><span class="op">$</span><span class="va">text_label</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">vis_r1</span><span class="op">$</span><span class="va">text_label</span>, levels <span class="op">=</span> <span class="va">inters_df</span><span class="op">$</span><span class="va">text</span><span class="op">)</span></span>
 <span>    <span class="va">vis_r1</span><span class="op">$</span><span class="va">sample</span> <span class="op">&lt;-</span> <span class="st">"Lung5_Rep1"</span></span>
 <span>    </span>
 <span>    <span class="co"># Prepare data for Lung5_Rep3</span></span>
@@ -1872,7 +1949,7 @@ humoral immune engagement within the tumor microenvironment.</p>
 <span>    <span class="va">vis_r3</span> <span class="op">&lt;-</span> <span class="va">r3_tx</span><span class="op">[</span><span class="va">iters_rep3</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"feature_name"</span><span class="op">)</span><span class="op">]</span></span>
 <span>    <span class="va">vis_r3</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="va">inters_df</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">vis_r3</span><span class="op">$</span><span class="va">feature_name</span>, <span class="va">inters_df</span><span class="op">$</span><span class="va">gene</span><span class="op">)</span>, <span class="st">"value"</span><span class="op">]</span></span>
 <span>    <span class="va">vis_r3</span><span class="op">$</span><span class="va">text_label</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">vis_r3</span><span class="op">$</span><span class="va">feature_name</span>, <span class="va">vis_r3</span><span class="op">$</span><span class="va">value</span>, sep <span class="op">=</span> <span class="st">": "</span><span class="op">)</span></span>
-<span>    <span class="va">vis_r3</span><span class="op">$</span><span class="va">text_label</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">vis_r3</span><span class="op">$</span><span class="va">text_label</span><span class="op">)</span></span>
+<span>    <span class="va">vis_r3</span><span class="op">$</span><span class="va">text_label</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">vis_r3</span><span class="op">$</span><span class="va">text_label</span>, levels <span class="op">=</span> <span class="va">inters_df</span><span class="op">$</span><span class="va">text</span><span class="op">)</span></span>
 <span>    <span class="va">vis_r3</span><span class="op">$</span><span class="va">sample</span> <span class="op">&lt;-</span> <span class="st">"Lung5_Rep3"</span></span>
 <span>    </span>
 <span>    <span class="co"># Create plots for each sample</span></span>
@@ -1968,7 +2045,7 @@ of spatial markers across biological replicates.</p></li>
 <strong>jazzPanda stands out by incorporating spatial context</strong>,
 offering deeper biological insight and improving the robustness of
 marker identification in complex tissue structures.</p>
-<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## R version 4.5.2 (2025-10-31)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
@@ -2003,7 +2080,7 @@ marker identification in complex tissue structures.</p>
 <span><span class="co">## [17] S4Vectors_0.48.0                   BiocGenerics_0.56.0               </span></span>
 <span><span class="co">## [19] generics_0.1.4                     MatrixGenerics_1.22.0             </span></span>
 <span><span class="co">## [21] matrixStats_1.5.0                  patchwork_1.3.2                   </span></span>
-<span><span class="co">## [23] ggplot2_4.0.0                     </span></span>
+<span><span class="co">## [23] ggplot2_4.0.1                     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
 <span><span class="co">##   [1] RcppAnnoy_0.0.22       splines_4.5.2          later_1.4.4           </span></span>
@@ -2014,7 +2091,7 @@ marker identification in complex tissue structures.</p>
 <span><span class="co">##  [16] limma_3.66.0           plotly_4.11.0          sass_0.4.10           </span></span>
 <span><span class="co">##  [19] rmarkdown_2.30         jquerylib_0.1.4        yaml_2.3.10           </span></span>
 <span><span class="co">##  [22] httpuv_1.6.16          otel_0.2.0             sctransform_0.4.2     </span></span>
-<span><span class="co">##  [25] spam_2.11-1            spatstat.sparse_3.1-0  reticulate_1.44.0     </span></span>
+<span><span class="co">##  [25] spam_2.11-1            spatstat.sparse_3.1-0  reticulate_1.44.1     </span></span>
 <span><span class="co">##  [28] cowplot_1.2.0          pbapply_1.7-4          RColorBrewer_1.1-3    </span></span>
 <span><span class="co">##  [31] lubridate_1.9.4        abind_1.4-8            Rtsne_0.17            </span></span>
 <span><span class="co">##  [34] purrr_1.2.0            BumpyMatrix_1.18.0     nnet_7.3-20           </span></span>
@@ -2030,18 +2107,18 @@ marker identification in complex tissue structures.</p>
 <span><span class="co">##  [64] tools_4.5.2            ragg_1.5.0             ica_1.0-3             </span></span>
 <span><span class="co">##  [67] Rcpp_1.1.0             glue_1.8.0             prodlim_2025.04.28    </span></span>
 <span><span class="co">##  [70] gridExtra_2.3          SparseArray_1.10.1     xfun_0.54             </span></span>
-<span><span class="co">##  [73] withr_3.0.2            fastmap_1.2.0          digest_0.6.37         </span></span>
+<span><span class="co">##  [73] withr_3.0.2            fastmap_1.2.0          digest_0.6.38         </span></span>
 <span><span class="co">##  [76] timechange_0.3.0       R6_2.6.1               mime_0.13             </span></span>
 <span><span class="co">##  [79] colorspace_2.1-2       textshaping_1.0.4      scattermore_1.2       </span></span>
 <span><span class="co">##  [82] tensor_1.5.1           spatstat.data_3.1-9    hexbin_1.28.5         </span></span>
 <span><span class="co">##  [85] tidyr_1.3.1            data.table_1.17.8      recipes_1.3.1         </span></span>
 <span><span class="co">##  [88] class_7.3-23           httr_1.4.7             htmlwidgets_1.6.4     </span></span>
-<span><span class="co">##  [91] S4Arrays_1.10.0        uwot_0.2.3             ModelMetrics_1.2.2.2  </span></span>
+<span><span class="co">##  [91] S4Arrays_1.10.0        uwot_0.2.4             ModelMetrics_1.2.2.2  </span></span>
 <span><span class="co">##  [94] pkgconfig_2.0.3        gtable_0.3.6           timeDate_4051.111     </span></span>
-<span><span class="co">##  [97] lmtest_0.9-40          S7_0.2.0               XVector_0.50.0        </span></span>
+<span><span class="co">##  [97] lmtest_0.9-40          S7_0.2.1               XVector_0.50.0        </span></span>
 <span><span class="co">## [100] htmltools_0.5.8.1      dotCall64_1.2          scales_1.4.0          </span></span>
-<span><span class="co">## [103] png_0.1-8              gower_1.0.2            spatstat.univar_3.1-4 </span></span>
-<span><span class="co">## [106] knitr_1.50             reshape2_1.4.4         rjson_0.2.23          </span></span>
+<span><span class="co">## [103] png_0.1-8              gower_1.0.2            spatstat.univar_3.1-5 </span></span>
+<span><span class="co">## [106] knitr_1.50             reshape2_1.4.5         rjson_0.2.23          </span></span>
 <span><span class="co">## [109] nlme_3.1-168           cachem_1.1.0           zoo_1.8-14            </span></span>
 <span><span class="co">## [112] stringr_1.6.0          KernSmooth_2.23-26     parallel_4.5.2        </span></span>
 <span><span class="co">## [115] miniUI_0.1.2           desc_1.4.3             pillar_1.11.1         </span></span>
@@ -2053,7 +2130,7 @@ marker identification in complex tissue structures.</p>
 <span><span class="co">## [133] stringi_1.8.7          viridisLite_0.4.2      deldir_2.0-4          </span></span>
 <span><span class="co">## [136] BiocParallel_1.44.0    lazyeval_0.2.2         spatstat.geom_3.6-0   </span></span>
 <span><span class="co">## [139] glmnet_4.1-10          Matrix_1.7-4           RcppHNSW_0.6.0        </span></span>
-<span><span class="co">## [142] future_1.67.0          statmod_1.5.1          shiny_1.11.1          </span></span>
+<span><span class="co">## [142] future_1.68.0          statmod_1.5.1          shiny_1.11.1          </span></span>
 <span><span class="co">## [145] ROCR_1.0-11            igraph_2.2.1           bslib_0.9.0</span></span></code></pre>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-R-rmarkdown" class="csl-entry">
