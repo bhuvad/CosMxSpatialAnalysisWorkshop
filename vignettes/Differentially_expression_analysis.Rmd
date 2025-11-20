@@ -589,42 +589,45 @@ This section analyzes the results of permutation testing to identify the most pr
 # 1. High absolute correlation (|r| > 0.7)
 # 2. Statistical significance (FDR < 0.05)
 # ============================================================================
+top_genes_per_cluster <- list()
 
-# Display top correlations (regardless of significance)
-cat("=== TOP 10 HIGHEST CORRELATIONS ===\n")
-top_cor_genes <- obs_corr[order(apply(abs(obs_corr), 1, max), decreasing = TRUE), ]
-print(head(top_cor_genes, 10))
-
-# Display significant results (regardless of correlation strength)
-cat("\n=== TOP 10 MOST SIGNIFICANT RESULTS ===\n")
-min_pvals <- apply(perm_res, 1, min, na.rm = TRUE)
-top_sig <- names(sort(min_pvals)[1:10])
-print(perm_res[top_sig, ])
-
-
-top_genes_per_cluster <- lapply(colnames(perm_res), function(cluster) {
+for (cluster in cluster_names) {
+  
   pvals <- perm_res[, cluster]
   corrs <- obs_corr[, cluster]
   
-  # Combine and sort
+  # Build dataframe per column
   df <- data.frame(
     gene = rownames(perm_res),
     pval = pvals,
-    corr = corrs
+    corr = corrs,
+    stringsAsFactors = FALSE
   )
   
-  df <- df[!is.na(df$pval), ]  # remove NA
-  df <- df[order(df$pval, -abs(df$corr)), ]  # first by pval, then by abs(corr)
+  # Remove NA p-values
+  df <- df[!is.na(df$pval), ]
   
-  head(df$gene, 10)
-})
+  # Sort: smallest p-value → largest |corr|
+  df <- df[order(df$pval, -abs(df$corr)), ]
+  
+  # Print table for this column
+  cat("\n=====================================\n")
+  cat("CLUSTER:", cluster, "\n")
+  cat("=====================================\n")
+  print.data.frame(head(df, 10))
 
-names(top_genes_per_cluster) <- colnames(perm_res)
+  # Store top 10 genes for heatmap
+  top_genes_per_cluster[[cluster]] <- head(df$gene, 10)
+}
+
+# ---- Extract all unique top genes across clusters ----
 top_genes_all <- unique(unlist(top_genes_per_cluster))
-heatmap_matrix <- obs_corr[top_genes_all, ]
+
+# ---- Build heatmap matrix ----
+heatmap_matrix <- obs_corr[top_genes_all, , drop = FALSE]
 heatmap_matrix <- heatmap_matrix[, cluster_names, drop = FALSE]
 
-
+# ---- Plot heatmap ----
 pheatmap(
   heatmap_matrix,
   cluster_rows = TRUE,
